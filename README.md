@@ -9,3 +9,6 @@ Bakalářská práce vznikala v letech 2022-2023 na FIT ČVUT.
 
 ## Tipy
 - tilda (~) na české klávesnici: `pravý Alt` + `Shift` + `` ` ``
+
+## PDF
+Při každém commitu proběhne kompilační pipeline a vygeneruje se export v PDF. Seznam artefaktů je k dispozici na kartě `Actions`.
