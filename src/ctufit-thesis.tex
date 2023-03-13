@@ -30,7 +30,7 @@
 % thesis type: bachelor/master/dissertation
 % colour: bw for black&white OR no option for default colour scheme
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\documentclass[czech,bachelor,unicode,bw]{ctufit-thesis}
+\documentclass[czech,bachelor,unicode]{ctufit-thesis}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FILL IN THIS INFORMATION
@@ -93,6 +93,7 @@
 \addbibresource{text/bib-database.bib}
 \usepackage{listings} % typesetting of sources
 % \usepackage{minted} % typesetting of sources
+\usepackage{epigraph}
 
 %theorems, definitions, etc.
 \theoremstyle{plain}
@@ -169,7 +170,7 @@ Beru na vědomí, že se na moji práci vztahují práva a povinnosti vyplývaj�
 §~2373~odst.~2 zákona č.~89/2012~Sb., občanský zákoník, ve znění pozdějších předpisů,
 tímto uděluji nevýhradní oprávnění (licenci) k~užití této mojí práce, a to včetně všech
 počítačových programů, jež jsou její součástí či přílohou a veškeré jejich
-dokumentace (dále souhrnně jen „Dílo“), a to všem osobám, které si přejí Dílo užít.
+dokumentace (dále souhrnně jen \uv{Dílo}), a to všem osobám, které si přejí Dílo užít.
 Tyto osoby jsou oprávněny Dílo užít jakýmkoli způsobem, který nesnižuje hodnotu
 Díla, avšak pouze k~nevýdělečným účelům. Toto oprávnění je časově, teritoriálně
 i~množstevně neomezené.
@@ -218,9 +219,8 @@ i~množstevně neomezené.
 % List the abbreviations in lexicography order.
 %%%%%%%%%%%%%%%%%%%
 \chapter{Seznam zkratek}
-	
 \begin{tabular}{rl}
-DFA & Deterministic Finite Automaton\\
+ROM & Read Only Memory\\
 FA & Finite Automaton\\
 LPS & Labelled Prüfer Sequence\\
 NFA & Nondeterministic Finite Automaton\\
