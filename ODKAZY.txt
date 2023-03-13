@@ -1,0 +1,3 @@
+https://archive.org/details/6502softwaredesi0000scan
+https://en.wikibooks.org/wiki/NES_Programming
+https://www.nesdev.org/NESDoc.pdf
