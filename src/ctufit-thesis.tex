@@ -56,7 +56,6 @@
 % CUSTOMIZATION of this template
 % Skip this part or alter it if you know what you are doing.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \RequirePackage{iftex}[2020/03/06]
 \iftutex % XeLaTeX and LuaLaTeX
     \RequirePackage{ellipsis}[2020/05/22] %ellipsis workaround for XeLaTeX
@@ -75,7 +74,9 @@
 
 \setcounter{secnumdepth}{4} % numbering sections; 4: subsubsection
 
-
+\definecolor{mastercomponent}{RGB}{71, 188, 255}
+\definecolor{slavecomponent}{RGB}{250, 159, 66}
+\definecolor{interface}{RGB}{253, 214, 176}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % CUSTOMIZATION of this template END
@@ -88,6 +89,7 @@
 %%%%%%%%%%%%%%%%%%%%%%
 \usepackage{dirtree}
 \usepackage{lipsum,tikz}
+\usetikzlibrary{positioning}
 \usepackage{csquotes}
 \usepackage[style=iso-numeric]{biblatex}
 \addbibresource{text/bib-database.bib}
@@ -220,7 +222,19 @@ i~množstevně neomezené.
 %%%%%%%%%%%%%%%%%%%
 \chapter{Seznam zkratek}
 \begin{tabular}{rl}
-ROM & Read Only Memory\\
+NTSC & National Television System Committee\\
+I/O & input/output \\
+PAL &  Phase Alternating Line\\
+CPU & central processing unit\\
+ROM & read only memory\\
+RAM & random access memory\\
+JSA & jazyk symbolických adres\\
+NES & Nintendo Entertainment System\\
+FC & Family Computer\\
+ASIC & application-specific integrated circuit\\
+APU & Audio Processing Unit\\
+PPU & Picture Processing Unit\\
+ISA & instruction set architecture\\
 FA & Finite Automaton\\
 LPS & Labelled Prüfer Sequence\\
 NFA & Nondeterministic Finite Automaton\\

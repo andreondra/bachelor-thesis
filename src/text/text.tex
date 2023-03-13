@@ -29,6 +29,16 @@ Práce je členěna na několik hlavních částí:
 	\item[Navazující práce] Poslední kapitola je věnována shrnutí zbývajících funkcionalit, které budou implementovány v~dalších verzích emulační platformy. Slouží také jako pobídka dalším uživatelům-vývojářům, kteří by měli zájem projekt rozšířit v~rámci sebevzdělávání.
 \end{description}
 
+\begin{note*}[Terminologie]
+	Jelikož je bakalářská práce zaměřena na vzdělávací využití, kombinuje odbornost s~populárně-naučným formátem. Počítá se s~faktem, že čtenář se v~oboru informačních technologií již pohybuje, proto se používají anglické termíny tam, kde je to běžné. Nemělo by tedy například čtenáře zaskočit, že se občas jako \emph{programové vybavení} počítače označuje výrazem \emph{software} a~\emph{technické vybavení} počítače jako \emph{hardware}.
+\end{note*}
+
+\begin{note*}[Značení]
+	V~textu se často používají čísla v šestnáctkové soustavě, jelikož úsporně reprezentují například paměťové adresy. Takové číslice se značí předponou amerického dolaru: \$. Desítková čísla jsou uvedena bez předpony.
+	
+	Dále se používají různé zkratky; jsou uvedeny v~seznamu zkratek. Neobvyklé zkratky se před jejich použitím v~textu vysvětlují.
+\end{note*}
+
 %---------------------------------------------------------------
 \chapter{Představení problematiky}
 %---------------------------------------------------------------
@@ -57,22 +67,53 @@ V~kontextu herních konzolí lze uvést rozdíl na následujícím příkladu. S
 \end{example}
 
 \subsection{Způsoby emulace}
-Emulaci je možné dělit dle úrovně, na které emulátor pracuje, což je úzce spjato s~teorií počítačových architektur. Na úvod je vhodné se zamyslet nad programováním fyzického počítačového systému.
+Emulaci je možné dělit dle úrovně, na které emulátor pracuje, což je úzce spjato s~teorií počítačových architektur. Na úvod je vhodné se zamyslet nad programováním fyzického počítačového systému, což poskytne přehled o~dostupných zdrojích informací pro vývoj emulátoru. Tato podkapitola tedy odpoví na dvě otázky:
+\begin{enumerate}
+	\item V~jaké formě bude spouštěný software?
+	\item Na jaké úrovni se tento software zpracuje?
+\end{enumerate}
 
 Běžné počítačové systémy odpovídají teoretickému modelu programovatelného počítače.
 
 \begin{definition}[Programovatelný počítač]
-	Programovatelný počítač je takový počítač, který čte instrukce z~elektronické paměti, kde jsou uloženy.
+	Programovatelný počítač je takový počítač, který čte instrukce z~elektronické paměti, kde jsou uloženy.~\cite{Wikipedia:programovatelny-pocitac}
 \end{definition}
 
+Komponentou počítače, která je zodpovědná za řízení, je většinou \emph{procesor}. Proto má smysl se nejdříve zamýšlet nad úrovní abstrakce procesoru, jelikož je to právě ta komponenta, která bude zpracovávat programy a~řídit komponenty ostatní.
 
-TODO: vyjít z programovatelného počítače, popsat, jak se programuje pro fyzický systém instrukcemi dle ISA
-
-Emulaci je možné dělit dle úrovně, na které emulátor pracuje. Úrovní je myšlen stupeň abstrakce hardwaru. Obecně dle prof.\,Kubátové~\cite{Kubatova2018:SAP} rozlišujeme čtyři základní úrovně, které jsou hierarchicky uspořádány, jak uvádí obrázek \ref{fig:abstrakce-rizeni}. Nabízí se příměr k~abstrakci v~programování --- tak, jak je abstraktní datový typ vektor rozhraním pro primitivnější datové typy, poskytuje procesor rozhraní nad svou vnitřní implementací. 
+Instrukce bývají v paměti číslicových počítačů reprezentovány jako strojový kód, který většinou vzniká překladem z~jazyka vyšší abstrakce (například JSA)~\cite{Kubatova2018:SAP}, což ilustruje diagram~\ref{fig:abstrakce-sw}. Jelikož je strojový kód nativní způsob zpracování instrukcí a~zároveň se v~této formě běžně distribuuje software, emulátor by měl pracovat právě s~touto reprezentací. Tím se získala odpověď na první otázku.
 
 \begin{figure}[ht!]
 	\centering
-	\caption{~Úrovně abstrakce hardwaru}\label{fig:abstrakce-rizeni}
+	\caption{~Úrovně abstrakce softwaru}\label{fig:abstrakce-sw}
+	\begin{tikzpicture}[node distance=2cm] 
+		\tikzstyle{uroven} = [rectangle, rounded corners, minimum width=5cm, minimum height=1cm,text centered, draw=black]
+		\tikzstyle{arrow} = [thick,->,>=stealth]
+		
+		\node (vyssijazyk) [uroven] {Vyšší programovací jazyk};
+		\node (jsa) [uroven, below of=vyssijazyk] {Jazyk symbolických instrukcí};
+		\node (strojkod) [uroven, below of=jsa, fill=headbackgroundgray] {Strojový kód};
+		\node (signaly) [uroven, below of=strojkod] {Řídící signály};
+		
+		\draw [arrow] (vyssijazyk) -- (jsa);
+		\draw [arrow] (jsa) -- (strojkod);
+		\draw [arrow] (strojkod) -- (signaly);
+	\end{tikzpicture}
+\end{figure}
+
+Druhá otázka se již zabývá přiřazení smyslu jednotlivým instrukcím. Množina podporovaných instrukcí včetně dalších potřebných informací (především o způsobu reprezentace a ukládání dat) je součástí architektury procesoru (ISA)~\cite{Kubatova2018:SAP}.
+
+Z výše uvedeného vyplývá, že pro zpracování instrukcí tak, jako to dělal původní hardware, stačí jen přesně napodobit chování jednotlivých instrukcí dle popisu architektury, bez dalšího zamýšlení se, jak je procesor konkrétně implementován. To představuje nejvyšší úroveň abstrakce. 
+
+Některé programy se však občas spoléhají na nedokumentované chování procesorů, kde je již nutné pracovat na nižší úrovni. Dle prof. Kubátové se jedná o úroveň předávání dat mezi registry, na které pracuje i~emulátor bakalářské práce.
+
+Existují ještě dvě nižší úrovně, úroveň logických hradel a~úroveň tranzistorů~\cite{Kubatova2018:SAP}. Tyto dvě úrovně již však vyžadují znalost konkrétní hardwarové implementace, která bývá obchodním tajemstvím. Výhodou je, že ve své podstatě nevyžaduje vůbec znalost o~funkci procesoru jako takovém a~zároveň nejvěrněji implementuje jeho funkčnost. Velkými nevýhodami jsou obtížnost, častá absence potřebných informací a~při implementaci v softwaru i~velká náročnost na prostředky, jelikož se emuluje každý řídicí signál, tedy nejnižší úroveň řízení dle diagramu~\ref{fig:abstrakce-sw}. Zájemce o~tuto úroveň lze odkázat na projekt Visual6502~\cite{Visual6502:slides}.
+
+Všechny úrovně shrnuje diagram~\ref{fig:abstrakce-hw}, kde je zvýrazněna úroveň používaná v této práci.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{~Úrovně abstrakce hardwaru}\label{fig:abstrakce-hw}
 	\begin{tikzpicture}[node distance=2cm] 
 		\tikzstyle{uroven} = [rectangle, rounded corners, minimum width=5cm, minimum height=1cm,text centered, draw=black]
 		\tikzstyle{arrow} = [thick,->,>=stealth]
@@ -88,18 +129,94 @@ Emulaci je možné dělit dle úrovně, na které emulátor pracuje. Úrovní je
 	\end{tikzpicture} 
 \end{figure}
 
-\begin{description}
-\item[Kapitola 1] Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Curabitur sagittis hendrerit ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Cras pede libero, dapibus nec, pretium sit amet, tempor quis.
+\section{Nintendo Entertainment System}
+Konzole Nintendo Entertainment System, často zkracována jako NES, je osmibitový zábavní počítačový systém firmy Nintendo, který byl vydán nejprve v Japonsku jako Family Computer (FC, \enquote{Famicom}). V~České republice je tento systém znám především díky mnoha klonům, které byly levnější a~dostupnější, než oficiální systém. Tyto klony nejprve používaly kopie původního hardwaru, poté se objevily hardwarové emulátory založené na ASIC, které celou konzoli zmenšili do jednoho čipu (proto přezdívány NES-on-a-chip). Zájemce o~podrobnou historii NES lze odkázat na Wikipedii~\cite{Wikipedia:NES}~\cite{Wikipedia:famiclone} a článek~\cite{Svara:polystation}.
 
-\item[Kapitola 2] Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Curabitur sagittis hendrerit ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Cras pede libero, dapibus nec, pretium sit amet, tempor quis.
+Systém se skládá z několika hlavních komponent, které spolu komunikují pomocí dvou sběrnic. Nejprve budou představeny komponenty na hlavní sběrnici, což je ilustrováno na obrázku~\ref{fig:nes-hlavnisbernice}. Druhá sběrnice je pak ilustrována na TODO.
 
-\item[Kapitola 3] Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Curabitur sagittis hendrerit ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Cras pede libero, dapibus nec, pretium sit amet, tempor quis.
+\subsection{Hlavní sběrnice}
+Hlavní sběrnice je adresována 16~bity a~přenáší 8~datových bitů. Komunikaci na hlavní sběrnici řídí klon procesoru \emph{6502}, do jeho adresního prostoru jsou mapovány komponenty dle tabulky~\ref{tab:cpu-adresniprostor}.
 
-\item[Kapitola 4] Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Curabitur sagittis hendrerit ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Cras pede libero, dapibus nec, pretium sit amet, tempor quis.
-\end{description}
+\begin{table}[ht!]
+	\centering
+	\caption{~Adresní prostor CPU}\label{tab:cpu-adresniprostor}
+	\begin{tabular}{|c|c|}
+		\hline
+		Adresní rozsah & Zařízení \\
+		\hline
+		\$0000–\$07FF & RAM \\
+		\hline
+		\$0800–\$1FFF & Zrcadlo \$0000–\$07FF \\
+		\hline
+		\$2000–\$2007 & Registry PPU \\
+		\hline
+		\$2008–\$3FFF & Zrcadlo \$2000–\$2007 \\
+		\hline
+		\$4000–\$4017 & Registry APU a I/O \\
+		\hline
+		\$4018–\$401F & Nepoužíváno \\
+		\hline
+		\$4020–\$FFFF & Game Pak \\
+		\hline
+	\end{tabular}
+\end{table}
 
-\lipsum[2]
+Komunikaci na hlavní sběrnici řídí klon procesoru \emph{6502} vyrobený firmou Ricoh. Přímo v~procesoru se nachází čip pro generování zvuku, přezdívaný jako Audio Processing Unit (APU). Tento čip komunikuje také na hlavní sběrnici.  Procesor má k~dispozici 2~kB paměti RAM. Na sběrnici se dále nachází grafický čip \emph{2C02}, označovaný jako Picture Processing Unit (PPU). Jako poslední je na sběrnici několik vstupně-výstupních (I/O) rozhraní: slot pro médium typu cartridge, obchodně označovaná jako Game~Pak, pomocí níž se distribuoval veškerý software pro konzoli a~porty pro periferie, především herní ovladače.
 
-\section{Lorem ipsum dolor sit amet}
 
-\lipsum[3-5]
+
+\subsection{Grafická sběrnice}
+Systém obsahuje i~vedlejší sběrnici, kterou ovládá PPU. Tato sběrnice obsahuje další paměť RAM o~kapacitě 2~kB. Do paměťového prostoru
+
+\begin{figure}[ht!]
+	\centering
+	\caption{~Hlavní sběrnice konzole NES}\label{fig:nes-hlavnisbernice}
+	% Kód pro renderování sběrnice byl inspirován příspěvkem od uživatele Ignasi na StackExchange.
+	% https://tex.stackexchange.com/questions/319864/how-to-improve-my-draw-for-i2c-bus
+	\begin{tikzpicture}[
+		master/.style={draw, rounded corners, fill=mastercomponent, minimum height=15mm, minimum width=2.5cm},
+		slave/.style={draw, rounded corners, fill=slavecomponent, minimum height=10mm, minimum width=2.5cm},
+		slot/.style={draw, rounded corners, fill=interface, minimum height=10mm, minimum width=2.5cm}
+		]
+		
+		\node[master] (m) {CPU (6502)};
+		\node[slave, below right=3mm and 7mm of m] (s1) {RAM};
+		\node[slave, right= 6mm of s1] (s2) {PPU (2C02)};
+		\node[slave, right= 6mm of s2] (s3) {APU (2A03)};
+		\node[slot, right= 6mm of s3] (s4) {I/O};
+		
+		\draw[thick] (m)--(m-|s4.east) node[above]{Hlavní sběrnice};
+		\foreach \i in {1,2,3,4}{
+			\draw[fill=black] (s\i)--(s\i|-m) circle (2pt);
+		}
+	
+		\node[slave, below left=of s4] (gamepak) {Game Pak};	
+		\draw[dashed] (s4)--(gamepak);
+
+
+		\node[slave, below=of s4] (periferie) {Periferie};	
+		\draw[dashed] (s4)--(periferie);
+	\end{tikzpicture}
+\end{figure}
+	
+\subsection{CPU 6502}
+Základem NES je kopie procesoru \emph{6502}, označená jako \emph{2A03}. Aby se zabránilo porušení patentu, v~hardwaru se přerušilo několik cest tak, aby se učinil desítkový režim (viz dále) procesoru nefunkční. Tento procesor byl navíc doplněn o~zvukový syntezátor, přezdívaný jako Audio Processing Unit (APU). Aby byla zachována univerzálnost řešení, je v~práci implementován původní procesor 6502 a~funkcionality specifické pro 2A03 jsou řešeny zvlášť, proto jsou komponenty takto popisovány i~v~této části.
+
+
+\subsubsection{Specifika Ricoh 2A03}
+
+\subsection{PPU}
+Nedílnou součástí herní konzole je grafický výstup, tu zajišťuje čip 2C02, přezdívaný jako Picture Processing Unit (PPU). Existují dvě varianty specifické pro konkrétní trhy v~závislosti na typu výstupního signálu --- NTSC a PAL. Tento čip během zpracování grafických dat generuje přímo analogový signál, tudíž každý hodinový takt odpovídá jednomu obrazovému bodu.
+
+
+
+
+
+
+%---------------------------------------------------------------
+\chapter{Analýza}
+%---------------------------------------------------------------
+
+%---------------------------------------------------------------
+\chapter{Implementace}
+%---------------------------------------------------------------
