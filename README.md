@@ -6,6 +6,10 @@ Bakalářská práce vznikala v letech 2022-2023 na FIT ČVUT.
 
 ## Kompilace
 - Je nutné použít `biber` místo `bibtex`. TeXstudio používá jako výchozí právě `bibtex`, je to třeba přepnout v nastavení: `Options > Configure TeXstudio > Build > Default Bibliography Tool`.
+- Požadované balíčky oproti vestavěné instalaci na Fedoře 37:
+  - czech.ldf,
+  - dirtree.sty,
+  - tip: na Fedoře lze TeXové balíčky nainstalovat pomocí dnf: `dnf install "tex(balicek.pripona)"`.
 
 ## Tipy
 - tilda (~) na české klávesnici: `pravý Alt` + `Shift` + `` ` ``
