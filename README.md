@@ -6,6 +6,7 @@ Bakalářská práce vznikala v letech 2022-2023 na FIT ČVUT.
 
 ## Kompilace
 - Je nutné použít `biber` místo `bibtex`. TeXstudio používá jako výchozí právě `bibtex`, je to třeba přepnout v nastavení: `Options > Configure TeXstudio > Build > Default Bibliography Tool`.
+- Dále je nutné v TeXstudio přidat parametr `--shell-escape` pro PdfLaTeX: `Options > Configure TeXstudio > Commands`.
 - Před kompilací je nutno spustit generování bibliografie.
 - Pro TeXstudio je nutné doinstalovat český slovník pro kontrolu pravopisu.
 
