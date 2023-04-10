@@ -1,10 +1,12 @@
 # Emulátor konzole Nintendo Entertainment System
-
-Repozitář obsahuje zdrojový kód bakalářské práce, která se zabývá vývojem emulátoru herní konzole s důrazem na využití ve vzdělávání.
+Repozitář obsahuje zdrojový kód textu bakalářské práce, která se zabývá vývojem emulátoru herní konzole s důrazem na využití ve vzdělávání. Samotná implementace je k dispozici v [samostatném repozitáři](https://github.com/andreondra/use).
 
 Bakalářská práce vznikala v letech 2022-2023 na FIT ČVUT.
 
-## Kompilace
+## Zkompilované PDF
+Nejnovější PDF je k dispozici v záložce [Actions](https://github.com/andreondra/bachelor-thesis/actions). Každý commit do hlavní větve spustí kompilaci, která vyprodukuje artefakt: ZIP archiv obsahující PDF práce.
+
+## Vlastní kompilace
 - Je nutné použít `biber` místo `bibtex`. TeXstudio používá jako výchozí právě `bibtex`, je to třeba přepnout v nastavení: `Options > Configure TeXstudio > Build > Default Bibliography Tool`.
 - Dále je nutné v TeXstudio přidat parametr `--shell-escape` pro PdfLaTeX: `Options > Configure TeXstudio > Commands`.
 - Před kompilací je nutno spustit generování bibliografie.
@@ -24,8 +26,11 @@ Bakalářská práce vznikala v letech 2022-2023 na FIT ČVUT.
   - texlive-biblatex-iso690.
 - Alternativní řešení: instalace kompletní distribuce: texlive-scheme-full
 
+### Ubuntu
+- V distribuci Ubuntu lze nainstalovat celou distribuci texlive pomocí `apt install texlive-full`. Případně lze použít balík `texlive-base` doplněný o `texlive-lang-czechslovak` a `texlive-latex-extra`.
+
 ## Tipy
 - tilda (~) na české klávesnici: `pravý Alt` + `Shift` + `` ` ``
 
-## PDF
-Při každém commitu proběhne kompilační pipeline a vygeneruje se export v PDF. Seznam artefaktů je k dispozici na kartě `Actions`.
+## Licence
+(C) 2023, Ondřej Golasowski
