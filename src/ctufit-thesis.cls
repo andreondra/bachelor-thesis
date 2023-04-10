@@ -504,7 +504,7 @@
 	\@ifpackageloaded{minted}{%
 		\DeclareRobustCommand{\listingscaption}{\thectufitlistinglabel}%
 		\DeclareRobustCommand{\listoflistingscaption}{\thectufitlollabel}%
-		\usemintedstyle{color}%
+		\usemintedstyle{colorful}%
 		\setminted{bgcolor={backgroundgray}}%
 		\setmintedinline{bgcolor={}}
 	}{}%
