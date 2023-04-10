@@ -28,6 +28,7 @@ Nejnovější PDF je k dispozici v záložce [Actions](https://github.com/andreo
 
 ### Ubuntu
 - V distribuci Ubuntu lze nainstalovat celou distribuci texlive pomocí `apt install texlive-full`. Případně lze použít balík `texlive-base` doplněný o `texlive-lang-czechslovak` a `texlive-latex-extra`.
+- Dále je nutné doinstalovat biber: `apt install biber`.
 
 ## Tipy
 - tilda (~) na české klávesnici: `pravý Alt` + `Shift` + `` ` ``
