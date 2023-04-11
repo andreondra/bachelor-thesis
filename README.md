@@ -4,7 +4,8 @@ Repozitář obsahuje zdrojový kód textu bakalářské práce, která se zabýv
 Bakalářská práce vznikala v letech 2022-2023 na FIT ČVUT.
 
 ## Zkompilované PDF
-Nejnovější PDF je k dispozici v záložce [Actions](https://github.com/andreondra/bachelor-thesis/actions). Každý commit do hlavní větve spustí kompilaci, která vyprodukuje artefakt: ZIP archiv obsahující PDF práce.
+- Nejnovější PDF je k dispozici v záložce [Actions](https://github.com/andreondra/bachelor-thesis/actions). Každý commit spustí kompilaci, která vyprodukuje artefakt: ZIP archiv obsahující PDF práce.
+- PDF pouze z commitů do hlavní větve ("stabilní" vydání) je k dispozici jako [release s tagem latest](https://github.com/andreondra/bachelor-thesis/releases/tag/latest).
 
 ## Vlastní kompilace
 - Je nutné použít `biber` místo `bibtex`. TeXstudio používá jako výchozí právě `bibtex`, je to třeba přepnout v nastavení: `Options > Configure TeXstudio > Build > Default Bibliography Tool`.
