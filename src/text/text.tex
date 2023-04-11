@@ -159,8 +159,14 @@ Hardware, není-li open-source, nebývá dokumentován do větší míry, nežli
 
 Velkým komunitním zdrojem je organizace nesdev.org, zabývající se neoficiálním vývojem softwaru (nazýváno \enquote{homebrew}) a~emulátorů. Tento zdroj je důležitý především pro vývoj softwarového modelu proprietárních komponent specifických pro NES --- grafického čipu, zvukového syntezátoru, paměťového rozhraní pro ROM a~dalších.
 
-Komponentou, která byla využívána i~v~jiných systémech, je (kromě základních součástek jako posuvné registry) procesor 2A03. Jelikož je klonem procesoru 6502 od firmy MOS, existuje mnoho dokumentace od ISA až po popis na úrovni hardwaru.
+Komponentou, která byla využívána i~v~jiných systémech, je (kromě základních součástek jako posuvné registry) procesor 2A03. Jelikož je klonem procesoru 6502 od firmy MOS, existuje mnoho dokumentace od ISA až po popis na úrovni hardwaru --- viz publikace~\cite{mos:hw-manual}, jejíž obálka je na obrázku~\ref{fig:mos-hw-manual}. V~této publikaci je popsán nejen hardwarový princip, ale i~filozofie za jednotlivými návrhovými rozhodnutími.
 
+\begin{figure}[ht!]
+	\centering
+	\caption{Obálka hardwarového manuálu rodiny komponent 6500 (archive.6502.org)}
+	\label{fig:mos-hw-manual}
+	\includegraphics[width=0.25\textwidth]{images/mos-hw-manual.png}
+\end{figure}
 
 \begin{enumerate}
 	\item NES.DOC
@@ -173,7 +179,7 @@ Konzole Nintendo Entertainment System, často zkracována jako NES, je osmibitov
 Systém se skládá z několika hlavních komponent, které spolu komunikují pomocí dvou sběrnic. Nejprve jsou představeny sběrnice a~k~nim připojené komponenty, jež jsou později rozebrány podrobněji.
 
 \subsection{Hlavní sběrnice}
-Hlavní sběrnice, kterou ilustruje obrázek~\ref{fig:nes-hlavnisbernice}, je adresována 16~bity a~přenáší 8~datových bitů. Komunikaci na hlavní sběrnici řídí klon procesoru \emph{6502}.
+Hlavní sběrnice, kterou ilustruje obrázek~\ref{fig:nes-hlavnisbernice}, je adresována 16~bity a~přenáší 8~datových bitů. Komunikaci na hlavní sběrnici řídí pouze procesor~\emph{2A03}, který obsahuje i~řadič přímého přístupu do pamětí (DMA). Tudíž neexistuje (a~ani není potřebná) žádná forma arbitrace.
 
 \begin{figure}[ht!]
 	\centering
@@ -186,10 +192,10 @@ Hlavní sběrnice, kterou ilustruje obrázek~\ref{fig:nes-hlavnisbernice}, je ad
 		slot/.style={draw, rounded corners, fill=interface, minimum height=10mm, minimum width=2.5cm}
 		]
 		
-		\node[master] (m) {CPU (6502)};
+		\node[master] (m) {CPU (2A03)};
 		\node[slave, below right=3mm and 7mm of m] (s1) {RAM};
-		\node[slave, right= 3mm of s1] (s2) {PPU (2C02)};
-		\node[slave, right= 3mm of s2] (s3) {APU (2A03)};
+		\node[slave, right= 3mm of s1] (s2) {APU};
+		\node[slave, right= 3mm of s2] (s3) {PPU (2C02)};
 		\node[slot, right= 3mm of s3] (s4) {I/O};
 		
 		\draw[thick] (m)--(m-|s4) node[above]{Hlavní sběrnice};
@@ -206,19 +212,22 @@ Hlavní sběrnice, kterou ilustruje obrázek~\ref{fig:nes-hlavnisbernice}, je ad
 	\end{tikzpicture}
 \end{figure}
 
-Přímo v~procesoru se nachází čip pro generování zvuku, přezdívaný jako Audio Processing Unit (APU). Procesor má k~dispozici 2~kB paměti RAM. Na sběrnici se dále nachází grafický čip \emph{2C02}, označovaný jako Picture Processing Unit (PPU). Jako poslední je na sběrnici několik vstupně-výstupních (I/O) rozhraní: slot pro médium typu cartridge, obchodně označovaná jako Game~Pak, pomocí níž se distribuoval veškerý software pro konzoli, a~porty pro periferie, především herní ovladače.
+Procesor má k~dispozici 2~kB paměti RAM. Přímo v~procesoru se nachází čip pro generování zvuku, přezdívaný jako Audio Processing Unit (APU).  Na sběrnici se dále nachází grafický čip \emph{2C02}, označovaný jako Picture Processing Unit (PPU). Jako poslední je na sběrnici několik vstupně-výstupních (I/O) rozhraní: slot pro paměťové médium typu kazeta (cartridge), obchodně označovaná jako Game~Pak, pomocí níž se distribuoval veškerý software pro konzoli, a~porty pro periferie, především herní ovladače.
 
 \begin{note}[APU a~hlavní sběrnice]
-	APU, ačkoliv je součástí procesoru, také komunikuje na hlavní sběrnici. Proto je na obrázku~\ref{fig:nes-hlavnisbernice} uveden jako další zařízení na sběrnici.
+	APU, ačkoliv je součástí procesorového čipu, také komunikuje na hlavní sběrnici. Proto je na obrázku~\ref{fig:nes-hlavnisbernice} uveden jako další zařízení na sběrnici.
 \end{note}
 
 \subsection{Grafická sběrnice}
-Systém obsahuje i~vedlejší sběrnici adresovanou 14~bity (celkem tedy 16~kB adresovatelného prostoru), kde komunikaci řídí PPU. Tato sběrnice je zcela oddělena od hlavní. Sběrnice obsahuje paměť video RAM (VRAM) o~kapacitě 2~kB. Do paměťového prostoru je dále mapována RAM obsahující barevnou paletu.
+Systém obsahuje i~vedlejší sběrnici adresovanou 14~bity (celkem tedy 16~kB adresovatelného prostoru), kde komunikaci řídí PPU. Schematicky je znázorněna na obrázku~\ref{fig:nes-grafickasbernice}. Tato sběrnice je zcela oddělena od hlavní. Sběrnice obsahuje paměť video RAM (VRAM, také označována jako CIRAM) o~kapacitě 2~kB. Do paměťového prostoru je dále mapována RAM obsahující barevnou paletu a~paměť OAM (Object Attribute Memory), která obsahuje seznam spritů a~informace potřebné k~jejich zobrazování.
+
+\begin{definition}[Sprite]
+	Sprite (počeštěně sprajt) je dvourozměrný obrázek, který bývá integrován do větších scén. Termín pochází z~dob, kdy se zvlášť vykreslovalo pozadí a~právě sprity, které často představovaly herní postavičky a~asociované předměty (zbraně, náboje a~další). To je případ i~konzole NES, která pro sprity měla dedikovanou paměť OAM.
+\end{definition}
 
 \begin{note}[Přístup CPU na grafickou sběrnici]
-	Přestože není procesor přímo připojený na grafickou sběrnici, může na ní nepřímo komunikovat přes registry PPU (\$2006 a \$2007), které jsou mapovány na hlavní sběrnici (a~tím i~do adresního prostoru CPU).
+	Přestože není procesor přímo připojený na grafickou sběrnici, může na ní nepřímo komunikovat přes registry PPU (\$2006 a \$2007), které jsou mapovány na hlavní sběrnici (a~tím i~do adresního prostoru CPU). Tyto registry se používají i~pro přístup během DMA.
 \end{note}
-
 
 \begin{figure}[ht!]
 	\centering
@@ -245,10 +254,16 @@ Systém obsahuje i~vedlejší sběrnici adresovanou 14~bity (celkem tedy 16~kB a
 	\end{tikzpicture}
 \end{figure}
 
-\subsection{Procesor 6502}
-Základem NES je klon procesoru \emph{6502}, označený jako \emph{2A03}. Aby se zabránilo porušení patentu, v~hardwaru se přerušilo několik cest tak, aby se učinil desítkový režim procesoru nefunkční. Zároveň byl procesor doplněn o~zvukový syntezátor, který je popisován v jiné kapitole.
+\section{Procesor 6502}
+Základem NES je klon procesoru \emph{6502}, označený jako \emph{2A03}. Tato podkapitola popisuje původní variantu procesoru a~specifika klonu jsou rozebrány v~samostatné podkapitole~\ref{sec:2A03}.
 
-(zde bude popis procesoru, jeho registrů, instrukcí, ukázka assembleru?)
+\subsection{Historie}
+Procesor 6502 navrhla firma MOS Technology v~roce 1975. Na procesoru pracoval tým, který původně navrhoval mikroprocesor Motorola 6800. 6502 vznikl jako levnější a~rychlejší alternativa procesoru od Motoroly pod vedením Chucka Peddla~\cite{computer-history-museum:chuck-peddle}, která zachovává hardwarovou kompatibilitu. Cílem bylo umožnit využití i~v~projektech, kde by jinak byla levnější diskrétní logika~\cite{mos:hw-manual}. Ve své podstatě jde o~aplikaci programovatelného počítače (definovaného v~kapitole~\ref{chap:predstaveni-problematiky}) v~praxi --- funkce zařízení lze změnit pouze výměnou programu, což byl i~jediný požadavek při přechodu z~konkurenční Motoroly; upravit program pro ISA 6502.
+
+\subsection{Interakce procesoru s~prostředím}
+Na úvod, jak se píše v~hardwarovém manuálu~\cite{mos:hw-manual}, je vhodné se zabývat, v~jakém prostředí procesor bude pracovat~a jak s~ním bude interagovat. Prostředím je myšlen systém, který bude procesorem řízen. Procesor 6502 s okolím komunikuje pomocí jedné systémové sběrnice, která obsahuje 16~adresních vodičů, 8~datových vodičů a~signál R/W, který signalizuje zdroj dat vzhledem k~procesoru. Logická jednička (napětí větší než 2,4~V) signalizuje čtení procesorem, logická nula pak zápis procesorem. Okolí procesoru je tvořeno několika komponentami, ty jsou součástí adresního prostoru CPU, který je znázorněn v~tabulce~\ref{tab:cpu-adresniprostor}.
+
+Adresní prostor je v~terminologii produktové řady MCS650X rozdělen na stránky, což představuje rozsah adresovatelný jedním bajtem (256 adres). Index v~rámci stránky zajišťuje spodní bajt, index stránky poté horní bajt. Z~toho vyplývá, že stránek je také 256. Znalost tohoto faktu je klíčová pro pochopení důvodu existence speciálního zero-page adresního režimu, který je vysvětlen v~podkapitole~\ref{sec:6502-adresni-rezimy}.
 
 \begin{table}[ht!]
 	\centering
@@ -274,14 +289,78 @@ Základem NES je klon procesoru \emph{6502}, označený jako \emph{2A03}. Aby se
 	\end{tabular}
 \end{table}
 
-\subsubsection{Specifika Ricoh 2A03}
+Komunikace je řízena dvoufázovými systémovými hodinami, v~první fázi se vystaví adresa na sběrnici (předstih), v~druhé fázi dochází k~přenosu dat. Z~těchto dvou fází se pak skládá celý procesorový cyklus~\cite{mos:hw-manual}. Příklad komunikace směrem k~procesoru (čtení) je znázorněn na obrázku~\ref{fig:6502-casovani-cteni}. Dle dokumentace je pro 1MHz hodiny garantováno, že adresa bude stabilní 300~ns po náběžné hraně první fáze; naopak je požadováno, aby data byla platná alespoň 100~ns před sestupnou hranou druhé fáze hodin.
 
-\subsection{Grafický čip 2C02}
+\begin{figure}[ht!]
+	\centering
+	\caption{~Časování čtení procesoru}\label{fig:6502-casovani-cteni}
+	\begin{tikztimingtable}[%
+		timing/dslope=0.1,
+		timing/.style={x=5ex,y=3ex},
+		x=5ex,
+		timing/rowdist=4ex,
+		timing/name/.style={font=\sffamily\scriptsize}
+		]
+		\signal{CLK $\phi1$}     & L l H H H L L L h \\
+		\signal{CLK $\phi2$}     & H L L L H H H L  \\
+		\signal*{R/W}            & L l h 6H \\
+		\signal[15:0]{ADRESA}    & 1.5D{...} U 4.5D{adresa do paměti} U \\
+		\signal[7:0]{DATA}       & 5.5Z 2D{data z paměti} u  \\
+		\extracode
+		\begin{pgfonlayer}{background}
+			\begin{scope}[semitransparent ,semithick]
+				\vertlines[black,dotted]{1.0,2.0,...,7.5}
+				\vertlines[gray,dotted]{0.5,1.5,...,8.0}
+			\end{scope}
+		\end{pgfonlayer}
+	\end{tikztimingtable}
+\end{figure}
+
+Kromě systémové sběrnice existuje další způsob komunikace, a~to je přerušení. Všechny procesory v~produktové řadě MCS650X obsahují celkem tři vstupy reprezentující různá přerušení: RST, IRQ a~NMI.
+
+\subsection{Architektura}
+Po diskusi vnější komunikace procesoru je vhodné se zabývat jeho architekturou. Procesor 6502 je osmibitový, jelikož pracuje se slovem o~velikosti osmi bitů~\cite{6502:sw-manual}. ISA procesoru 6502 je střadačově orientovaná, pracovní registr je totiž právě pouze střadač (akumulátor). ISA definuje několik adresních režimů, z~toho jeden speciální, zero-page režim, který slouží jako částečná náhrada absence více registrů a~efektivně činí z~první paměťové stránky pomyslnou zápisníkovou paměť.
+
+\subsubsection{Instrukční cyklus}
+Instrukční cyklus odpovídá standardnímu cyklu procesoru, jako uvádí prof. Kubátová v~\cite{Kubatova2018:SAP}; fetch, decode, execute.
+
+\begin{enumerate}
+	\item čtení instrukce,
+	\item dekódování instrukce,
+	\item čtení operandů,
+	\item provedení instrukce,
+	\item uložení výsledku,
+	\item (kontrola přerušení).
+\end{enumerate}
+
+Zpracování instrukcí zabírá od 2 do 7 (8 v~případě nedokumentovaných instrukcí) strojových cyklů.
+
+\subsubsection{Struktura instrukce}
+
+\subsubsection{Adresní režimy}
+\label{sec:6502-adresni-rezimy}
+
+\subsubsection{Instrukční sada}
+
+
+\subsection{Specifika Ricoh 2A03}
+\label{sec:2A03}
+Aby se zabránilo porušení patentu, v~hardwaru se přerušilo několik cest tak, aby se učinil desítkový režim procesoru nefunkční. Zároveň byl procesor doplněn o~zvukový syntezátor, který je popisován v~podkapitole~\ref{sec:APU}, a~řadič DMA.
+
+\section{Audio Processing Unit}
+\label{sec:APU}
+
+\section{Grafický čip 2C02}
 Nedílnou součástí herní konzole je grafický výstup, tu zajišťuje čip 2C02, přezdívaný jako Picture Processing Unit (PPU). Existují dvě varianty specifické pro konkrétní trhy v~závislosti na typu výstupního signálu --- NTSC a PAL. Tento čip během zpracování grafických dat generuje přímo analogový signál, tudíž každý hodinový takt odpovídá jednomu obrazovému bodu.
+
 
 %---------------------------------------------------------------
 \chapter{Návrh}
 %---------------------------------------------------------------
+\epigraph{
+	\enquote{Simplicity is prerequisite for reliability.}
+}{\textsc{Edsger W. Dijkstra}}
+
 \section{Úvod}
 Při analýze byly získány potřebné informace o~tom, z~čeho se NES skládá a~jak tyto komponenty fungují. Po analyzování systému je třeba navrhnout, jak jej prakticky implementovat. Vzhledem k~tomu, že je cílem projektu být co nejsrozumitelnější, je nutné brát v~potaz nejen návrh implementace samotného systému, ale i~emulační platformy, na které emulovaný systém poběží.
 
@@ -329,6 +408,9 @@ Pro samotné psaní testů již není třeba další komponenty,
 %---------------------------------------------------------------
 \chapter{Implementace}
 %---------------------------------------------------------------
+\epigraph{
+	\enquote{If you love what you do and are willing to do what it takes, it's within your reach.}
+}{\textsc{Steve Wozniak}}
 
 %---------------------------------------------------------------
 \chapter{Testování}

@@ -97,6 +97,9 @@
 \usepackage{minted} % typesetting of sources
 \counterwithin{listing}{chapter}
 \usepackage{epigraph}
+\usepackage{tikz-timing}
+\usetikztiminglibrary[rising arrows]{clockarrows}
+\usepackage{xparse}
 
 %theorems, definitions, etc.
 \theoremstyle{plain}
@@ -116,6 +119,27 @@
 %theorems, definitions, etc. END
 %%%%%%%%%%%%%%%%%%%%%%
 % DEMO CONTENTS SETTINGS END
+%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%
+% CUSTOM XPARSE COMMANDS
+%%%%%%%%%%%%%%%%%%%%%%
+% Reference a signal.
+%
+% Usage:
+%
+%     \signal[3::0]{C/BE}    ->   C/BE[3::0]
+%     \signal*{AD}           ->   AD#
+%     \signal*[3::0]{C/BE}   ->   C/BE[3::0]#
+%
+% By Nathan Typanski from: https://nathantypanski.com/blog/2014-10-29-tikz-timing.html#fn1\textbf
+\NewDocumentCommand{\signal}{som}{\texttt{%
+		#3%
+		\IfValueTF{#2}{[#2]}{}%
+		\IfBooleanTF{#1}{\#}{}%
+}}
+%%%%%%%%%%%%%%%%%%%%%%
+% XPARSE COMMANDS END
 %%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document} 
@@ -233,6 +257,7 @@ PAL &  Phase Alternating Line\\
 CPU & central processing unit\\
 ROM & read only memory\\
 RAM & random access memory\\
+OAM & object attribute memory\\
 JSA & jazyk symbolických adres\\
 NES & Nintendo Entertainment System\\
 FC & Family Computer\\
