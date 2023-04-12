@@ -319,26 +319,53 @@ Komunikace je řízena dvoufázovými systémovými hodinami, v~první fázi se 
 Kromě systémové sběrnice existuje další způsob komunikace, a~to je přerušení. Všechny procesory v~produktové řadě MCS650X obsahují celkem tři vstupy reprezentující různá přerušení: RST, IRQ a~NMI.
 
 \subsection{Architektura}
-Po diskusi vnější komunikace procesoru je vhodné se zabývat jeho architekturou. Procesor 6502 je osmibitový, jelikož pracuje se slovem o~velikosti osmi bitů~\cite{6502:sw-manual}. ISA procesoru 6502 je střadačově orientovaná, pracovní registr je totiž právě pouze střadač (akumulátor). ISA definuje několik adresních režimů, z~toho jeden speciální, zero-page režim, který slouží jako částečná náhrada absence více registrů a~efektivně činí z~první paměťové stránky pomyslnou zápisníkovou paměť.
+Po diskusi vnější komunikace procesoru je vhodné se zabývat jeho architekturou, a~nejen instrukční sadou, ale i~implementačními detaily tam, kde je to nutné. Architekturou se zabývá především softwarový manuál~\cite{6502:sw-manual}.
 
-\subsubsection{Instrukční cyklus}
-Instrukční cyklus odpovídá standardnímu cyklu procesoru, jako uvádí prof. Kubátová v~\cite{Kubatova2018:SAP}; fetch, decode, execute.
+Procesor 6502 je osmibitový, jelikož pracuje se slovem o~velikosti osmi bitů. ISA procesoru 6502 je střadačově orientovaná, pracovní registr je totiž právě pouze střadač (akumulátor). ISA definuje adresu jako 16bitové číslo ve formátu little-endian, jako první je tedy vždy uváděn nejméně významný bajt (LSB). ISA také definuje několik adresních režimů, z~toho jeden speciální, zero-page režim, který slouží jako částečná náhrada absence více registrů a~efektivně činí z~první paměťové stránky pomyslnou zápisníkovou paměť. Jelikož struktura a~délka instrukcí a~instrukční cyklus pevně souvisí s~adresními režimy, budou nejprve probrány ty.
 
-\begin{enumerate}
-	\item čtení instrukce,
-	\item dekódování instrukce,
-	\item čtení operandů,
-	\item provedení instrukce,
-	\item uložení výsledku,
-	\item (kontrola přerušení).
-\end{enumerate}
-
-Zpracování instrukcí zabírá od 2 do 7 (8 v~případě nedokumentovaných instrukcí) strojových cyklů.
-
-\subsubsection{Struktura instrukce}
+\begin{note}[Značení adresních bajtů]
+	Jelikož je adresa uváděna po bajtech a~obsahuje právě dva bajty, bylo zavedeno v~rámci příruček firmy MOS označení ADL (address low) pro nejméně významný (nižší) bajt adresy a~ADH (address high) pro nejvíce významný (vyšší) bajt. Tohoto značení se drží i~bakalářská práce.
+\end{note}
 
 \subsubsection{Adresní režimy}
 \label{sec:6502-adresni-rezimy}
+Nejjednodušší adresní režim se skládá pouze z~operačního znaku (OZ, anglicky opcode), který jednoznačně identifikuje příslušnou instrukci. Sama instrukce implikuje, s~jakými daty se bude pracovat, proto je tento režim nazván \emph{implikovaný}. Struktura a~příklad instrukce je znázorněn na obrázku~\ref{fig:6502-adr-impl}.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{~Struktura instrukce implikovaného adresního režimu s~příkladem instrukce Clear Interrupt Disable Bit (CLI)}\label{fig:6502-adr-impl}
+	
+	\begin{bytefield}[bitheight=\widthof{~Sign~},
+		boxformatting={\centering\small\ttfamily}]{8}
+		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7} \\
+		\bitbox[]{8}{}    		   && \bitbox{8}[bgcolor=bfcommon]{OZ} \\
+		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7} \\
+		\bitbox[]{8}{CLI} && \bitboxes*{1}[bgcolor=bfcommonlight]{01011000}
+	\end{bytefield}
+\end{figure}
+
+Adresní režim, který již pracuje s~hodnotami adres, se označuje jako absolutní. Součástí instrukce v~tomto režimu je přímá hodnota adresy, kde se nachází kýžená data. Formát instrukce i~s~příkladem je na obrázku~\ref{fig:6502-adr-abs}.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{~Struktura instrukce absolutního adresního režimu s~příkladem instrukce Load Accumulator (LDA)}\label{fig:6502-adr-abs}
+	
+	\begin{bytefield}[bitheight=\widthof{~Sign~},
+		boxformatting={\centering\small\ttfamily}]{8}
+		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15,16,23} \\
+		\bitbox[]{8}{}    		   && \bitbox{8}[bgcolor=bfcommon]{OZ} && \bitbox{8}[bgcolor=bfcommon]{ADL} && \bitbox{8}[bgcolor=bfcommon]{ADH} \\
+		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15,16,23}  \\
+		\bitbox[]{8}{LDA} && \bitboxes*{1}[bgcolor=bfcommonlight]{10101101} && \bitboxes*{1}[bgcolor=bfcommonlight]{00000000} && \bitboxes*{1}[bgcolor=bfcommonlight]{00000001}
+	\end{bytefield}
+\end{figure}
+
+Instrukční cyklus odpovídá standardnímu cyklu procesoru, jako uvádí prof. Kubátová v~\cite{Kubatova2018:SAP}; fetch, decode, execute. Standardně je součástí běhu navíc počáteční nastavení při spuštění a~ošetření příčiny přerušení.
+
+
+Zpracování instrukcí zabírá od 2 do 7 (8 v~případě nedokumentovaných instrukcí) strojových cyklů.
+
+\subsubsection{Instrukční cyklus}
+zde popsat v návaznosti na adr. režimy, viz str. 168 HW manuálu
 
 \subsubsection{Instrukční sada}
 
