@@ -21,6 +21,7 @@ Bakalářská práce vznikala v letech 2022-2023 na FIT ČVUT.
   - epigraph.sty,
   - nextpage.sty,
   - minted.sty,
+  - bytefield.sty,
   - tip: na Fedoře lze TeXové balíčky nainstalovat pomocí dnf: `dnf install "tex(balicek.pripona)"`.
 - Požadované další systémové balíčky na Fedoře 37:
   - texlive-collection-langczechslovak,
@@ -28,7 +29,7 @@ Bakalářská práce vznikala v letech 2022-2023 na FIT ČVUT.
 - Alternativní řešení: instalace kompletní distribuce: texlive-scheme-full
 
 ### Ubuntu
-- V distribuci Ubuntu lze nainstalovat celou distribuci texlive pomocí `apt install texlive-full`. Případně lze použít balík `texlive-base` doplněný o `texlive-lang-czechslovak` a `texlive-latex-extra`.
+- V distribuci Ubuntu lze nainstalovat celou distribuci texlive pomocí `apt install texlive-full`. Případně lze použít balík `texlive-base` doplněný o `texlive-lang-czechslovak`, `texlive-latex-extra` a `texlive-science`.
 - Dále je nutné doinstalovat biber: `apt install biber`.
 
 ## Tipy
