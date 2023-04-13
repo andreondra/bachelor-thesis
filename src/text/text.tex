@@ -345,7 +345,7 @@ Procesor 6502 obsahuje ve své datové cestě několik registrů. V~tabulce~\ref
 		\hline
 		programový čítač & PC & 16 & adresa instrukce ke zpracování \\
 		\hline
-		akumulátor & A & 8 & zpracovávané hodnoty \\
+		střadač (akumulátor) & A & 8 & zpracovávané hodnoty \\
 		\hline
 		ukazatel zásobníku & S & 8 & adresa vrcholu zásobníku \\
 		\hline
@@ -359,6 +359,8 @@ Procesor 6502 obsahuje ve své datové cestě několik registrů. V~tabulce~\ref
 \end{table}
 
 Indexovací registry slouží primárně jako zdroj offsetu pro adresní režimy s~indexací. Fungují jako čítač, existují instrukce pro jejich inkrementaci (INX, INY), dekrementaci (DEX, DEY) a~porovnávání hodnot s~hodnotou v~paměti (CPX, CPY). Jelikož se ale jejich hodnota načítá z~paměti a~lze do paměti i~uložit, mohou sloužit jako programem využitelné pomocné registry.
+
+Střadač v ISA 6502 má podobný účel jako v~jiné střadačové architektuře. Jedná se o~jediný univerzální registr, všechny operace musí být prováděny přes zásobník (kromě načítání a~ukládání, což zvládají i~indexovací registry). To znamená aritmetické a~logické operace, porovnávání, změny hodnot. Střadač je implicitním úložným místem pro výsledky operací.
 
 TODO další popis zásobníku
 
@@ -503,27 +505,104 @@ Druhý režim, \emph{nepřímý-indexovaný}, funguje podobně, ale přičítán
 	\end{bytefield}
 \end{figure}
 
+Existuje ještě jeden nepřímý režim, označovaný jako \emph{nepřímý absolutní}. Tento režim je použit pouze instrukcí skoku (JMP). Princip je podobný jako u~zmíněných nepřímých režimů s~tím rozdílem, že nedochází k~přičítání indexu. Instrukce se skládá z~operačního znaku a~dvou adresních bajtů, které fungují jako 16bitový ukazatel na výslednou adresu, na kterou se má skočit. V~příkladu na obrázku~\ref{fig:6502-adr-ind} instrukce JMP skočí na adresu uloženou na adrese \$2010, jejíž hodnota je \$FA55 --- skok bude tedy proveden na adresu \$FA55.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{~Struktura instrukce JMP využívající nepřímý absolutní adresní režim s~příkladem skoku na adresu \$FA55}\label{fig:6502-adr-ind}
+	
+	\begin{bytefield}[bitheight=\widthof{~Sign~},
+		boxformatting={\centering\small\ttfamily}]{8}
+		\bitbox[]{8}{} && \bitheader[endianness=little]{0,7,8,15,16,23} \\
+		\bitbox[]{8}{\$F000:} && \bitbox{8}[bgcolor=bfcommon]{OZ} && \bitbox{8}[bgcolor=bfcommon]{ukazatel (LO)} && \bitbox{8}[bgcolor=bfcommon]{ukazatel (HI)} \\
+		
+		\bitbox[]{8}{} && \bitboxes*{1}[bgcolor=bfcommonlight]{01101100} && \bitbox{8}[bgcolor=bfcommonlight]{\$10} && \bitbox{8}[bgcolor=bfcommonlight]{\$20} \\
+		
+		\bitbox[]{8}{} && \bitheader[endianness=little]{0,7,8,15} \\ \bitbox[]{8}{\$2010:} && \bitbox{8}[bgcolor=bfcommon]{ADL} && \bitbox{8}[bgcolor=bfcommon]{ADH} \\
+		
+		\bitbox[]{8}{} && \bitbox{8}[bgcolor=bfcommonlight]{\$55} && \bitbox{8}[bgcolor=bfcommonlight]{\$FA} \\
+	\end{bytefield}
+\end{figure}
+
 \begin{example}[Využití nepřímého adresování]
 Nepřímé adresování má mnoho různých využití. U indexovaného-nepřímého se jedná především o~práci se seznamem adres. Tento seznam může uchovávat například adresy tlačítek herních ovladačů, ze kterých se periodicky vyčítá stav. Nepřímý-indexovaný pak může sloužit k~modifikaci chování volaného podprogramu. Úpravou hodnoty registru Y bude podprogram pracovat s~jiným offsetem v~odkazované paměti.
 \end{example}
 
 \subsubsection{Instrukční cyklus}
-Instrukční cyklus odpovídá standardnímu cyklu procesoru, jako uvádí prof. Kubátová v~\cite{Kubatova2018:SAP}; fetch, decode, execute. Standardně je součástí běhu navíc počáteční nastavení při spuštění a~ošetření příčiny přerušení.
+Instrukční cyklus odpovídá standardnímu cyklu procesoru, jako uvádí prof. Kubátová v~\cite{Kubatova2018:SAP}; fetch (načtení instrukce), decode (dekódování instrukce), execute (provedení instrukce). Standardně je součástí běhu navíc počáteční nastavení při spuštění a~ošetření příčiny přerušení; právě tomuto je věnována zvláštní pozornost v~podkapitolách~\ref{sec:6502-reset} a~\ref{sec:6502-preruseni}.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{~Instrukční cyklus procesoru}\label{fig:6502-instrukcni-cyklus}
+	\begin{tikzpicture}[node distance=2cm] 
+		\tikzstyle{akce} = [rectangle, minimum width=4cm, minimum height=1cm, text centered, draw=black, fill=fcaction]
+		\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=fcstart]
+		\tikzstyle{vetveni} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=fcbranch]
+		\tikzstyle{arrow} = [thick,->,>=stealth]
+		
+		\node (start) [startstop] {Start};
+		\node (IC) [vetveni, below of=start] {Přerušení?};
+		\node (IS) [akce, right of=IC, xshift=3cm] {Obsluha přerušení};
+		\node (IF) [akce, below of=IC] {Načtení instrukce};
+		\node (ID) [akce, below of=IF] {Dekódování instrukce};
+		\node (EX) [akce, below of=ID] {Provedení instrukce};
+		\node (aux) [left=2cm of IC] {};
+		
+		\draw [arrow] (start) -- (IC);
+		\draw [arrow] (IC) -- (IS);
+		\draw [arrow, <-] (IF) -| (IS);
+		\draw [arrow] (IC) -- (IF);
+		\draw [arrow] (IF) -- (ID);
+		\draw [arrow] (ID) -- (EX);
+		\draw [arrow] (EX) -| (aux);
+		\draw [arrow] (aux) -- (IC);
+	\end{tikzpicture} 
+\end{figure}
 
 Přesné dodržení instrukčního cyklu nemusí být u~emulace nutné, dokonce bývá zvykem velkou část cyklu zjednodušit pro dosažení většího výkonu tak, že se pracuje pouze na úrovni instrukcí. Jelikož je ale v~systému komponent více, je nutné se zabývat alespoň délkou trvání jednotlivých instrukcí, aby nedocházelo ke ztrátě synchronizace. 
 
-Délka zpracování instrukce je vázána především na její typ a podtyp. Instrukce totiž existují ve více variantách v~závislosti na použitém adresním režimu. Každý podtyp je jednoznačně identifikován operačním znakem. To znamená, že pro stejnou instrukci existuje více různých operačních znaků, lišících se pouze v~adresním režimu. Je tedy možné délku zpracování odvodit pouze na základě operačního znaku.
+Délka zpracování instrukce je vázána především na její typ a podtyp --- pohybuje se od 2 do 7 (8 v~případě nedokumentovaných instrukcí) strojových cyklů. Instrukce totiž existují ve více variantách v~závislosti na použitém adresním režimu. Každý podtyp je jednoznačně identifikován operačním znakem. To znamená, že pro stejnou instrukci existuje více různých operačních znaků, lišících se pouze v~adresním režimu. Je tedy možné délku zpracování odvodit pouze na základě operačního znaku.
 
 Existují však výjimky. U~některých instrukcí pracujících s~pamětí může dojít k~překročení paměťové stránky, což způsobí provedení jednoho strojového cyklu navíc. To se týká adresních režimů pracujících s~indexy, konkrétně absolutního režimu s~indexací pro registry X i~Y. Týká se to i~nepřímého-indexovaného režimu, ten totiž také přičítá hodnotu registru k~16bitové adrese s~možností překročení stránky. Indexovaný-nepřímý režim již nedovoluje překročení paměťové stránky (horní bajt je vždy ignorován a~k~přenosu do vyššího řádu tak nedochází); jej se to již tedy netýká.
 
 Poslední výjimkou jsou instrukce větvení. Dojde-li ke kladnému vyhodnocení podmínky, musí se vykonat jeden strojový cyklus navíc; to je způsobeno nutností přičíst offset k~programovému čítači. Dojde-li navíc k~překročení paměťové stránky, musí se kvůli přičtení přenosu provést ještě další strojový cyklus. Abych to shrnul, je-li proveden skok, který navíc překračuje stránku, provedou se navíc celkem dva strojové cykly.
 
-zde popsat v návaznosti na adr. režimy, viz str. 168 HW manuálu, popsat pipelining (str. 71)
-
-Zpracování instrukcí zabírá od 2 do 7 (8 v~případě nedokumentovaných instrukcí) strojových cyklů.
+\begin{note}[6502 a pipelining]
+	Procesor 6502 zároveň provádí více činností --- operace na vnitřní sběrnici provádí souběžně s~operacemi na vnější sběrnici. Zatímco na vnější sběrnici se připravuje operační znak a~příslušné adresy, na vnitřní probíhají výpočty (inkrementace programového čítače, operace na aritmeticko-logické jednotce a~další). Díky pipeliningu je možné instrukce zpracovat v~méně cyklech. Pro účely emulace to však není relevantní a~zájemci si mohou o~problematice více přečíst v~manuálu~\cite{6502:sw-manual}.
+\end{note}
 
 \subsubsection{Instrukční sada}
+\label{sec:6502-instrukce}
+Instrukční sadu procesoru je možné rozdělit do několika skupin dle jejich účelu. Každá instrukce se pak dělí dle adresních režimů, které používá. Nakonec je u~každé instrukce známo, jaké příznaky procesoru nastavuje. Instrukce má pro použití v~JSA symbolické textové označení, které se označuje jako mnemonika (mnemonic); příklady takových označení již byly uvedeny u~adresních režimů, například STA pro Store Accumulator.
 
+TODO: instrukce uvést po skupinách jen v tabulce, kde bude seznam aktivovaných  příznaků (členění dle opcodu spíš v příloze)
+
+\subsubsection*{Aritmeticko-logické instrukce}
+
+Do první skupiny patří instrukce přesouvající hodnoty mezi pamětí a~zásobníkem. Instrukce LDA do zásobníku načte hodnotu z~paměti, instrukce STA hodnotu ze zásobníků poté ukládá. Do první skupiny patří i~instrukce 
+
+\begin{table}[ht!]
+	\centering
+	\caption{Aritmeticko-logické instrukce}\label{tab:6502-instr-aritlog}
+\begin{tblr}{|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|X[c,m]|}
+	\hline
+	Instrukce & N & Z & C & I & D & V & Popis \\
+	\hline
+	LDA & \checkmark  & \checkmark & - & - & - & - & Načte hodnotu z~paměti do střadače. \\
+	\hline
+	
+\end{tblr}
+\end{table}
+
+
+\subsubsection{Rozšířená instrukční sada}
+RO
+
+\subsubsection{Počáteční stav}
+\label{sec:6502-reset}
+
+\subsubsection{Obsluha přerušení}
+\label{sec:6502-preruseni}
 
 \subsection{Specifika Ricoh 2A03}
 \label{sec:2A03}
@@ -535,6 +614,9 @@ Aby se zabránilo porušení patentu, v~hardwaru se přerušilo několik cest ta
 \section{Grafický čip 2C02}
 Nedílnou součástí herní konzole je grafický výstup, tu zajišťuje čip 2C02, přezdívaný jako Picture Processing Unit (PPU). Existují dvě varianty specifické pro konkrétní trhy v~závislosti na typu výstupního signálu --- NTSC a PAL. Tento čip během zpracování grafických dat generuje přímo analogový signál, tudíž každý hodinový takt odpovídá jednomu obrazovému bodu.
 
+\section{Game Pak}
+
+\section{Herní ovladače}
 
 %---------------------------------------------------------------
 \chapter{Návrh}

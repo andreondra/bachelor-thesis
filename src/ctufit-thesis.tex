@@ -79,6 +79,10 @@
 \definecolor{bfaux}{RGB}{71, 188, 255}
 \definecolor{bfauxlight}{RGB}{194, 233, 255}
 
+\definecolor{fcaction}{RGB}{253, 214, 176}
+\definecolor{fcbranch}{RGB}{194, 233, 255}
+\definecolor{fcstart}{RGB}{250, 159, 66}
+
 \definecolor{mastercomponent}{RGB}{71, 188, 255}
 \definecolor{slavecomponent}{RGB}{250, 159, 66}
 \definecolor{interface}{RGB}{253, 214, 176}
@@ -94,7 +98,7 @@
 %%%%%%%%%%%%%%%%%%%%%%
 \usepackage{dirtree}
 \usepackage{lipsum,tikz}
-\usetikzlibrary{positioning}
+\usetikzlibrary{positioning, shapes.geometric, calc, arrows}
 \usepackage{csquotes}
 \usepackage[style=iso-numeric]{biblatex}
 \addbibresource{text/bib-database.bib}
@@ -106,6 +110,7 @@
 \usetikztiminglibrary[rising arrows]{clockarrows}
 \usepackage{xparse}
 \usepackage{bytefield}
+\usepackage{tabularray}
 
 %theorems, definitions, etc.
 \theoremstyle{plain}
