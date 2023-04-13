@@ -154,6 +154,10 @@ TODO: popsat, jak se používá listing v testování pomocí programů použív
 %---------------------------------------------------------------
 \chapter{Analýza}
 %---------------------------------------------------------------
+\epigraph{
+	\enquote{Kowalski, Analysis.}
+}{\textit{Penguins of Madagascar}\\ \textsc{Skipper}}
+
 \section{Zdroje informací}
 Hardware, není-li open-source, nebývá dokumentován do větší míry, nežli je třeba k~vytváření softwaru pro danou platformu. Jinak to není ani po vypršení patentu. Přestože veškeré patenty konzole Nintendo Entertainment System již vypršely~\cite{Nesdev:patents}, společnost Nintendo nevydala (ani nemá důvod vydat) kompletní hardwarový manuál. V~takovém případě je nutné tyto informace získat jinou formou. Nabízí se časově náročná metoda reverzního inženýrství. Díky popularitě a~stáří systému NES již ale vzniklo mnoho komunitní dokumentace, na níž se lze odkazovat a~při vývoji emulátoru není potřeba mít k~dispozici reálný systém.
 
@@ -321,15 +325,52 @@ Kromě systémové sběrnice existuje další způsob komunikace, a~to je přeru
 \subsection{Architektura}
 Po diskusi vnější komunikace procesoru je vhodné se zabývat jeho architekturou, a~nejen instrukční sadou, ale i~implementačními detaily tam, kde je to nutné. Architekturou se zabývá především softwarový manuál~\cite{6502:sw-manual}.
 
-Procesor 6502 je osmibitový, jelikož pracuje se slovem o~velikosti osmi bitů. ISA procesoru 6502 je střadačově orientovaná, pracovní registr je totiž právě pouze střadač (akumulátor). ISA definuje adresu jako 16bitové číslo ve formátu little-endian, jako první je tedy vždy uváděn nejméně významný bajt (LSB). ISA také definuje několik adresních režimů, z~toho jeden speciální, zero-page režim, který slouží jako částečná náhrada absence více registrů a~efektivně činí z~první paměťové stránky pomyslnou zápisníkovou paměť. Jelikož struktura a~délka instrukcí a~instrukční cyklus pevně souvisí s~adresními režimy, budou nejprve probrány ty.
+Procesor 6502 je osmibitový, jelikož pracuje se slovem o~velikosti osmi bitů. ISA procesoru 6502 je střadačově orientovaná, pracovní registr je totiž právě pouze střadač (akumulátor). ISA definuje adresu jako 16bitové číslo ve formátu little-endian, jako první je tedy vždy uváděn nejméně významný bajt (LSB). ISA také definuje několik adresních režimů, z~toho jeden speciální, zero-page režim, který slouží jako částečná náhrada absence více registrů a~efektivně činí z~první paměťové stránky pomyslnou zápisníkovou paměť.
+
+Nejprve je potřeba analyzovat datovou cestu pro pochopení, jaký hardware mají jednotlivé instrukce k~dispozici. Dále adresní režimy, jelikož struktura a~délka instrukcí a~instrukční cyklus s~nimi pevně souvisí.
 
 \begin{note}[Značení adresních bajtů]
 	Jelikož je adresa uváděna po bajtech a~obsahuje právě dva bajty, bylo zavedeno v~rámci příruček firmy MOS označení ADL (address low) pro nejméně významný (nižší) bajt adresy a~ADH (address high) pro nejvíce významný (vyšší) bajt. Tohoto značení se drží i~bakalářská práce.
 \end{note}
 
-\subsubsection{Adresní režimy}
+\subsubsection{Datová cesta}
+Procesor 6502 obsahuje ve své datové cestě několik registrů. V~tabulce~\ref{tab:6502-registry} je uveden popis registrů s~velikostmi, často používanými zkratkami a~popisem obsahu.
+
+\begin{table}[ht!]
+	\centering
+	\caption{~Registry procesoru 6502}\label{tab:6502-registry}
+	\begin{tabular}{|c|c|c|c|}
+		\hline
+		Registr & Zkratka & Velikost (bit) & Obsah \\
+		\hline
+		programový čítač & PC & 16 & adresa instrukce ke zpracování \\
+		\hline
+		akumulátor & A & 8 & zpracovávané hodnoty \\
+		\hline
+		ukazatel zásobníku & S & 8 & adresa vrcholu zásobníku \\
+		\hline
+		indexovací registr X & X & 8 & adresní offset \\
+		\hline
+		indexovací registr Y & Y & 8 & adresní offset \\
+		\hline
+		registr příznaků & P & 8 & výsledky provedení ALU operací a~stav CPU \\ 
+		\hline
+	\end{tabular}
+\end{table}
+
+Indexovací registry slouží primárně jako zdroj offsetu pro adresní režimy s~indexací. Fungují jako čítač, existují instrukce pro jejich inkrementaci (INX, INY), dekrementaci (DEX, DEY) a~porovnávání hodnot s~hodnotou v~paměti (CPX, CPY). Jelikož se ale jejich hodnota načítá z~paměti a~lze do paměti i~uložit, mohou sloužit jako programem využitelné pomocné registry.
+
+TODO další popis zásobníku
+
+TODO další popis příznaků
+
+Procesor dále obsahuje pomocné registry pro dočasné ukládání paměti a~dat (programově nepřístupné; používané při přístupu na sběrnici). Nedílnou součástí je pak také aritmeticko-logická jednotka, ve které probíhají nejen konkrétní výpočty požadované instrukcemi, ale i~pomocí výpočty například pro zjištění absolutní adresy při vyhodnocování skoků.
+
+\subsubsection{Základní adresní režimy}
 \label{sec:6502-adresni-rezimy}
-Nejjednodušší adresní režim se skládá pouze z~operačního znaku (OZ, anglicky opcode), který jednoznačně identifikuje příslušnou instrukci. Sama instrukce implikuje, s~jakými daty se bude pracovat, proto je tento režim nazván \emph{implikovaný}. Struktura a~příklad instrukce je znázorněn na obrázku~\ref{fig:6502-adr-impl}.
+Základní adresní režimy pracují pouze s~pevnými adresními hodnotami. Patří mezi ně implikovaný režim, okamžitý režim, absolutní režim, režim nulté stránky a~relativní režim.
+
+Nejjednodušší adresní režim se skládá pouze z~operačního znaku (OZ, anglicky opcode), který jednoznačně identifikuje příslušnou instrukci. Sama instrukce implikuje, s~jakými daty se bude pracovat, proto je tento režim nazván \emph{implikovaný} a~taková instrukce má vždy 1 bajt. Struktura a~příklad instrukce je znázorněn na obrázku~\ref{fig:6502-adr-impl}.
 
 \begin{figure}[ht!]
 	\centering
@@ -344,7 +385,22 @@ Nejjednodušší adresní režim se skládá pouze z~operačního znaku (OZ, ang
 	\end{bytefield}
 \end{figure}
 
-Adresní režim, který již pracuje s~hodnotami adres, se označuje jako absolutní. Součástí instrukce v~tomto režimu je přímá hodnota adresy, kde se nachází kýžená data. Formát instrukce i~s~příkladem je na obrázku~\ref{fig:6502-adr-abs}.
+Další adresní režim pracuje s~konstantní hodnotou, která je uváděná ihned za operačním znakem. To znamená, že se zpracovávaná hodnota nemusí načítat z~paměti pomocí adresy, ale nachází se přímo ve zpracovávaném kódu. Označuje se jako \emph{okamžitý} (immediate) a~instrukci tak tvoří dva bajty. Příklad je uveden na obrázku~\ref{fig:6502-adr-imm}; instrukce AND provede logický součin hodnoty v~akumulátoru s~konstantou \$42.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{~Struktura instrukce okamžitého adresního režimu s~příkladem instrukce AND Memory with Accumulator (AND)}\label{fig:6502-adr-imm}
+	
+	\begin{bytefield}[bitheight=\widthof{~Sign~},
+		boxformatting={\centering\small\ttfamily}]{8}
+		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15} \\
+		\bitbox[]{8}{}    		   && \bitbox{8}[bgcolor=bfcommon]{OZ} && \bitbox{8}[bgcolor=bfcommon]{konstanta} \\
+		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15} \\
+		\bitbox[]{8}{AND} && \bitboxes*{1}[bgcolor=bfcommonlight]{00101001} && \bitboxes*{1}[bgcolor=bfcommonlight]{01000010}
+	\end{bytefield}
+\end{figure}
+
+Adresní režim, který již pracuje s~hodnotami adres, se označuje jako \emph{absolutní}. Součástí instrukce v~tomto režimu je přímá hodnota adresy, kde se nachází kýžená data. Instrukce je tedy 3 bajtová. Formát instrukce i~s~příkladem je na obrázku~\ref{fig:6502-adr-abs}; demonstrovaná instrukce načte do akumulátoru hodnotu ze~zařízení v~adresním prostoru procesoru na adrese \$102.
 
 \begin{figure}[ht!]
 	\centering
@@ -355,17 +411,116 @@ Adresní režim, který již pracuje s~hodnotami adres, se označuje jako absolu
 		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15,16,23} \\
 		\bitbox[]{8}{}    		   && \bitbox{8}[bgcolor=bfcommon]{OZ} && \bitbox{8}[bgcolor=bfcommon]{ADL} && \bitbox{8}[bgcolor=bfcommon]{ADH} \\
 		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15,16,23}  \\
-		\bitbox[]{8}{LDA} && \bitboxes*{1}[bgcolor=bfcommonlight]{10101101} && \bitboxes*{1}[bgcolor=bfcommonlight]{00000000} && \bitboxes*{1}[bgcolor=bfcommonlight]{00000001}
+		\bitbox[]{8}{LDA} && \bitboxes*{1}[bgcolor=bfcommonlight]{10101101} && \bitboxes*{1}[bgcolor=bfcommonlight]{00000010} && \bitboxes*{1}[bgcolor=bfcommonlight]{00000001}
 	\end{bytefield}
 \end{figure}
 
-Instrukční cyklus odpovídá standardnímu cyklu procesoru, jako uvádí prof. Kubátová v~\cite{Kubatova2018:SAP}; fetch, decode, execute. Standardně je součástí běhu navíc počáteční nastavení při spuštění a~ošetření příčiny přerušení.
+Absence univerzálních registrů je částečně suplována existencí adresním režimem \emph{nulté stránky} (zero-page). Adresa, která je uvedena za OZ, je jednobajtová. V~tomto režimu je možné indexovat pouze v~rámci jedné stránky, a~to té první (při indexování od nuly nulté) (adresní rozsah \$0000--\$00FF). Zato však tyto instrukce zabírají dva bajty v~instrukční paměti a~jejich zpracování je rychlejší. Na nultou paměťovou stránku je tak možné nahlížet jako na formu ručně spravované cache~---~v~programátorském manuálu řady MSC6500~\cite{6502:sw-manual} je zdůrazněno, že je program možné optimalizovat přesunem nejčastěji používaných hodnot právě do nulté stránky. Formát je znázorněn na obrázku~\ref{fig:6502-adr-zp}; instrukce Store Accumulator načte do akumulátoru bajt z~první paměťové stránky s offsetem \$42.
 
+\begin{figure}[ht!]
+	\centering
+	\caption{~Struktura instrukce adresního režimu nulté stránky s~příkladem instrukce Store Accumulator (STA)}\label{fig:6502-adr-zp}
+	
+	\begin{bytefield}[bitheight=\widthof{~Sign~},
+		boxformatting={\centering\small\ttfamily}]{8}
+		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15} \\
+		\bitbox[]{8}{}    		   && \bitbox{8}[bgcolor=bfcommon]{OZ} && \bitbox{8}[bgcolor=bfcommon]{ADL} \\
+		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15}  \\
+		\bitbox[]{8}{STA} && \bitboxes*{1}[bgcolor=bfcommonlight]{10000101} && \bitboxes*{1}[bgcolor=bfcommonlight]{01000010}
+	\end{bytefield}
+\end{figure}Kowalski, Analysis
 
-Zpracování instrukcí zabírá od 2 do 7 (8 v~případě nedokumentovaných instrukcí) strojových cyklů.
+\emph{Relativní} adresování je používáno výlučně instrukcemi větvení. Obsahuje pouze jeden adresní bajt, který reprezentuje offset v~dvojkovém doplňku. Vyhodnotí-li se podmínka skoku kladně a~skok se tedy provádí, je hodnota offsetu přičítána k~adrese následující instrukce (než se podmínka skoku vyhodnotí, nachází se již programový čítač na další adrese). V~JSA obecně není nutné uvádět offset explicitně, uvádí se konkrétní adresa, nebo návěští; pomocí těchto údajů je assembler schopen výsledný offset dopočítat. Režim je demonstrován na instrukci Branch On Carry Set na obrázku~\ref{fig:6502-adr-rel} s~offsetem \$42.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{~Struktura instrukce relativního adresování s~příkladem instrukce Branch On Carry Set (BCS)}\label{fig:6502-adr-rel}
+	
+	\begin{bytefield}[bitheight=\widthof{~Sign~},
+		boxformatting={\centering\small\ttfamily}]{8}
+		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15} \\
+		\bitbox[]{8}{}    		   && \bitbox{8}[bgcolor=bfcommon]{OZ} && \bitbox{8}[bgcolor=bfcommon]{offset} \\
+		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15}  \\
+		\bitbox[]{8}{BCS} && \bitboxes*{1}[bgcolor=bfcommonlight]{10110000} && \bitboxes*{1}[bgcolor=bfcommonlight]{01000010}
+	\end{bytefield}
+\end{figure}
+
+\subsubsection{Adresní režimy s~indexací}
+Složitější adresní režimy přinášejí další možnost přístupu k~datům v~paměti. Do této chvíle byly uvedeny pouze takové režimy, které disponují pouze pevně stanovenou adresou. Často je však nutné adresy měnit, nebo vytvářet zcela dynamicky. Takový typ adres označuje manuál~\cite{6502:sw-manual} jako počítané adresy. Pro práci s~počítanými adresami obsahuje ISA speciální adresní režimy využívající indexovací registry: absolutní režim s~indexací a~režim nulté stránky s~indexací.
+
+\begin{example}[Kopírování souvislých dat bez indexace]
+Jedním ze základních řídicích struktur programovacích jazyků jsou cykly, které mohou posloužit jako nástroj pro práci s~bloky dat. Typickým příkladem nechť je kopírování dat z~jednoho paměťového místa na jiné. Ve střadačové architektuře se provádí načtením do střadače a~uložením.
+
+Byla-li by implementace provedena pouze za použitím pevných adres, muselo by se pro každé paměťové místo uvést instrukci načtení i~instrukci zápisu. Vytváří-li se adresy dynamicky, je možné provést operace v~cyklu. Ačkoliv existuje způsob úpravy pevných adres za běhu programu pomocí techniky samomodifikujícího se kódu (viz stranu 72 manuálu~\cite{6502:sw-manual}), představují adresní režimy s~indexací elegantnější alternativu nevyžadující přepisovatelnou instrukční paměť.
+\end{example}
+
+Nechť je jako první uveden \emph{absolutní adresní režim s~indexací}. Tento režim přidává absolutnímu režimu možnost přičíst k~původní adrese i~offset z~registru X, nebo Y; dle zvoleného registru se tak jedná o~dva různé adresní režimy. Adresa pevně určená instrukcí je nazývaná jako základová (base). Výsledná adresa je vypočtena jednoduše: $zakladova\_adresa + offset$. Struktura je stejná jako u standardního absolutního režimu na obrázku~\ref{fig:6502-adr-abs}.
+
+Podobně jako u~standardních režimů existuje možnost pracovat pouze s~nultou stránkou, k~tomu~účelu slouží \emph{režim nulté stránky s~indexací}. Struktura instrukce je opět stejná jako na obrázku~\ref{fig:6502-adr-zp}. V~tomto režimu nedochází k~překročení paměťových stránek při přičtení indexu, horní bajt je ignorován a~výpočty tak efektivně probíhají v~modulu \$100. Výpočet tedy probíhá jako: $(zakladova\_adresa + offset) \mod 256$. Kromě instrukcí LDX a~STX, kdy jsou k~dispozici oba indexovací registry k~výběru, je tento režim použitelný pouze s~registrem X.
+
+\subsubsection{Nepřímé adresování}
+V~architektuře 6502 existuje ještě \emph{nepřímé adresování}, které umožňuje pracovat s~ukazateli, namísto s~přímou hodnotou adresy. Takové režimy jsou dva, indexovaný-nepřímý a nepřímý-indexovaný. Názvy režimů jsou odvozené podle pořadí, ve kterém se přičítá index.
+
+První zmíněný režim, \emph{indexovaný-nepřímý}, pracuje s~jednobajtovou adresou následovanou po operačním znaku. Tato adresa je základ ukazatele do nulté stránky. K~základu se přičte hodnota indexovacího registru X. Součet probíhá opět v modulu 256, vyšší bajt je totiž zahazován. Vznikne tak výsledný ukazatel, který směřuje na místo nacházející se v~nulté stránce, které obsahuje první bajt kýžené adresy. Ta je opět uspořádána ve formátu nižší bajt a~vyšší bajt. Příklad na obrázku~\ref{fig:6502-adr-idx-ind} ukazuje variantu instrukce STA v~indexovaném-nepřímém režimu. Samotný OZ se základem ukazatele je umístěn v~instrukční pamětí na adrese \$F000. K~základu \$42 je přičten obsah registru X \$10. Výsledkem je adresa \$52, na které se již nachází 16bitová konečná adresa. Instrukce STA v~popsaném příkladě tedy uloží hodnotu akumulátoru až na adresu zjištěnou v~posledním kroku: \$3412.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{~Struktura instrukce indexovaného-nepřímého režimu s~příkladem instrukce STA}\label{fig:6502-adr-idx-ind}
+	
+	\begin{bytefield}[bitheight=\widthof{~Sign~},
+		boxformatting={\centering\small\ttfamily}]{8}
+		\bitbox[]{8}{} && \bitheader[endianness=little]{0,7,8,15} \\
+		\bitbox[]{8}{\$F000:} && \bitbox{8}[bgcolor=bfcommon]{OZ} && \bitbox{8}[bgcolor=bfcommon]{základ ukazatele} && \bitbox[]{8}{} && \bitbox{8}[bgcolor=bfaux]{X} \\
+
+		\bitbox[]{8}{} && \bitboxes*{1}[bgcolor=bfcommonlight]{10000001} && \bitbox{8}[bgcolor=bfcommonlight]{\$42} && \bitbox[]{8}{} && \bitbox{8}[bgcolor=bfauxlight]{\$10} \\ \\ \\
+
+		\bitbox[]{8}{Výpočet:} && \bitbox{8}[bgcolor=bfcommonlight]{\$42} && \bitbox{1}[]{+} && \bitbox{8}[bgcolor=bfauxlight]{\$10} \\
+
+		\bitbox[]{8}{} && \bitheader[endianness=little]{0,7,8,15} \\ \bitbox[]{8}{\$52:} && \bitbox{8}[bgcolor=bfcommon]{ADL} && \bitbox{8}[bgcolor=bfcommon]{ADH} \\
+		
+		\bitbox[]{8}{} && \bitbox{8}[bgcolor=bfcommonlight]{\$12} && \bitbox{8}[bgcolor=bfcommonlight]{\$34}
+	\end{bytefield}
+\end{figure}
+
+Druhý režim, \emph{nepřímý-indexovaný}, funguje podobně, ale přičítání indexu probíhá až v~druhém kroku a~používá se registr Y. Po operačním znaku následuje hodnota ukazatele, která se již nemění. Ukazuje do nulté stránky, kde se nachází dvojbajtový základ konečné adresy. K~základu se přičte hodnota registru Y. Vznikne tak konečná adresa, se kterou může daná instrukce dále pracovat. Příklad opět na instrukci STA je uveden na obrázku~\ref{fig:6502-adr-ind-idx}. Tentokrát bude hodnota akumulátoru uložena na adresu \$3422.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{~Struktura instrukce nepřímého-indexovaného režimu s~příkladem instrukce STA}\label{fig:6502-adr-ind-idx}
+	
+	\begin{bytefield}[bitheight=\widthof{~Sign~},
+		boxformatting={\centering\small\ttfamily}]{8}
+		\bitbox[]{8}{} && \bitheader[endianness=little]{0,7,8,15} \\
+		\bitbox[]{8}{\$F000:} && \bitbox{8}[bgcolor=bfcommon]{OZ} && \bitbox{8}[bgcolor=bfcommon]{ukazatel} && \bitbox[]{8}{} && \bitbox{8}[bgcolor=bfaux]{X} \\
+		
+		\bitbox[]{8}{} && \bitboxes*{1}[bgcolor=bfcommonlight]{10000001} && \bitbox{8}[bgcolor=bfcommonlight]{\$42} && \bitbox[]{8}{} && \bitbox{8}[bgcolor=bfauxlight]{\$10} \\
+		
+		\bitbox[]{8}{} && \bitheader[endianness=little]{0,7,8,15} \\ \bitbox[]{8}{\$42:} && \bitbox{8}[bgcolor=bfcommon]{ADL} && \bitbox{8}[bgcolor=bfcommon]{ADH} \\
+		
+		\bitbox[]{8}{} && \bitbox{8}[bgcolor=bfcommonlight]{\$12} && \bitbox{8}[bgcolor=bfcommonlight]{\$34} \\ \\ \\
+		
+		\bitbox[]{8}{Výpočet:} && \bitbox{8}[bgcolor=bfcommonlight]{\$3412} && \bitbox{1}[]{+} && \bitbox{8}[bgcolor=bfauxlight]{\$10} \\
+	\end{bytefield}
+\end{figure}
+
+\begin{example}[Využití nepřímého adresování]
+Nepřímé adresování má mnoho různých využití. U indexovaného-nepřímého se jedná především o~práci se seznamem adres. Tento seznam může uchovávat například adresy tlačítek herních ovladačů, ze kterých se periodicky vyčítá stav. Nepřímý-indexovaný pak může sloužit k~modifikaci chování volaného podprogramu. Úpravou hodnoty registru Y bude podprogram pracovat s~jiným offsetem v~odkazované paměti.
+\end{example}
 
 \subsubsection{Instrukční cyklus}
-zde popsat v návaznosti na adr. režimy, viz str. 168 HW manuálu
+Instrukční cyklus odpovídá standardnímu cyklu procesoru, jako uvádí prof. Kubátová v~\cite{Kubatova2018:SAP}; fetch, decode, execute. Standardně je součástí běhu navíc počáteční nastavení při spuštění a~ošetření příčiny přerušení.
+
+Přesné dodržení instrukčního cyklu nemusí být u~emulace nutné, dokonce bývá zvykem velkou část cyklu zjednodušit pro dosažení většího výkonu tak, že se pracuje pouze na úrovni instrukcí. Jelikož je ale v~systému komponent více, je nutné se zabývat alespoň délkou trvání jednotlivých instrukcí, aby nedocházelo ke ztrátě synchronizace. 
+
+Délka zpracování instrukce je vázána především na její typ a podtyp. Instrukce totiž existují ve více variantách v~závislosti na použitém adresním režimu. Každý podtyp je jednoznačně identifikován operačním znakem. To znamená, že pro stejnou instrukci existuje více různých operačních znaků, lišících se pouze v~adresním režimu. Je tedy možné délku zpracování odvodit pouze na základě operačního znaku.
+
+Existují však výjimky. U~některých instrukcí pracujících s~pamětí může dojít k~překročení paměťové stránky, což způsobí provedení jednoho strojového cyklu navíc. To se týká adresních režimů pracujících s~indexy, konkrétně absolutního režimu s~indexací pro registry X i~Y. Týká se to i~nepřímého-indexovaného režimu, ten totiž také přičítá hodnotu registru k~16bitové adrese s~možností překročení stránky. Indexovaný-nepřímý režim již nedovoluje překročení paměťové stránky (horní bajt je vždy ignorován a~k~přenosu do vyššího řádu tak nedochází); jej se to již tedy netýká.
+
+Poslední výjimkou jsou instrukce větvení. Dojde-li ke kladnému vyhodnocení podmínky, musí se vykonat jeden strojový cyklus navíc; to je způsobeno nutností přičíst offset k~programovému čítači. Dojde-li navíc k~překročení paměťové stránky, musí se kvůli přičtení přenosu provést ještě další strojový cyklus. Abych to shrnul, je-li proveden skok, který navíc překračuje stránku, provedou se navíc celkem dva strojové cykly.
+
+zde popsat v návaznosti na adr. režimy, viz str. 168 HW manuálu, popsat pipelining (str. 71)
+
+Zpracování instrukcí zabírá od 2 do 7 (8 v~případě nedokumentovaných instrukcí) strojových cyklů.
 
 \subsubsection{Instrukční sada}
 
