@@ -529,7 +529,8 @@ Nepřímé adresování má mnoho různých využití. U indexovaného-nepřím�
 \end{example}
 
 \subsubsection{Instrukční cyklus}
-Instrukční cyklus odpovídá standardnímu cyklu procesoru, jako uvádí prof. Kubátová v~\cite{Kubatova2018:SAP}; fetch (načtení instrukce), decode (dekódování instrukce), execute (provedení instrukce). Standardně je součástí běhu navíc počáteční nastavení při spuštění a~ošetření příčiny přerušení; právě tomuto je věnována zvláštní pozornost v~podkapitolách~\ref{sec:6502-reset} a~\ref{sec:6502-preruseni}.
+\label{sec:6502-instrukcni-cyklus}
+Instrukční cyklus odpovídá standardnímu cyklu procesoru, jako uvádí prof. Kubátová v~\cite{Kubatova2018:SAP}; fetch (načtení instrukce), decode (dekódování instrukce), execute (provedení instrukce). Dekódování je věnována zvláštní pozornost v~podkapitole~\ref{sec:6502-dekodovani-instrukci}. Standardně je součástí běhu navíc počáteční nastavení při spuštění a~ošetření příčiny přerušení; právě tomuto je věnována zvláštní pozornost v~podkapitolách~\ref{sec:6502-reset} a~\ref{sec:6502-preruseni}.
 
 \begin{figure}[ht!]
 	\centering
@@ -571,9 +572,19 @@ Poslední výjimkou jsou instrukce větvení. Dojde-li ke kladnému vyhodnocení
 	Procesor 6502 zároveň provádí více činností --- operace na vnitřní sběrnici provádí souběžně s~operacemi na vnější sběrnici. Zatímco na vnější sběrnici se připravuje operační znak a~příslušné adresy, na vnitřní probíhají výpočty (inkrementace programového čítače, operace na aritmeticko-logické jednotce a~další). Díky pipeliningu je možné instrukce zpracovat v~méně cyklech. Pro účely emulace to však není relevantní a~zájemci si mohou o~problematice více přečíst v~manuálu~\cite{6502:sw-manual}.
 \end{note}
 
+\subsubsection{Dekódování instrukcí}
+\label{sec:6502-dekodovani-instrukci}
+Každá instrukce je jednoznačně identifikována včetně příslušného adresního režimu pomocí operačního znaku. V~případě 6502 je tento operační znak vždy 8bitový.  Každá instrukce je prováděna v~několika strojových cyklech.  Index strojového cyklu je uchováván v~čítači. Dvojice operační znak a~index jsou dekódovány v~programovatelném logickém poli (Programmable Logic Array, PLA).  Právě použití PLA způsobilo existenci takzvaných neoficiálních instrukcí, viz podkapitola~\ref{sec:6502-rozsirena-instrukcni-sada}.
+
+PLA slouží k~efektivní implementaci kombinační logiky.  Oproti klasické paměti PLA nevyžaduje záznam pro každou možnou adresu, výstupy jsou řízeny hradly AND a~OR, které implementují logickou funkci v~disjunktivní normální formě~\cite{Wikipedia:PLA}. Takto je možné efektivně zakódovat funkci obsahující hodnoty \enquote{don't care}, aniž by muselo dojít k~duplikaci řádků. Právě díky hodnotám don't care může jeden záznam reagovat na více různých vstupů, v~případě řadiče 6502 jsou vstupem operační kódy. Mají-li se stejná operace vykonat pro více operačních kódu, je to implementováno právě takto.
+
+\begin{example}[Dekódování instrukcí]
+TODO
+\end{example}
+
 \subsubsection{Instrukční sada}
 \label{sec:6502-instrukce}
-Instrukční sadu procesoru je možné rozdělit do několika skupin dle jejich účelu. Každá instrukce se pak dělí dle adresních režimů, které používá. Nakonec je u~každé instrukce známo, jaké příznaky procesoru nastavuje. Instrukce má pro použití v~JSA symbolické textové označení, které se označuje jako mnemonika (mnemonic); příklady takových označení již byly uvedeny u~adresních režimů, například STA pro Store Accumulator.
+Instrukční sadu procesoru je možné rozdělit do několika skupin dle jejich účelu. Každá instrukce se pak dělí dle adresních režimů, které používá; to určuje i~délku vykonávání ve strojových cyklech a~také říká, zdali dojde při překročení paměťové stránky k~vykonání dalšího strojového cyklu. Nakonec je u~každé instrukce známo, jaké příznaky procesoru nastavuje. Instrukce má pro použití v~JSA symbolické textové označení, které se označuje jako mnemonika (mnemonic); příklady takových označení již byly uvedeny u~adresních režimů, například STA pro Store Accumulator.
 
 TODO: instrukce uvést po skupinách jen v tabulce, kde bude seznam aktivovaných  příznaků (členění dle opcodu spíš v příloze)
 
@@ -594,9 +605,9 @@ Do první skupiny patří instrukce přesouvající hodnoty mezi pamětí a~zás
 \end{tblr}
 \end{table}
 
-
 \subsubsection{Rozšířená instrukční sada}
-RO
+\label{sec:6502-rozsirena-instrukcni-sada}
+Kromě oficiálních instrukcí, tedy takových, které byly popsány v~oficiálních manuálech od výrobce, existuje i~\enquote{skrytá} množina instrukcí. Tyto instrukce nebyly brány v~potaz při návrhu a~jejich existence je důsledkem principu, který byl použit pro dekódování instrukcí (dekódování probíhá v druhém kroku instrukčního cyklu, viz podkapitola~\ref{sec:6502-instrukcni-cyklus}). Nejprve je tedy vhodné pochopit, jak funguje dekódování instrukcí u~procesoru 6502, což vysvětluje podkapitola~\ref{sec:6502-dekodovani-instrukci}.
 
 \subsubsection{Počáteční stav}
 \label{sec:6502-reset}
