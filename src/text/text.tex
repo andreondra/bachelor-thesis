@@ -167,15 +167,10 @@ Komponentou, která byla využívána i~v~jiných systémech, je (kromě základ
 
 \begin{figure}[ht!]
 	\centering
-	\caption{Obálka hardwarového manuálu rodiny komponent 6500 (archive.6502.org)}
+	\caption{Obálka hardwarového manuálu rodiny komponent MCS6500 (archive.6502.org)}
 	\label{fig:mos-hw-manual}
 	\includegraphics[width=0.25\textwidth]{images/mos-hw-manual.png}
 \end{figure}
-
-\begin{enumerate}
-	\item NES.DOC
-	\item Nestech.txt
-\end{enumerate}
 
 \section{Nintendo Entertainment System}
 Konzole Nintendo Entertainment System, často zkracována jako NES, je osmibitový zábavní počítačový systém firmy Nintendo, který byl vydán nejprve v Japonsku jako Family Computer (FC, \enquote{Famicom}). V~České republice je tento systém znám především díky mnoha klonům (\enquote{televizní hry na žlutých kazetkách}), které byly levnější a~dostupnější než oficiální systém. Tyto klony používaly kopie původního hardwaru, poté se objevily hardwarové emulátory založené na ASIC, které celou konzoli zmenšili do jednoho čipu (proto přezdívány NES-on-a-chip). Tato kapitola má za úkol popsat především technické specifikace systému --- zájemce o~podrobnou historii NES lze odkázati na Wikipedii~\cite{Wikipedia:NES}~\cite{Wikipedia:famiclone} a~článek~\cite{Svara:polystation}.
@@ -272,7 +267,7 @@ Adresní prostor je v~terminologii produktové řady MCS650X rozdělen na strán
 \begin{table}[ht!]
 	\centering
 	\caption{~Adresní prostor CPU}\label{tab:cpu-adresniprostor}
-	\begin{tabular}{|c|c|}
+	\begin{tblr}{|Q[c,m]|Q[c,m]|}
 		\hline
 		Adresní rozsah & Zařízení \\
 		\hline
@@ -290,7 +285,7 @@ Adresní prostor je v~terminologii produktové řady MCS650X rozdělen na strán
 		\hline
 		\$4020–\$FFFF & Game Pak \\
 		\hline
-	\end{tabular}
+	\end{tblr}
 \end{table}
 
 Komunikace je řízena dvoufázovými systémovými hodinami, v~první fázi se vystaví adresa na sběrnici (předstih), v~druhé fázi dochází k~přenosu dat. Z~těchto dvou fází se pak skládá celý procesorový cyklus~\cite{mos:hw-manual}. Příklad komunikace směrem k~procesoru (čtení) je znázorněn na obrázku~\ref{fig:6502-casovani-cteni}. Dle dokumentace je pro 1MHz hodiny garantováno, že adresa bude stabilní 300~ns po náběžné hraně první fáze; naopak je požadováno, aby data byla platná alespoň 100~ns před sestupnou hranou druhé fáze hodin.
@@ -339,7 +334,7 @@ Procesor 6502 obsahuje ve své datové cestě několik registrů. V~tabulce~\ref
 \begin{table}[ht!]
 	\centering
 	\caption{~Registry procesoru 6502}\label{tab:6502-registry}
-	\begin{tabular}{|c|c|c|c|}
+	\begin{tblr}{|Q[c,m]|Q[c,m]|Q[c,m]|X[c,m]|}
 		\hline
 		Registr & Zkratka & Velikost (bit) & Obsah \\
 		\hline
@@ -355,18 +350,51 @@ Procesor 6502 obsahuje ve své datové cestě několik registrů. V~tabulce~\ref
 		\hline
 		registr příznaků & P & 8 & výsledky provedení ALU operací a~stav CPU \\ 
 		\hline
-	\end{tabular}
+	\end{tblr}
 \end{table}
-
-Indexovací registry slouží primárně jako zdroj offsetu pro adresní režimy s~indexací. Fungují jako čítač, existují instrukce pro jejich inkrementaci (INX, INY), dekrementaci (DEX, DEY) a~porovnávání hodnot s~hodnotou v~paměti (CPX, CPY). Jelikož se ale jejich hodnota načítá z~paměti a~lze do paměti i~uložit, mohou sloužit jako programem využitelné pomocné registry.
 
 Střadač v ISA 6502 má podobný účel jako v~jiné střadačové architektuře. Jedná se o~jediný univerzální registr, všechny operace musí být prováděny přes zásobník (kromě načítání a~ukládání, což zvládají i~indexovací registry). To znamená aritmetické a~logické operace, porovnávání, změny hodnot. Střadač je implicitním úložným místem pro výsledky operací.
 
-TODO další popis zásobníku
+Zásobník architektury 6502 je fixován na adresách \$0100--\$01FF. Jeho kapacita je tedy 256 bajtů a~roste odshora dolů. Se zásobníkem se manipuluje pomocí dedikovaných instrukcí, je možné na zásobník uložit střadač nebo obsah příznakového registru. Adresa vrcholu zásobníku je v~registru S. 
 
-TODO další popis příznaků
+Indexovací registry slouží primárně jako zdroj offsetu pro adresní režimy s~indexací. Fungují jako čítač, existují instrukce pro jejich inkrementaci (INX, INY), dekrementaci (DEX, DEY) a~porovnávání hodnot s~hodnotou v~paměti (CPX, CPY). Jelikož se ale jejich hodnota načítá z~paměti a~lze do paměti i~uložit, mohou sloužit jako programem využitelné pomocné registry.
 
-Procesor dále obsahuje pomocné registry pro dočasné ukládání paměti a~dat (programově nepřístupné; používané při přístupu na sběrnici). Nedílnou součástí je pak také aritmeticko-logická jednotka, ve které probíhají nejen konkrétní výpočty požadované instrukcemi, ale i~pomocí výpočty například pro zjištění absolutní adresy při vyhodnocování skoků.
+Příznakový registr obsahuje 7 využívaných příznaků. Jejich popis je v~tabulce~\ref{tab:6502-flags}. Index označuje pořadí bitu (zprava), do kterého se daný příznak ukládá při použití instrukce PHP. Příznakem, který ve fyzickém registru není implementován, je B. Tento příznak je viditelný pouze při operaci přenosu registru příznaků do zásobníku a~jeho hodnota záleží na tom, která operace přenos do zásobníku vyvolala. Přenos je vyvolán dvěma způsoby:
+
+\begin{itemize}
+	\item softwarově (instrukce BRK a~PHP): hodnota B je 1,
+	\item hardwarově (přerušení): hodnota B je 0.
+\end{itemize}
+
+Tím, že registr B nemá hardwarovou reprezentaci, je jeho hodnota ignorována při navrácení příznaků ze zásobníků.
+
+\begin{table}[ht!]
+		\centering
+		\caption{Popis příznakového registru procesoru 6502\label{tab:6502-flags}}.
+		\begin{tblr}{|Q[c,m]|Q[c,m]|X[c,m]|}
+			\hline
+			Index & Příznak &  Popis \\
+			\hline
+			0 & C & Operace vygenerovala přenos. \\
+			\hline
+			1 & Z & Zpracovávaná hodnota je nulová. \\
+			\hline
+			2 & I  & Maska přerušení (hodnota 1: přerušení maskováno) . \\
+			\hline
+			3 & D & Režim BCD (hodnota 1: režim je aktivní). \\
+			\hline
+			4 & B & Příznak \enquote{break}. Neexistuje fyzicky. \\
+			\hline
+			5 & - & Nepoužito. \\
+			\hline
+			6 & V & Operace vyvolala přetečení. \\
+			\hline
+			7 & N & Zpracovávaná hodnota je záporná (má-li sedmý bit má hodnotu 1) \\
+			\hline
+		\end{tblr}
+	\end{table}
+
+Procesor dále obsahuje pomocné registry pro dočasné ukládání paměti a~dat (programově nepřístupné; používané při přístupu na sběrnici). Nedílnou součástí je pak také aritmeticko-logická jednotka, ve které probíhají nejen konkrétní výpočty požadované instrukcemi, ale i~pomocné výpočty například pro zjištění absolutní adresy při vyhodnocování skoků.
 
 \subsubsection{Základní adresní režimy}
 \label{sec:6502-adresni-rezimy}
@@ -430,7 +458,7 @@ Absence univerzálních registrů je částečně suplována existencí adresní
 		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15}  \\
 		\bitbox[]{8}{STA} && \bitboxes*{1}[bgcolor=bfcommonlight]{10000101} && \bitboxes*{1}[bgcolor=bfcommonlight]{01000010}
 	\end{bytefield}
-\end{figure}Kowalski, Analysis
+\end{figure}
 
 \emph{Relativní} adresování je používáno výlučně instrukcemi větvení. Obsahuje pouze jeden adresní bajt, který reprezentuje offset v~dvojkovém doplňku. Vyhodnotí-li se podmínka skoku kladně a~skok se tedy provádí, je hodnota offsetu přičítána k~adrese následující instrukce (než se podmínka skoku vyhodnotí, nachází se již programový čítač na další adrese). V~JSA obecně není nutné uvádět offset explicitně, uvádí se konkrétní adresa, nebo návěští; pomocí těchto údajů je assembler schopen výsledný offset dopočítat. Režim je demonstrován na instrukci Branch On Carry Set na obrázku~\ref{fig:6502-adr-rel} s~offsetem \$42.
 
@@ -574,45 +602,121 @@ Poslední výjimkou jsou instrukce větvení. Dojde-li ke kladnému vyhodnocení
 
 \subsubsection{Dekódování instrukcí}
 \label{sec:6502-dekodovani-instrukci}
-Každá instrukce je jednoznačně identifikována včetně příslušného adresního režimu pomocí operačního znaku. V~případě 6502 je tento operační znak vždy 8bitový.  Každá instrukce je prováděna v~několika strojových cyklech.  Index strojového cyklu je uchováván v~čítači. Dvojice operační znak a~index jsou dekódovány v~programovatelném logickém poli (Programmable Logic Array, PLA).  Právě použití PLA způsobilo existenci takzvaných neoficiálních instrukcí, viz podkapitola~\ref{sec:6502-rozsirena-instrukcni-sada}.
+Každá instrukce je jednoznačně identifikována včetně příslušného adresního režimu pomocí operačního znaku. V~případě 6502 je tento operační znak vždy 8bitový.  Každá instrukce je prováděna v~několika strojových cyklech.  Index strojového cyklu je uchováván v~čítači a~v~dokumentaci je označován písmem T s indexem (například T1 pro první cyklus). Dvojice operační znak a~index jsou dekódovány v~programovatelném logickém poli (Programmable Logic Array, PLA).  Právě použití PLA způsobilo existenci takzvaných neoficiálních instrukcí, viz podkapitola~\ref{sec:6502-rozsirena-instrukcni-sada}.
 
 PLA slouží k~efektivní implementaci kombinační logiky.  Oproti klasické paměti PLA nevyžaduje záznam pro každou možnou adresu, výstupy jsou řízeny hradly AND a~OR, které implementují logickou funkci v~disjunktivní normální formě~\cite{Wikipedia:PLA}. Takto je možné efektivně zakódovat funkci obsahující hodnoty \enquote{don't care}, aniž by muselo dojít k~duplikaci řádků. Právě díky hodnotám don't care může jeden záznam reagovat na více různých vstupů, v~případě řadiče 6502 jsou vstupem operační kódy. Mají-li se stejná operace vykonat pro více operačních kódu, je to implementováno právě takto.
 
-\begin{example}[Dekódování instrukcí]
-TODO
-\end{example}
-
-\subsubsection{Instrukční sada}
-\label{sec:6502-instrukce}
-Instrukční sadu procesoru je možné rozdělit do několika skupin dle jejich účelu. Každá instrukce se pak dělí dle adresních režimů, které používá; to určuje i~délku vykonávání ve strojových cyklech a~také říká, zdali dojde při překročení paměťové stránky k~vykonání dalšího strojového cyklu. Nakonec je u~každé instrukce známo, jaké příznaky procesoru nastavuje. Instrukce má pro použití v~JSA symbolické textové označení, které se označuje jako mnemonika (mnemonic); příklady takových označení již byly uvedeny u~adresních režimů, například STA pro Store Accumulator.
-
-TODO: instrukce uvést po skupinách jen v tabulce, kde bude seznam aktivovaných  příznaků (členění dle opcodu spíš v příloze)
-
-\subsubsection*{Aritmeticko-logické instrukce}
-
-Do první skupiny patří instrukce přesouvající hodnoty mezi pamětí a~zásobníkem. Instrukce LDA do zásobníku načte hodnotu z~paměti, instrukce STA hodnotu ze zásobníků poté ukládá. Do první skupiny patří i~instrukce 
+Příklad několika záznamů je uveden v~tabulce~\ref{tab:6502-PLA}, kde například operační znak \$AC ve strojovém cyklu T3 způsobí načtení hodnoty ze sběrnice do registru Y. Operační znak \$AF však vlivem hodnot don't care způsobí načtení do dvou registrů: A a~X.  Operační znaky s~více funkcemi jsou neoficiální a~jejich bližší popis je v~podkapitole~\ref{sec:6502-rozsirena-instrukcni-sada}.
 
 \begin{table}[ht!]
 	\centering
-	\caption{Aritmeticko-logické instrukce}\label{tab:6502-instr-aritlog}
-\begin{tblr}{|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|X[c,m]|}
-	\hline
-	Instrukce & N & Z & C & I & D & V & Popis \\
-	\hline
-	LDA & \checkmark  & \checkmark & - & - & - & - & Načte hodnotu z~paměti do střadače. \\
-	\hline
-	
-\end{tblr}
+	\caption{Ukázka záznamů v~PLA procesoru 6502~\cite{Steil2008:illegal-opcodes}}\label{tab:6502-PLA}
+	\begin{tblr}{|Q[c,m]|Q[c,m]|X[c,m]|}
+		\hline
+		Maska & Cyklus &  Popis \\
+		\hline
+		\texttt{10101100} & T3 & Načti do registru Y. \\
+		\hline
+		\texttt{101011X1} & T3 & Načti do registru A. \\
+		\hline
+		\texttt{1010111X} & T3 & Načti do registru X. \\
+		\hline
+		
+	\end{tblr}
+\end{table}
+
+\subsubsection{Instrukční sada}
+\label{sec:6502-instrukce}
+Instrukční sadu procesoru je možné rozdělit do několika skupin dle jejich účelu. Každá instrukce se pak dělí dle adresních režimů, které používá; to určuje i~délku vykonávání ve strojových cyklech a~také říká, zdali dojde při překročení paměťové stránky k~vykonání dalšího strojového cyklu. Nakonec je u~každé instrukce známo, jaké příznaky procesoru nastavuje. Instrukce má pro použití v~JSA symbolické textové označení, které se označuje jako mnemonika (mnemonic); příklady takových označení již byly uvedeny u~adresních režimů, například STA pro Store Accumulator. Instrukční sada je popsána nejen v~oficiálních manuálech, ale i~v~mnoha přehledných dokumentech, které jsou k~dispozici na webu; tato kapitola je tedy věnována analýze formátu takových dokumentů a~ukázce zajímavých instrukcí.
+
+Popis instrukcí většinou bývá ve formě tabulky. První tabulkou je přehled operačních znaků, kde řádky odpovídají vyšším čtyřem bitům OZ a~sloupce nižším bitům. Další tabulka je poté věnována popisům jednotlivých instrukcí. Příkladem je tabulka~\ref{tab:6502-instr-priklad}, ve které je mnemonika instrukce, seznam příznaků a~stručný popis.
+
+\begin{table}[ht!]
+	\centering
+	\caption{Ukázka popisu instrukcí logických operací}\label{tab:6502-instr-priklad}
+	\begin{tblr}{|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|X[c,m]|}
+		\hline
+		Instrukce & N & Z & C & I & D & V & Popis \\
+		\hline
+		AND & \checkmark  & \checkmark & - & - & - & - & Provede logický součin střadače a~hodnoty z~paměti. \\
+		\hline
+		EOR & \checkmark  & \checkmark & - & - & - & - & Provede úplnou disjunkci (XOR) střadače a~hodnoty z~paměti. \\
+		\hline
+		ORA & \checkmark  & \checkmark & - & - & - & - & Provede disjunkci střadače a~hodnoty z~paměti. \\
+		\hline
+		
+	\end{tblr}
 \end{table}
 
 \subsubsection{Rozšířená instrukční sada}
 \label{sec:6502-rozsirena-instrukcni-sada}
-Kromě oficiálních instrukcí, tedy takových, které byly popsány v~oficiálních manuálech od výrobce, existuje i~\enquote{skrytá} množina instrukcí. Tyto instrukce nebyly brány v~potaz při návrhu a~jejich existence je důsledkem principu, který byl použit pro dekódování instrukcí (dekódování probíhá v druhém kroku instrukčního cyklu, viz podkapitola~\ref{sec:6502-instrukcni-cyklus}). Nejprve je tedy vhodné pochopit, jak funguje dekódování instrukcí u~procesoru 6502, což vysvětluje podkapitola~\ref{sec:6502-dekodovani-instrukci}.
+Kromě oficiálních instrukcí, tedy takových, které byly popsány v~oficiálních manuálech od výrobce, existuje i~\enquote{skrytá} množina instrukcí, označována jako neoficiální nebo nelegální. Tyto instrukce nebyly brány v~potaz při návrhu a~jejich existence je důsledkem principu, který byl použit pro dekódování instrukcí (dekódování probíhá v druhém kroku instrukčního cyklu, viz podkapitola~\ref{sec:6502-instrukcni-cyklus}). Nejprve je tedy vhodné pochopit, jak funguje dekódování instrukcí u~procesoru 6502, což vysvětluje podkapitola~\ref{sec:6502-dekodovani-instrukci}.
+
+Některé instrukce jsou prostou kombinací více instrukcí. Tyto instrukce bývají stabilní a~používají je i~některé oficiální hry. Například hra \emph{Disney's Aladdin}~\cite{Nesdev:illegal-opcodes} z~roku 1994 používá instrukci SLO, která kombinuje ASL (aritmetický posuv vlevo) a~ORA (disjunkce střadače s~paměťovou hodnotou). Dále je často používána instrukce LAX, která  načte hodnotu do akumulátoru i~do registru X. Příklad, jak taková instrukce funguje, je popsán v~podkapitole~\ref{sec:6502-dekodovani-instrukci}.
+
+Další instrukce nastavují příznaky zvláštním způsobem, popřípadě jsou nestabilní (výsledek je dán fyzikálními jevy, například teplotou čipu). Poslední skupina instrukcí zastaví instrukční cyklus a~je vyžadován restart. Tyto instrukce jsou označovány jako JAM, KIL, HLT. Zastavení instrukčního cyklu je způsobeno nenastavením čítače taktů zpět na první index, procesor se tak zacyklí. 
 
 \subsubsection{Počáteční stav}
 \label{sec:6502-reset}
 
+Má-li být emulace věrohodná, je třeba ctít stav po restartu zařízení. Tabulka~\ref{tab:6502-restart} popisuje obsah registrů po restartu. Nejdůležitější je hodnota programového čítače, bez korektního nastavení jeho hodnoty se začne program vykonávat z~nesprávné adresy.
+
+\begin{table}[ht!]
+	\centering
+	\caption{Stav registrů 6502 po restartu}\label{tab:6502-restart}.
+	\begin{tblr}{|Q[c,m]|Q[c,m]|}
+		\hline
+		Registr & Hodnota \\
+		\hline
+		P & \$34 \\
+		\hline
+		A & 0 \\
+		\hline
+		X & 0 \\
+		\hline
+		Y & 0 \\
+		\hline
+		PC & dle vektoru na adresách \$FFFC--\$FFFD \\
+		\hline
+	\end{tblr}
+\end{table}
+
 \subsubsection{Obsluha přerušení}
+Přerušení se dá použít mimo jiné pro synchronizaci systémových komponent. Toho využívá například PPU pro oznámení procesoru, že bylo dosaženo konce zobrazitelné oblasti obrazovky. Proto je podrobná analýza obsluh přerušení důležitá. Procesor 6502 disponuje dvěma typy přerušení: NMI a~IRQ.
+
+\subsubsection*{NMI}
+Přerušení NMI (non-maskable interrupt) je nemaskovatelné a~vyvolává se stejnojmenným pinem. Časový diagram detekce je na obrázku~\ref{fig:6502-detekce-nmi}. K~detekci dochází v~každé druhé fázi strojového cyklu pomocí hranového detektoru. Signál NMI je aktivní v~logické nule, tudíž k~detekci dochází, pakliže byla hodnota v~minulém cyklu 1 a~současná je 0. Dojde-li k~detekci, je v~první fázi následujícího strojového cyklu procesoru aktivován vnitřní signálu, v~diagramu označen jako \emph{NMI aktivní}. K~další aktivaci vnitřního signálu dojde při další změně z 1 na 0 a~nejdříve po započetí obslužné rutiny přerušení.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{~Detekce přerušení NMI}\label{fig:6502-detekce-nmi}
+	\begin{tikztimingtable}[
+		timing/dslope=0.1,
+		timing/.style={x=5ex,y=3ex},
+		x=5ex,
+		timing/rowdist=4ex,
+		timing/name/.style={font=\sffamily\scriptsize}
+		]
+		\signal{CLK $\phi1$}     & 1.5L 3H 3L 3H 3L h \\
+		\signal {CLK $\phi2$}  & H 3L 3H 3L 3H L  \\
+		\signal*{NMI}            & H H 12 L   \\
+		\signal{NMI aktivní}    & 7.5L 6.5H \\
+		\extracode
+		\begin{pgfonlayer}{background}
+			\begin{scope}[semitransparent ,semithick]
+				\vertlines[black,dotted]{1.0,2.0,...,13.5}
+				\vertlines[gray,dotted]{0.5,1.5,...,14.0}
+   			    \node (detekce) [anchor=south east,inner sep=0pt,color=red] at (7,-3.5) {detekce};
+   			    \node[circle, minimum width = 1cm, draw=red] (boddetekce) at (4, -1.5) {};
+   			    \draw[thick,->,>=stealth,color=red] (detekce) -- (boddetekce);
+			\end{scope}
+		\end{pgfonlayer}
+	\end{tikztimingtable}
+\end{figure}
+
+\subsubsection*{IRQ}
+Přerušení IRQ (interrupt request) se dá vyvolat buďto hardwarově stejnojmenným pinem, nebo softwarově instrukcí BRK.
+
 \label{sec:6502-preruseni}
 
 \subsection{Specifika Ricoh 2A03}
