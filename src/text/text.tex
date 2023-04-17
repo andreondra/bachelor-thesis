@@ -270,7 +270,7 @@ Adresní prostor je v~terminologii produktové řady MCS650X rozdělen na strán
 	\begin{tblr}{|Q[c,m]|Q[c,m]|}
 		\hline
 		Adresní rozsah & Zařízení \\
-		\hline
+		\hline[2pt]
 		\$0000–\$07FF & RAM \\
 		\hline
 		\$0800–\$1FFF & Zrcadlo \$0000–\$07FF \\
@@ -337,7 +337,7 @@ Procesor 6502 obsahuje ve své datové cestě několik registrů. V~tabulce~\ref
 	\begin{tblr}{|Q[c,m]|Q[c,m]|Q[c,m]|X[c,m]|}
 		\hline
 		Registr & Zkratka & Velikost (bit) & Obsah \\
-		\hline
+		\hline[2pt]
 		programový čítač & PC & 16 & adresa instrukce ke zpracování \\
 		\hline
 		střadač (akumulátor) & A & 8 & zpracovávané hodnoty \\
@@ -374,7 +374,7 @@ Tím, že registr B nemá hardwarovou reprezentaci, je jeho hodnota ignorována 
 		\begin{tblr}{|Q[c,m]|Q[c,m]|X[c,m]|}
 			\hline
 			Index & Příznak &  Popis \\
-			\hline
+			\hline[2pt]
 			0 & C & Operace vygenerovala přenos. \\
 			\hline
 			1 & Z & Zpracovávaná hodnota je nulová. \\
@@ -600,6 +600,8 @@ Poslední výjimkou jsou instrukce větvení. Dojde-li ke kladnému vyhodnocení
 	Procesor 6502 zároveň provádí více činností --- operace na vnitřní sběrnici provádí souběžně s~operacemi na vnější sběrnici. Zatímco na vnější sběrnici se připravuje operační znak a~příslušné adresy, na vnitřní probíhají výpočty (inkrementace programového čítače, operace na aritmeticko-logické jednotce a~další). Díky pipeliningu je možné instrukce zpracovat v~méně cyklech. Pro účely emulace to však není relevantní a~zájemci si mohou o~problematice více přečíst v~manuálu~\cite{6502:sw-manual}.
 \end{note}
 
+Podrobný rozpis vykonávaných úkonů při zpracování instrukcí je s~přesností na strojové cykly uveden na v~příloze A hardwarového manuálu~\cite{6502:hw-manual}.
+
 \subsubsection{Dekódování instrukcí}
 \label{sec:6502-dekodovani-instrukci}
 Každá instrukce je jednoznačně identifikována včetně příslušného adresního režimu pomocí operačního znaku. V~případě 6502 je tento operační znak vždy 8bitový.  Každá instrukce je prováděna v~několika strojových cyklech.  Index strojového cyklu je uchováván v~čítači a~v~dokumentaci je označován písmem T s indexem (například T1 pro první cyklus). Dvojice operační znak a~index jsou dekódovány v~programovatelném logickém poli (Programmable Logic Array, PLA).  Právě použití PLA způsobilo existenci takzvaných neoficiálních instrukcí, viz podkapitola~\ref{sec:6502-rozsirena-instrukcni-sada}.
@@ -614,7 +616,7 @@ Příklad několika záznamů je uveden v~tabulce~\ref{tab:6502-PLA}, kde např�
 	\begin{tblr}{|Q[c,m]|Q[c,m]|X[c,m]|}
 		\hline
 		Maska & Cyklus &  Popis \\
-		\hline
+		\hline[2pt]
 		\texttt{10101100} & T3 & Načti do registru Y. \\
 		\hline
 		\texttt{101011X1} & T3 & Načti do registru A. \\
@@ -637,7 +639,7 @@ Popis instrukcí většinou bývá ve formě tabulky. První tabulkou je přehle
 	\begin{tblr}{|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|X[c,m]|}
 		\hline
 		Instrukce & N & Z & C & I & D & V & Popis \\
-		\hline
+		\hline[2pt]
 		AND & \checkmark  & \checkmark & - & - & - & - & Provede logický součin střadače a~hodnoty z~paměti. \\
 		\hline
 		EOR & \checkmark  & \checkmark & - & - & - & - & Provede úplnou disjunkci (XOR) střadače a~hodnoty z~paměti. \\
@@ -661,13 +663,15 @@ Další instrukce nastavují příznaky zvláštním způsobem, popřípadě jso
 
 Má-li být emulace věrohodná, je třeba ctít stav po restartu zařízení. Tabulka~\ref{tab:6502-restart} popisuje obsah registrů po restartu. Nejdůležitější je hodnota programového čítače, bez korektního nastavení jeho hodnoty se začne program vykonávat z~nesprávné adresy.
 
+Po spuštění dojde k~7cyklové inicializaci, nakonec se provede instrukce skoku (JMP) na adresu nacházející se ve vektoru resetu \$FFFC--\$FFFD.
+
 \begin{table}[ht!]
 	\centering
 	\caption{Stav registrů 6502 po restartu}\label{tab:6502-restart}.
 	\begin{tblr}{|Q[c,m]|Q[c,m]|}
 		\hline
 		Registr & Hodnota \\
-		\hline
+		\hline[2pt]
 		P & \$34 \\
 		\hline
 		A & 0 \\
@@ -682,10 +686,13 @@ Má-li být emulace věrohodná, je třeba ctít stav po restartu zařízení. T
 \end{table}
 
 \subsubsection{Obsluha přerušení}
-Přerušení se dá použít mimo jiné pro synchronizaci systémových komponent. Toho využívá například PPU pro oznámení procesoru, že bylo dosaženo konce zobrazitelné oblasti obrazovky. Proto je podrobná analýza obsluh přerušení důležitá. Procesor 6502 disponuje dvěma typy přerušení: NMI a~IRQ.
+\label{sec:6502-preruseni}
+Přerušení se dá použít mimo jiné pro synchronizaci systémových komponent. Toho využívá například PPU pro oznámení procesoru, že bylo dosaženo konce zobrazitelné oblasti obrazovky. Proto je podrobná analýza obsluh přerušení důležitá. Procesor 6502 disponuje dvěma typy přerušení: NMI a~IRQ (BRK).
+
+Přerušení se liší pouze způsobem vyvolání, postup po aktivaci vnitřního signálu je poté stejný. Vždy se dokončí právě probíhající instrukce, pak se na zásobník zálohuje hodnota registrů PC a P, dojde ke změně hodnoty PC na adresu nacházející ve vektoru přerušení pro daný typ a~nakonec se nastaví příznak masky přerušení. Poté se začne zpracovávat první instrukce rutiny přerušení. Z~přerušení se vystoupí instrukcí RTI (return from interrupt), která obnoví uložené hodnoty ze zásobníku a~navrátí se k~původnímu toku programu.
 
 \subsubsection*{NMI}
-Přerušení NMI (non-maskable interrupt) je nemaskovatelné a~vyvolává se stejnojmenným pinem. Časový diagram detekce je na obrázku~\ref{fig:6502-detekce-nmi}. K~detekci dochází v~každé druhé fázi strojového cyklu pomocí hranového detektoru. Signál NMI je aktivní v~logické nule, tudíž k~detekci dochází, pakliže byla hodnota v~minulém cyklu 1 a~současná je 0. Dojde-li k~detekci, je v~první fázi následujícího strojového cyklu procesoru aktivován vnitřní signálu, v~diagramu označen jako \emph{NMI aktivní}. K~další aktivaci vnitřního signálu dojde při další změně z 1 na 0 a~nejdříve po započetí obslužné rutiny přerušení.
+Přerušení NMI (non-maskable interrupt) je nemaskovatelné a~vyvolává se stejnojmenným pinem. Časový diagram detekce je na obrázku~\ref{fig:6502-detekce-nmi}. K~detekci dochází v~každé druhé fázi strojového cyklu pomocí hranového detektoru. Signál NMI je aktivní v~logické nule, tudíž k~detekci dochází, pakliže byla hodnota v~minulém cyklu 1 a~současná je 0. Dojde-li k~detekci, je v~první fázi následujícího strojového cyklu procesoru aktivován vnitřní signálu, v~diagramu označen jako \emph{NMI aktivní}. Tento signál zůstává aktivní do doby, než dojde ke zpracování~\cite{Nesdev:cpu-interrupts}.
 
 \begin{figure}[ht!]
 	\centering
@@ -717,21 +724,63 @@ Přerušení NMI (non-maskable interrupt) je nemaskovatelné a~vyvolává se ste
 \subsubsection*{IRQ}
 Přerušení IRQ (interrupt request) se dá vyvolat buďto hardwarově stejnojmenným pinem, nebo softwarově instrukcí BRK.
 
-\label{sec:6502-preruseni}
+Hardwarová implementace je zajištěna úrovňovým detektorem a~vyvolání probíhá stejně jako u~NMI s~tím rozdílem, že vnitřní signál zůstává aktivní pouze v~cyklu, ve kterém byl vyvolán. Poté dojde k~další kontrole stavu vnějšího signálu NMI a~není-li v~logické nule, vnitřní signál se deaktivuje~\cite{Nesdev:cpu-interrupts}.
+
+Softwarové přerušení pomocí instrukce BRK provede podobný sled kroků jako při vyvolání hardwarovém s~tím rozdílem, že není automaticky nastaven příznak maska přerušení (I).
+
+\subsubsection*{Zvláštnosti}
+Reakce na přerušení a~jeho zpracování je jedním z~příkladů, kde se není možné vyhnout emulaci na úrovni strojových cyklů.
+
+První zvláštností je zpožděná reakce IRQ u~instrukcí manipulujících s~maskou přerušení (NMI se to netýká; to je vyvoláno vždy nehledě na masku přerušení). Dvojcyklové instrukce nejprve vyhodnotí stav přerušení a~poté mění masku. Instrukce pro vymazání masky (CLI) a~přepis příznakového registru hodnotou ze zásobníku (PLP) tedy potenciální čekající přerušení odsunou až do další instrukce. Naopak instrukce RTI nejprve smaže masku a~poté kontroluje, zdali není očekávané přerušení IRQ; může tedy k~opětovnému skoku do rutiny přerušení dojít už po dokončení RTI~\cite{Nesdev:cpu-interrupts}.
+
+Další zvláštností je převážení přerušení (komunitně označováno jako hijacking; únos), které je dáno pseudo-prioritou přerušení: NMI, IRQ, BRK. Dojde-li při prvních čtyřech cyklech zpracovávání instrukce BRK k~vyvolání NMI, bude PC nastaven na hodnotu vektoru NMI, namísto očekávaného vektoru BRK (který je společný s~IRQ). Graficky je chování znázorněno na obrázku~\ref{fig:6502-nmi-brk-prevazeni}. Stejně může dojít ke změně vektoru při souběhu IRQ a~NMI. Podobné chování vykazuje i~souběh IRQ a~BRK, ale vzhledem ke stejnému použitému vektoru se to na zpracování programu nikterak neprojevuje, což tento souběh činí irelevantním pro emulační účely~\cite{Nesdev:cpu-interrupts}.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{Převážení přerušení BRK přerušením NMI}\label{fig:6502-nmi-brk-prevazeni}
+	\begin{tikztimingtable}[
+		timing/dslope=0.1,
+		timing/.style={x=5ex,y=3ex},
+		x=5ex,
+		timing/rowdist=4ex,
+		timing/name/.style={font=\sffamily\scriptsize}
+		]
+		\signal{CLK $\phi1$}  & l H L H L H L H L H L H L H L \\
+		\signal{CLK $\phi2$}  & H L H L H L H L H L H L H L h \\
+		\signal{Instrukce}    & 0.5U 14D{BRK}   \\
+		\extracode
+		\begin{pgfonlayer}{background}
+			\begin{scope}[semitransparent ,semithick]
+				\vertlines[black,dotted]{0.5,2.5,...,14}
+				\draw[thick, decorate, decoration={brace, mirror}, color=red] (0.5, -5.5) -- (8.5, -5.5);
+				\node[color=red] (detekce) at (4.5, -7) {zde může dojít k~převážení přerušením NMI};
+			\end{scope}
+		\end{pgfonlayer}
+	\end{tikztimingtable}
+\end{figure}
 
 \subsection{Specifika Ricoh 2A03}
 \label{sec:2A03}
 Aby se zabránilo porušení patentu, v~hardwaru se přerušilo několik cest tak, aby se učinil desítkový režim procesoru nefunkční. Zároveň byl procesor doplněn o~zvukový syntezátor, který je popisován v~podkapitole~\ref{sec:APU}, a~řadič DMA.
 
-\section{Audio Processing Unit}
-\label{sec:APU}
+Řadič DMA existuje v~2A03 pouze pro dva účely. Prvním je kopírování obrazových dat pro sprajty využívané komponentou PPU, druhým je kopírování surových zvukových dat komponentou APU. Jelikož bude v~emulátoru implementován pouze první typ, následuje jen popis této funkcionality.
+
+Podtyp DMA pro kopírování sprajtů se označuje jako OAM DMA. Spouští se zápisem do paměťově mapovaného registru procesoru na adrese \$4014. Do registru se zapíše číslo paměťové stránky, která se poté celá překopíruje (256 bajtů) do vnitřní paměti PPU přes registr PPU \$2004 (OAM DATA). Tento zápis trvá 513 cyklů (v~případě jiného zarovnání s~procesorem 514, to je ale náhodné po spuštění, tudíž irelevantní).
+
+\begin{note}[Důvod existence OAM DMA]
+	Data pro sprajty je možné zapisovat i~procesorovým přístupem do registru OAM DATA, což je dobře využitelné pro obnovu části paměti. Avšak vzhledem k~tomu, že na přepisování paměti OAM je jen omezený čas (doba prodlevy mezi snímky; vertical blanking), bylo nutné implementovat rychlejší alternativu pro případ nutnosti přepsání celé paměti OAM.
+\end{note}
+
+\section{Game Pak}
+
 
 \section{Grafický čip 2C02}
 Nedílnou součástí herní konzole je grafický výstup, tu zajišťuje čip 2C02, přezdívaný jako Picture Processing Unit (PPU). Existují dvě varianty specifické pro konkrétní trhy v~závislosti na typu výstupního signálu --- NTSC a PAL. Tento čip během zpracování grafických dat generuje přímo analogový signál, tudíž každý hodinový takt odpovídá jednomu obrazovému bodu.
 
-\section{Game Pak}
-
 \section{Herní ovladače}
+
+\section{Audio Processing Unit}
+\label{sec:APU}
 
 %---------------------------------------------------------------
 \chapter{Návrh}
