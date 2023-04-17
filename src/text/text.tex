@@ -167,13 +167,21 @@ Komponentou, která byla využívána i~v~jiných systémech, je (kromě základ
 
 \begin{figure}[ht!]
 	\centering
-	\caption{Obálka hardwarového manuálu rodiny komponent MCS6500 (archive.6502.org)}
+	\caption{Obálka hardwarového manuálu rodiny komponent MCS6500 (sken archive.6502.org)}
 	\label{fig:mos-hw-manual}
 	\includegraphics[width=0.25\textwidth]{images/mos-hw-manual.png}
 \end{figure}
 
 \section{Nintendo Entertainment System}
-Konzole Nintendo Entertainment System, často zkracována jako NES, je osmibitový zábavní počítačový systém firmy Nintendo, který byl vydán nejprve v Japonsku jako Family Computer (FC, \enquote{Famicom}). V~České republice je tento systém znám především díky mnoha klonům (\enquote{televizní hry na žlutých kazetkách}), které byly levnější a~dostupnější než oficiální systém. Tyto klony používaly kopie původního hardwaru, poté se objevily hardwarové emulátory založené na ASIC, které celou konzoli zmenšili do jednoho čipu (proto přezdívány NES-on-a-chip). Tato kapitola má za úkol popsat především technické specifikace systému --- zájemce o~podrobnou historii NES lze odkázati na Wikipedii~\cite{Wikipedia:NES}~\cite{Wikipedia:famiclone} a~článek~\cite{Svara:polystation}.
+Konzole Nintendo Entertainment System, často zkracována jako NES, je osmibitový zábavní počítačový systém firmy Nintendo, který byl vydán nejprve v Japonsku jako Family Computer (FC, \enquote{Famicom}). První verze je ukázaná na obrázku~\ref{fig:nes}. V~České republice je tento systém znám především díky mnoha klonům (\enquote{televizní hry na žlutých kazetkách}), které byly levnější a~dostupnější než oficiální systém. Tyto klony používaly kopie původního hardwaru, poté se objevily hardwarové emulátory založené na ASIC, které celou konzoli zmenšili do jednoho čipu (proto přezdívány NES-on-a-chip). Tato kapitola má za úkol popsat především technické specifikace systému --- zájemce o~podrobnou historii NES lze odkázati na Wikipedii~\cite{Wikipedia:NES}~\cite{Wikipedia:famiclone} a~článek~\cite{Svara:polystation}.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{Konzole Nintendo Entertainment System (foto \copyright~2016, Evan-Amos)}
+	\label{fig:nes}
+	\includegraphics[width=0.4\textwidth]{images/nes.jpg}
+\end{figure}
+
 
 Systém se skládá z několika hlavních komponent, které spolu komunikují pomocí dvou sběrnic. Nejprve jsou představeny sběrnice a~k~nim připojené komponenty, jež jsou později rozebrány podrobněji.
 
@@ -687,7 +695,23 @@ Po spuštění dojde k~7cyklové inicializaci, nakonec se provede instrukce skok
 
 \subsubsection{Obsluha přerušení}
 \label{sec:6502-preruseni}
-Přerušení se dá použít mimo jiné pro synchronizaci systémových komponent. Toho využívá například PPU pro oznámení procesoru, že bylo dosaženo konce zobrazitelné oblasti obrazovky. Proto je podrobná analýza obsluh přerušení důležitá. Procesor 6502 disponuje dvěma typy přerušení: NMI a~IRQ (BRK).
+Přerušení se dá použít mimo jiné pro synchronizaci systémových komponent. Toho využívá například PPU pro oznámení procesoru, že bylo dosaženo konce zobrazitelné oblasti obrazovky. Proto je podrobná analýza obsluh přerušení důležitá. Procesor 6502 disponuje dvěma typy přerušení: NMI a~IRQ (BRK). Tabulka~\ref{tab:6502-vektory} ukazuje vektory jednotlivých přerušení, pro úplnost je uveden i~vektor resetu.
+
+\begin{table}[ht!]
+	\centering
+	\caption{Vektory přerušení a~resetu}\label{tab:6502-vektory}.
+	\begin{tblr}{|Q[c,m]|Q[c,m]|}
+		\hline
+		Přerušení & Vektor \\
+		\hline[2pt]
+		NMI & \$FFFA--\$FFFB \\
+		\hline
+		IRQ, BRK &  \$FFFE--\$FFFF \\
+		\hline
+		Reset & \$FFFC--\$FFFD \\
+		\hline
+	\end{tblr}
+\end{table}
 
 Přerušení se liší pouze způsobem vyvolání, postup po aktivaci vnitřního signálu je poté stejný. Vždy se dokončí právě probíhající instrukce, pak se na zásobník zálohuje hodnota registrů PC a P, dojde ke změně hodnoty PC na adresu nacházející ve vektoru přerušení pro daný typ a~nakonec se nastaví příznak masky přerušení. Poté se začne zpracovávat první instrukce rutiny přerušení. Z~přerušení se vystoupí instrukcí RTI (return from interrupt), která obnoví uložené hodnoty ze zásobníku a~navrátí se k~původnímu toku programu.
 
@@ -765,19 +789,163 @@ Aby se zabránilo porušení patentu, v~hardwaru se přerušilo několik cest ta
 
 Řadič DMA existuje v~2A03 pouze pro dva účely. Prvním je kopírování obrazových dat pro sprajty využívané komponentou PPU, druhým je kopírování surových zvukových dat komponentou APU. Jelikož bude v~emulátoru implementován pouze první typ, následuje jen popis této funkcionality.
 
-Podtyp DMA pro kopírování sprajtů se označuje jako OAM DMA. Spouští se zápisem do paměťově mapovaného registru procesoru na adrese \$4014. Do registru se zapíše číslo paměťové stránky, která se poté celá překopíruje (256 bajtů) do vnitřní paměti PPU přes registr PPU \$2004 (OAM DATA). Tento zápis trvá 513 cyklů (v~případě jiného zarovnání s~procesorem 514, to je ale náhodné po spuštění, tudíž irelevantní).
+Podtyp DMA pro kopírování sprajtů se označuje jako OAM DMA. Spouští se zápisem do paměťově mapovaného registru procesoru na adrese \$4014. Do registru se zapíše číslo paměťové stránky, která se poté celá překopíruje (256 bajtů) do vnitřní paměti PPU přes registr PPU \$2004 (OAM DATA). Tento zápis trvá 513 cyklů (v~případě jiného zarovnání s~procesorem 514, to je ale náhodné po spuštění, tudíž irelevantní)~\cite{Nesdev:ppu-registers}.
 
 \begin{note}[Důvod existence OAM DMA]
 	Data pro sprajty je možné zapisovat i~procesorovým přístupem do registru OAM DATA, což je dobře využitelné pro obnovu části paměti. Avšak vzhledem k~tomu, že na přepisování paměti OAM je jen omezený čas (doba prodlevy mezi snímky; vertical blanking), bylo nutné implementovat rychlejší alternativu pro případ nutnosti přepsání celé paměti OAM.
 \end{note}
 
-\section{Game Pak}
-
-
 \section{Grafický čip 2C02}
 Nedílnou součástí herní konzole je grafický výstup, tu zajišťuje čip 2C02, přezdívaný jako Picture Processing Unit (PPU). Existují dvě varianty specifické pro konkrétní trhy v~závislosti na typu výstupního signálu --- NTSC a PAL. Tento čip během zpracování grafických dat generuje přímo analogový signál, tudíž každý hodinový takt odpovídá jednomu obrazovému bodu.
 
-\section{Herní ovladače}
+\section{Game Pak}
+Hlavním a~jediným nativně podporovaným formátem distribuce softwaru pro konzoli NES byly kazety (cartridge) označované jako Game Pak. Tyto kazety nebyly pouze standardní pamětí typu ROM, obsahovaly i~často velmi sofistikované obvody především pro mapování paměťových segmentů označované jako mappery, které umožňovaly obejít některé hardwarové limitace konzole. Pro účely emulace je také nutné se zabývat formátem souboru, v~jakém se distribuují kopie těchto kazet; bylo totiž nutné uchovat kromě obsahu paměti i~informaci o~přídavných obvodech na kazetě.
+
+Každá kazeta obsahuje paměť pro program, PRG~ROM, volitelně pracovní paměť pro program, PRG~RAM. Tyto jsou mapovány do rozsahu procesoru. Dále obsahuje buďto nepřepisovatelnou paměť s~grafickými podklady (CHR~ROM), nebo pracovní paměť (CHR~RAM), do které se grafické podklady nahrály za běhu. Tyto paměti jsou mapovány do rozsahu PPU. Standardní mapování kazety do rozsahu CPU a~PPU je uvedeno v~tabulce~\ref{tab:gamepak-mapovani}. Toto mapování také určuje velikost okna, tedy část paměti, která může být najednou viditelná pro CPU či PPU, pakliže mapper umožňuje přepínat paměťové banky.
+
+\begin{table}[ht!]
+	\centering
+	\caption{Mapování kazety do rozsahu CPU a~PPU}\label{tab:gamepak-mapovani}.
+	\begin{tblr}{|Q[c,m]|Q[c,m]|}
+		\hline
+        Rozsah & Mapování \\
+        \hline[2pt]
+		\SetCell[c=2]{c} CPU \\
+		\hline
+		\$6000--\$7FFF & PRG~RAM (s~možností zálohování baterií) \\
+		\hline
+		\$8000--\$BFFF & PRG~ROM banka 0\\
+		\hline
+		\$C000--\$FFFF & PRG~ROM banka 1 (případně zrcadlo 0)\\
+		\hline
+		\SetCell[c=2]{c} PPU \\
+		\hline
+		\$0000--\$0FFF & CHR~ROM/RAM (pattern table 0) \\
+		\hline
+		\$1000--\$1FFF & CHR~ROM/RAM (pattern table 1) \\
+		\hline
+		\$2000--\$2FFF & (volitelně) vlastní videopaměť \\
+		\hline
+	\end{tblr}
+\end{table}
+
+U~přepisovatelných pamětí není pevně definována výchozí hodnota; korektně naprogramovaný software se na výchozí hodnoty nespoléhá. U~emulátorů se však často volí hodnota \$00 či \$FF.
+
+\subsection{Mapper}
+Každá kazeta obsahovala řídicí desku, která jednotlivé části paměti umisťovala do paměťových prostorů procesoru a~PPU. Jelikož byl výchozí paměťový rozsah nedostačující pro komplexnější hry, umožňovaly sofistikovanější mappery přepínat mezi jednotlivými bankami paměti, což se označuje jako \emph{bankswitching}. Tyto desky byly mnoha typů, jednoduché byly složeny z~diskrétních komponent (deska NROM), složitější obsahovaly zákaznické obvody (ASIC), například deska MMC1 a~její podtypy (SKROM, SLROM, SNROM\dots).
+
+Další funkcí, kterou desky v~kazetách měly, bylo určení, jakým způsobem se bude číst z~videopaměti. Jednak bylo možné použít vestavěnou videopaměť PPU a určit, jak se má zrcadlit (pomocí speciálních výstupů CIRAM na kazetě), jednak bylo možné tuto paměť zcela obejít a~poskytnout vlastní videopaměť, což umožnilo převzít celou kontrolu nad mapováním. Japonská verze konzole (Famicom) navíc vedla zvukový výstup nejprve přes kazety, tudíž jim umožnila přimíchat další audiokanály pomocí dedikovaných zvukových procesorů~\cite{Nesdev:mapper}.
+
+Aby bylo možné desky jednoznačně identifikovat, bylo komunitou vytvořeno označení mapper a~deskám začaly být přiřazovány indexy. Mapper může zahrnovat více desek stejného podtypu, které se liší například jen velikostí pamětí. Pro účely emulace tedy dává smysl zabývat se vyhověním specifikace mapperu.
+
+\subsubsection{Mapper 000: NROM}
+První přidělený mapper má index 000 a~jedná se o~oficiální sadu desek společnosti Nintendo, která byla využívána pro jejich vlastní hry i~pro hry třetích stran. Jsou to desky NROM, HROM, RROM, RTROM, SROM, STROM.  Tyto desky nenabízí žádné možnosti přepínání bank. Obsahují jednu, nebo dvě banky PRG~ROM, některé desky i~až jednu banku PRG~RAM. CHR~ROM/RAM je také nepřepínatelná a~pevně mapována~\cite{Nesdev:mapper-000}.
+
+Desky používají vestavěnou videopaměť PPU, nepoužívá ani žádné mechanismy změny zrcadlení, toto je nastaveno v~hardwaru zaletováním příslušných pinů. Mapper tudíž umožňuje adresovat maximálně 32~KiB paměti programu, 32~KiB pracovní paměti programu a~8~KiB CHR~ROM/RAM.
+
+\subsubsection{Mapper 001: MMC1}
+Druhý přidělený mapper je také oficiální sada desek Nintenda: SKROM, SLROM, SNROM, SOROM, SUROM, SXROM, SZROM, 2ME a další. Již umožňují přepínat paměťové banky pamětí PRG i~CHR. Vše se konfiguruje přes jediný sériový port, který je dostupný procesorem na adresách \$8000--\$FFFF. Pozorný čtenář může namítnout, že tento rozsah koliduje s~mapováním pamětí PRG ROM; ano, je to tak a~je to možné díky tomu, že čtení je mapováno do pamětí a~zápis do sériového portu~\cite{Nesdev:mapper-001}.
+
+Proces konfigurace mapperu probíhá následujícím způsobem. Procesor zapíše do jednoho z~definovaných adresních rozsahů 5 po sobě jdoucích bajtů, které se postupně přenášejí do posuvného registru. Adresa, která byla použita při zápisu posledního bajtu poté rozhodne, do kterého vnitřního registru se posuvný registr zkopíruje. Tyto vnitřní registry jsou čtyři a~mají různé funkce, viz tabulka~\ref{tab:mmc1-registry-adresy}. Struktura jednotlivých vnitřních registrů je závislá na konkrétním typu desky a~je uvedena například ve~\cite{Nesdev:mapper-001}. Zapisovaná hodnota je jeden bajt, kde funkci mají pouze dva bity; nejvyšší a~nejnižší. Zapsáním 1 do nejvyššího bitu se resetuje posuvný registr a~do řídicího registru se zapíše hodnota \$0C. Nejnižší bit je poté hodnota k~zapsání do posuvného registru. Hodnota k~zapsání se do sériového portu posílá od nejnižšího bitu po nejvyšší~~\cite{Nesdev:mapper-001}.
+
+Díky využití přepínaní bank umožňuje mapper 001 oproti mapperu 000 adresovat až 512~KiB paměti PRG~ROM, 32~KiB paměti PRG~RAM a 128~KiB paměti CHR ROM/RAM.
+
+\begin{table}[ht!]
+	\centering
+	\caption{Adresy a~popis vnitřních registrů MMC1}\label{tab:mmc1-registry-adresy}.
+	\begin{tblr}{|Q[c,m]|Q[c,m]|X[c,m]|}
+		\hline
+        Adresa & Název & Popis \\
+		\hline[2pt]
+		\$8000--\$9FFF & Řízení & Nastavení mapperu, režim zrcadlení videopaměti a~režim přepínání bank. \\
+		\hline
+		\$A000--\$BFFF & Index banky v~CHR~ROM/RAM 0 & Nastavení banky, která bude dostupná v~adresním rozsahu pattern table~0. \\
+		\hline
+		\$C000--\$DFFF & Index banky v~CHR~ROM/RAM 1 & Nastavení banky, která bude dostupná v~adresním rozsahu pattern table~1. \\
+		\hline
+		\$E000--\$FFFF & Index banky v~PRG ROM & Nastavení banky, která bude dostupná v~adresním rozsahu paměti programu CPU. \\
+		\hline
+	\end{tblr}
+\end{table}
+
+\subsection{Formát souboru kopie kazety}
+První emulátory znamenaly také nutnost vytvoření jednotného formátu, pomocí kterého se budou ukládat obsahy a~konfigurace kazet. Prvním formátem, dodnes hojně používaným, je iNES.
+
+Formát iNES se skládá z~16bajtové hlavičky. Následuje volitelný \enquote{trainer}, což byly pomocné informace pro rané emulátory, o~velikosti 512~B. Poté je uložen jeden, nebo více 16KiB bloků PRG~ROM a~volitelně jeden, nebo více 8KiB bloků CHR~ROM. Dále mohou být součástí dodatečná data systému PlayChoice, čímž se bakalářská práce nezabývá.
+
+Formát hlavičky je uveden v~tabulce~\ref{tab:ines}. Jednotlivá struktura je opět velmi dobře dokumentována, proto je pro další informace možné nahlédnout na wiki~\cite{Nesdev:iNES}.
+
+\begin{table}[ht!]
+	\centering
+	\caption{Formát hlavičky iNES}\label{tab:ines}.
+	\begin{tblr}{|Q[c,m]|X[c,m]|}
+		\hline
+		Offset (B) & Obsah \\
+		\hline[2pt]
+		0--3 & Konstanta \$4E \$45 \$53 \$1A \\
+		\hline
+		4 & Počet bloků PRG ROM \\
+    	\hline
+		5 & Počet bloků CHR ROM (0 znamená použití RAM) \\
+     	\hline
+		6 & Index mapperu (spodní čtyři bajty), typ zrcadlení, přítomnost baterie, trainer \\
+		\hline
+		7 & Index mapperu (horní čtyři bajty), typ PlayChoice \\
+		\hline
+		8--10 & Zřídka používané či neoficiální rozšíření \\
+		\hline
+		11--15 & Výplň \\
+		\hline
+	\end{tblr}
+\end{table}
+
+\section{Periferie}
+Základní periferií, která byla dodávaná s~konzolí, jsou dva herní ovladače (každý pro jednoho hráče). Všechny periferie komunikují přes stejný typ portu. Kromě 5voltového napájení a hodin obsahuje port tři datové piny označované jako D0, D3 a~D4, kde pro ovladače je použit pouze D0.
+
+\begin{note}
+Mimo herních ovladačů existovalo mnoho dalších periferií, hodně známou je například Zapper, což je model zbraně používaný ve hře Duck Hunt. Později se objevily i~pokročilejší periferie, například klávesnice pro Family BASIC, Famicom 3D brýle, interaktivní robot R.O.B., disketová jednotka Family Disk System~\cite{Nesdev:inputs}, nebo dokonce síťová karta (pouze pro Famicom) s~vlastních procesorem, který sloužila pro přístup k~bankovnictví, sázecím programům a~dalším~\cite{Wikipedia:family-computer-network-system}. Pokročilejší periferie se připojovaly expanzním portem, který byl k~dispozici pouze u~japonské verze konzole Family Computer.
+\end{note}
+
+\subsection{Herní ovladače}
+Ovladače obsahují celkem 8~tlačítek, jak ukazuje ilustrační obrázek~\ref{fig:periferie-ovladac}. Výstup z~tlačítek je udržován v~logické jedničce pomocí rezistoru, jejich zmáčknutím dojde ke spojení se zemí (GND, 0 V) a~na výstupu je tak logická nula.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{Standardní ovladač konzole NES (foto \copyright~2016 Evan-Amos)}
+	\label{fig:periferie-ovladac}
+	\includegraphics[width=0.5\textwidth]{images/nes-ovladac.jpg}
+\end{figure}
+
+Periferie jsou mapovány do paměti; čtení i~zápis tedy probíhají stejným způsobem, jako do každého jiného registru. První ovladač je mapován na adresu \$4016, druhý na sousední \$4017.
+
+Při čtení jsou k~dispozici všechny tři piny, které jsou umístěny do jednotlivých bitů dle svého označení, tedy D0 na nejnižším bitu a tak dále. Tabulka~\ref{tab:periferie-cteci-piny} ukazuje, jakou mají piny funkci.
+
+\begin{table}[ht!]
+	\centering
+	\caption{Funkce vstupních pinů portů konzole}\label{tab:periferie-cteci-piny}
+	\begin{tblr}{|Q[c,m]|Q[c,m]|}
+		\hline
+		Pin & Funkce \\
+		\hline[2pt]
+		D0 & Sériový výstup stavů tlačítek ovladače \\
+		\hline
+		D3 & Výstup světelného senzoru periferie Zapper \\
+		\hline
+		D4 & Stav spouště periferie Zapper \\ 
+		\hline
+	\end{tblr}
+\end{table}
+
+Stav tlačítek se vyčítá z~jediného bitu: D0. Jedná se o~sériový výstup osmibitového paralelně-sériového posuvného registru a~to, co je na jeho výstupu, záleží na stavu ovládacího klopného obvodu, který je k~dispozici pouze na nejnižším bitu adresy \$4016 (\$4017 je pouze pro čtení). Logickou jedničkou se aktivuje obnova stavu tlačítek do vnitřních registrů a~na výstupu je neustále stav jediného tlačítka (A). Přivedením nuly je pak možné postupně vyčíst hodnotu stisknutých tlačítek v~následujícím pořadí: A, B, Select, Start, Up, Down, Left, Right. Jelikož stisk tlačítka přivede na výstup logickou nulu, dochází k~dodatečné inverzi hodnoty tak, aby stisknuté tlačítko vracelo logickou jedničku a~puštěné logickou nulu~\cite{Nesdev:standard-controller}.
+
+Po přečtení tlačítek vrací výstup logickou jedničku. To je způsobeno tím, že na sériový vstup posuvného registru (který se používá pro řetězení více takových posuvných registrů) je přivedeno nízké napětí (logická nula), což po dodatečné inverzi odpovídá logické jedničce. Pro další čtení je nutné opět obnovit stavy tlačítek~\cite{Nesdev:standard-controller}.
+
+Standardní postup při čtení by se tedy dal shrnout takto:
+\begin{enumerate}
+	\item Zapsání logické jedničky do bitu 0 na adrese \$4016.
+	\item Zapsání logické nuly do stejného místa.
+	\item Postupné vyčítání osmi bitů ze sériového portu na adrese dle požadovaného ovladače (\$4016 či \$4017).
+\end{enumerate}
 
 \section{Audio Processing Unit}
 \label{sec:APU}
