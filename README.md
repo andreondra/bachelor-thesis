@@ -24,6 +24,7 @@ Bakalářská práce vznikala v letech 2022-2023 na FIT ČVUT.
   - bytefield.sty,
   - tikz-timing.sty,
   - bytefield.sty,
+  - forloop.sty,
   - tip: na Fedoře lze TeXové balíčky nainstalovat pomocí dnf: `dnf install "tex(balicek.pripona)"`.
 - Požadované další systémové balíčky na Fedoře 37:
   - texlive-collection-langczechslovak,
