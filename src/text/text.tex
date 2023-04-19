@@ -987,19 +987,31 @@ Struktura sprajtu není nikterak složitá. První bajt je souřadnice Y (řáde
 
 \subsection{Vnější rozhraní}
 \label{sec:ppu-cpu-io}
-PPU je řízeno pomocí osmi registrů mapovaných do paměťového prostoru procesoru. Tyto registry jsou zrcadleny po širokém adresním rozsahu, jak bylo uvedeno v~úvodu. Tabulka~\ref{tab:ppu-registry} poskytuje přehled a~stručný popis. Pro podrobnější informace je možné čtenáře opět odkázat na:  DOPLNIT.
+PPU je řízeno pomocí osmi registrů mapovaných do paměťového prostoru procesoru. Tyto registry jsou zrcadleny po širokém adresním rozsahu, jak bylo uvedeno v~úvodu. Tabulka~\ref{tab:ppu-registry} poskytuje přehled a~stručný popis. Pro podrobnější informace je možné čtenáře opět odkázat na~\cite{Nesdev:ppu-registers}.
 
-\begin{table}[ht!]
+\begin{table}[htp!]
 	\centering
 	\caption{Procesorem přístupné registry čipu PPU. Označení \enquote{-} znamená, že se používá celý bajt pro jedinou hodnotu.}\label{tab:ppu-registry}
-	\begin{tblr}{|Q[c,m]|Q[c,m]|Q[c,m]|X[l,m]|}
+	\begin{tblr}{|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|X[l,m]|}
 		\hline
-		Označení & Adresa & Bity & Popis bitů \\
+		Označení & Adresa & Přístup & Bity & Popis bitů \\
 		\hline[2pt]
-		\SetCell[r=7]{c} PPUCTRL & \SetCell[r=7]{c} \$2000 & \SetCell[r=7]{c} \texttt{VPHB SINN} & \texttt{V}: Povolení generování NMI \\ \cline{4} & & & \texttt{P}: režim PPU (0: slave, 1: master) \\ \cline{4} & & & \texttt{H}: Velikost sprajtů (0: $8\times8$, 1: $8\times16$) \\ \cline{4} & & & \texttt{B}: Výběr pattern table pro pozadí (0: první, 1: druhá) \\ \cline{4} & & & \texttt{S}: Výběr pattern table pro sprajty (0: první, 1: druhá) \\ \cline{4} & & & \texttt{I}: Způsob inkrementace indexu do videopaměti (0: přičíst 1, 1: přičíst 32) \\ \cline{4} & & & \texttt{NN}: Základ pro index do videopaměti (0: \$2000, 1: \$2400, 2: \$2800, 3: \$2C00) \\
+		\SetCell[r=7]{c} PPUCTRL & \SetCell[r=7]{c} \$2000 & \SetCell[r=7]{c} zápis & \SetCell[r=7]{c} \texttt{VPHB SINN} & \texttt{V}: povolení generování NMI \\ \cline{5} & & & & \texttt{P}: režim PPU (0: slave, 1: master) \\ \cline{5} & & & & \texttt{H}: velikost sprajtů (0: $8\times8$, 1: $8\times16$) \\ \cline{5} & & & & \texttt{B}: výběr pattern table pro pozadí (0: první, 1: druhá) \\ \cline{5} & & & & \texttt{S}: výběr pattern table pro sprajty (0: první, 1: druhá) \\ \cline{5} & & & & \texttt{I}: způsob inkrementace indexu do videopaměti (0: přičíst 1, 1: přičíst 32) \\ \cline{5} & & & & \texttt{NN}: základ pro index do videopaměti (0: \$2000, 1: \$2400, 2: \$2800, 3: \$2C00) \\
 		\hline
-		\SetCell[r=6]{c} PPUMASK & \SetCell[r=6]{c} \$2001 & \SetCell[r=6]{c} \texttt{BGRs bMmG} & \texttt{BGR}: Zvýraznění barev (jednobitová hodnota pro modrou, zelenou a~červenou, 1 zvýraznění aktivuje) \\ \cline{4} & & & \texttt{s}: Povolení sprajtů \\ \cline{4} & & & \texttt{b}: Povolení pozadí \\ \cline{4} & & & \texttt{M}: 1: zobrazit sprajty v~levých 8~pixelech obrazovky, 0: skrýt \\ \cline{4} & & & \texttt{m}: 1: zobrazit pozadí v~levých 8~pixelech obrazovky, 0: skrýt \\ \cline{4} & & & \texttt{G}: 1: renderovat ve stupních šedi, 0: renderovat barevně \\
-		\hline		
+		\SetCell[r=6]{c} PPUMASK & \SetCell[r=6]{c} \$2001 & \SetCell[r=6]{c} zápis & \SetCell[r=6]{c} \texttt{BGRs bMmG} & \texttt{BGR}: Zvýraznění barev (jednobitová hodnota pro modrou, zelenou a~červenou, 1 zvýraznění aktivuje) \\ \cline{5} & & & & \texttt{s}: Povolení sprajtů \\ \cline{5} & & & & \texttt{b}: Povolení pozadí \\ \cline{5} & & & & \texttt{M}: 1: zobrazit sprajty v~levých 8~pixelech obrazovky, 0: skrýt \\ \cline{5} & & & & \texttt{m}: 1: zobrazit pozadí v~levých 8~pixelech obrazovky, 0: skrýt \\ \cline{5} & & & & \texttt{G}: 1: renderovat ve stupních šedi, 0: renderovat barevně \\
+		\hline
+		\SetCell[r=3]{c} PPUSTATUS & \SetCell[r=3]{c} \$2002 & \SetCell[r=3]{c} čtení & \SetCell[r=3]{c} \texttt{VSO- ----} & \texttt{V}: 1: probíhá VBlank \\ \cline{5} & & & & \texttt{S}: 1: proběhla kolize sprajtu 0 \\ \cline{5} & & & & \texttt{O}: 1: došlo k~přetečení sprajtů \\
+		\hline
+		OAMADDR & \$2003 & zápis & - & aktuální adresa v~OAM; běžně se nastaví na \$00 a~poté se použije DMA \\
+		\hline
+		OAMDATA & \$2004 & čtení i~zápis & - & čtení dat z~OAM, nebo zápis na adresu zvolenou pomocí OAMADDR; zápis autoinkrementuje adresu \\
+		\hline
+		PPUSCROLL & \$2005 & zápis ($2\times$) & - & zápis dvoubajtové hodnoty určující posuv ve videopaměti (která část se bude zobrazovat na obrazovce) \\
+		\hline
+		PPUADDR & \$2006 & zápis ($2\times$) & - & zápis aktivní adresy na grafické sběrnici \\
+		\hline
+		PPUDATA & \$2007 & čtení i~zápis & - & čtení i~zápis dat na grafickou sběrnici \\
+		\hline
 	\end{tblr}
 \end{table}
 
