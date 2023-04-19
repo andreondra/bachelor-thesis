@@ -226,7 +226,7 @@ Procesor má k~dispozici 2~kB paměti RAM. Přímo v~procesoru se nachází čip
 \end{note}
 
 \subsection{Grafická sběrnice}
-Systém obsahuje i~vedlejší sběrnici adresovanou 14~bity (celkem tedy 16~kB adresovatelného prostoru), kde komunikaci řídí PPU. Schematicky je znázorněna na obrázku~\ref{fig:nes-grafickasbernice}. Tato sběrnice je zcela oddělena od hlavní. Sběrnice obsahuje paměť video RAM (VRAM, také označována jako CIRAM) o~kapacitě 2~kB. Do paměťového prostoru je dále mapována RAM obsahující barevnou paletu a~paměť OAM (Object Attribute Memory), která obsahuje seznam spritů a~informace potřebné k~jejich zobrazování.
+Systém obsahuje i~vedlejší sběrnici adresovanou 14~bity (celkem tedy 16~kB adresovatelného prostoru), kde komunikaci řídí PPU. Schematicky je znázorněna na obrázku~\ref{fig:nes-grafickasbernice}. Tato sběrnice je zcela oddělena od hlavní. Sběrnice obsahuje paměť video RAM (VRAM, také označována jako CIRAM) o~kapacitě 2~kB. Do paměťového prostoru je dále mapována RAM obsahující barevnou paletu. V~systému existuje ještě paměť OAM (Object Attribute Memory), která obsahuje seznam spritů a~informace potřebné k~jejich zobrazování. Ta je ale není připojena ke sběrnici, nýbrž přímo k~čipu PPU.
 
 \begin{definition}[Sprite]
 	Sprite (počeštěně sprajt) je dvourozměrný obrázek, který bývá integrován do větších scén. Termín pochází z~dob, kdy se zvlášť vykreslovalo pozadí a~právě sprity, které často představovaly herní postavičky a~asociované předměty (zbraně, náboje a~další). To je případ i~konzole NES, která pro sprity měla dedikovanou paměť OAM.
@@ -416,10 +416,10 @@ Nejjednodušší adresní režim se skládá pouze z~operačního znaku (OZ, ang
 	
 	\begin{bytefield}[bitheight=\widthof{~Sign~},
 		boxformatting={\centering\small\ttfamily}]{8}
-		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7} \\
-		\bitbox[]{8}{}    		   && \bitbox{8}[bgcolor=bfcommon]{OZ} \\
-		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7} \\
-		\bitbox[]{8}{CLI} && \bitboxes*{1}[bgcolor=bfcommonlight]{01011000}
+		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7} \\
+		\bitbox[]{8}{}    		   & \bitbox{8}[bgcolor=bfcommon]{OZ} \\
+		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7} \\
+		\bitbox[]{8}{CLI} & \bitboxes*{1}[bgcolor=bfcommonlight]{01011000}
 	\end{bytefield}
 \end{figure}
 
@@ -431,10 +431,10 @@ Další adresní režim pracuje s~konstantní hodnotou, která je uváděná ihn
 	
 	\begin{bytefield}[bitheight=\widthof{~Sign~},
 		boxformatting={\centering\small\ttfamily}]{8}
-		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15} \\
-		\bitbox[]{8}{}    		   && \bitbox{8}[bgcolor=bfcommon]{OZ} && \bitbox{8}[bgcolor=bfcommon]{konstanta} \\
-		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15} \\
-		\bitbox[]{8}{AND} && \bitboxes*{1}[bgcolor=bfcommonlight]{00101001} && \bitboxes*{1}[bgcolor=bfcommonlight]{01000010}
+		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7,8,15} \\
+		\bitbox[]{8}{}    		   & \bitbox{8}[bgcolor=bfcommon]{OZ} & \bitbox{8}[bgcolor=bfcommon]{konstanta} \\
+		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7,8,15} \\
+		\bitbox[]{8}{AND} & \bitboxes*{1}[bgcolor=bfcommonlight]{00101001} & \bitboxes*{1}[bgcolor=bfcommonlight]{01000010}
 	\end{bytefield}
 \end{figure}
 
@@ -446,10 +446,10 @@ Adresní režim, který již pracuje s~hodnotami adres, se označuje jako \emph{
 	
 	\begin{bytefield}[bitheight=\widthof{~Sign~},
 		boxformatting={\centering\small\ttfamily}]{8}
-		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15,16,23} \\
-		\bitbox[]{8}{}    		   && \bitbox{8}[bgcolor=bfcommon]{OZ} && \bitbox{8}[bgcolor=bfcommon]{ADL} && \bitbox{8}[bgcolor=bfcommon]{ADH} \\
-		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15,16,23}  \\
-		\bitbox[]{8}{LDA} && \bitboxes*{1}[bgcolor=bfcommonlight]{10101101} && \bitboxes*{1}[bgcolor=bfcommonlight]{00000010} && \bitboxes*{1}[bgcolor=bfcommonlight]{00000001}
+		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7,8,15,16,23} \\
+		\bitbox[]{8}{}    		   & \bitbox{8}[bgcolor=bfcommon]{OZ} & \bitbox{8}[bgcolor=bfcommon]{ADL} & \bitbox{8}[bgcolor=bfcommon]{ADH} \\
+		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7,8,15,16,23}  \\
+		\bitbox[]{8}{LDA} & \bitboxes*{1}[bgcolor=bfcommonlight]{10101101} & \bitboxes*{1}[bgcolor=bfcommonlight]{00000010} & \bitboxes*{1}[bgcolor=bfcommonlight]{00000001}
 	\end{bytefield}
 \end{figure}
 
@@ -461,10 +461,10 @@ Absence univerzálních registrů je částečně suplována existencí adresní
 	
 	\begin{bytefield}[bitheight=\widthof{~Sign~},
 		boxformatting={\centering\small\ttfamily}]{8}
-		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15} \\
-		\bitbox[]{8}{}    		   && \bitbox{8}[bgcolor=bfcommon]{OZ} && \bitbox{8}[bgcolor=bfcommon]{ADL} \\
-		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15}  \\
-		\bitbox[]{8}{STA} && \bitboxes*{1}[bgcolor=bfcommonlight]{10000101} && \bitboxes*{1}[bgcolor=bfcommonlight]{01000010}
+		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7,8,15} \\
+		\bitbox[]{8}{}    		   & \bitbox{8}[bgcolor=bfcommon]{OZ} & \bitbox{8}[bgcolor=bfcommon]{ADL} \\
+		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7,8,15}  \\
+		\bitbox[]{8}{STA} & \bitboxes*{1}[bgcolor=bfcommonlight]{10000101} & \bitboxes*{1}[bgcolor=bfcommonlight]{01000010}
 	\end{bytefield}
 \end{figure}
 
@@ -476,10 +476,10 @@ Absence univerzálních registrů je částečně suplována existencí adresní
 	
 	\begin{bytefield}[bitheight=\widthof{~Sign~},
 		boxformatting={\centering\small\ttfamily}]{8}
-		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15} \\
-		\bitbox[]{8}{}    		   && \bitbox{8}[bgcolor=bfcommon]{OZ} && \bitbox{8}[bgcolor=bfcommon]{offset} \\
-		\bitbox[]{8}{}    		   && \bitheader[endianness=little]{0,7,8,15}  \\
-		\bitbox[]{8}{BCS} && \bitboxes*{1}[bgcolor=bfcommonlight]{10110000} && \bitboxes*{1}[bgcolor=bfcommonlight]{01000010}
+		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7,8,15} \\
+		\bitbox[]{8}{}    		   & \bitbox{8}[bgcolor=bfcommon]{OZ} & \bitbox{8}[bgcolor=bfcommon]{offset} \\
+		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7,8,15}  \\
+		\bitbox[]{8}{BCS} & \bitboxes*{1}[bgcolor=bfcommonlight]{10110000} & \bitboxes*{1}[bgcolor=bfcommonlight]{01000010}
 	\end{bytefield}
 \end{figure}
 
@@ -507,16 +507,16 @@ První zmíněný režim, \emph{indexovaný-nepřímý}, pracuje s~jednobajtovou
 	
 	\begin{bytefield}[bitheight=\widthof{~Sign~},
 		boxformatting={\centering\small\ttfamily}]{8}
-		\bitbox[]{8}{} && \bitheader[endianness=little]{0,7,8,15} \\
-		\bitbox[]{8}{\$F000:} && \bitbox{8}[bgcolor=bfcommon]{OZ} && \bitbox{8}[bgcolor=bfcommon]{základ ukazatele} && \bitbox[]{8}{} && \bitbox{8}[bgcolor=bfaux]{X} \\
+		\bitbox[]{8}{} & \bitheader[endianness=little]{0,7,8,15} \\
+		\bitbox[]{8}{\$F000:} & \bitbox{8}[bgcolor=bfcommon]{OZ} & \bitbox{8}[bgcolor=bfcommon]{základ ukazatele} & \bitbox[]{8}{} & \bitbox{8}[bgcolor=bfaux]{X} \\
 
-		\bitbox[]{8}{} && \bitboxes*{1}[bgcolor=bfcommonlight]{10000001} && \bitbox{8}[bgcolor=bfcommonlight]{\$42} && \bitbox[]{8}{} && \bitbox{8}[bgcolor=bfauxlight]{\$10} \\ \\ \\
+		\bitbox[]{8}{} & \bitboxes*{1}[bgcolor=bfcommonlight]{10000001} & \bitbox{8}[bgcolor=bfcommonlight]{\$42} & \bitbox[]{8}{} & \bitbox{8}[bgcolor=bfauxlight]{\$10} \\ \\ \\
 
-		\bitbox[]{8}{Výpočet:} && \bitbox{8}[bgcolor=bfcommonlight]{\$42} && \bitbox{1}[]{+} && \bitbox{8}[bgcolor=bfauxlight]{\$10} \\
+		\bitbox[]{8}{Výpočet:} & \bitbox{8}[bgcolor=bfcommonlight]{\$42} & \bitbox{1}[]{+} & \bitbox{8}[bgcolor=bfauxlight]{\$10} \\
 
-		\bitbox[]{8}{} && \bitheader[endianness=little]{0,7,8,15} \\ \bitbox[]{8}{\$52:} && \bitbox{8}[bgcolor=bfcommon]{ADL} && \bitbox{8}[bgcolor=bfcommon]{ADH} \\
+		\bitbox[]{8}{} & \bitheader[endianness=little]{0,7,8,15} \\ \bitbox[]{8}{\$52:} & \bitbox{8}[bgcolor=bfcommon]{ADL} & \bitbox{8}[bgcolor=bfcommon]{ADH} \\
 		
-		\bitbox[]{8}{} && \bitbox{8}[bgcolor=bfcommonlight]{\$12} && \bitbox{8}[bgcolor=bfcommonlight]{\$34}
+		\bitbox[]{8}{} & \bitbox{8}[bgcolor=bfcommonlight]{\$12} & \bitbox{8}[bgcolor=bfcommonlight]{\$34}
 	\end{bytefield}
 \end{figure}
 
@@ -528,16 +528,16 @@ Druhý režim, \emph{nepřímý-indexovaný}, funguje podobně, ale přičítán
 	
 	\begin{bytefield}[bitheight=\widthof{~Sign~},
 		boxformatting={\centering\small\ttfamily}]{8}
-		\bitbox[]{8}{} && \bitheader[endianness=little]{0,7,8,15} \\
-		\bitbox[]{8}{\$F000:} && \bitbox{8}[bgcolor=bfcommon]{OZ} && \bitbox{8}[bgcolor=bfcommon]{ukazatel} && \bitbox[]{8}{} && \bitbox{8}[bgcolor=bfaux]{X} \\
+		\bitbox[]{8}{} & \bitheader[endianness=little]{0,7,8,15} \\
+		\bitbox[]{8}{\$F000:} & \bitbox{8}[bgcolor=bfcommon]{OZ} & \bitbox{8}[bgcolor=bfcommon]{ukazatel} & \bitbox[]{8}{} & \bitbox{8}[bgcolor=bfaux]{X} \\
 		
-		\bitbox[]{8}{} && \bitboxes*{1}[bgcolor=bfcommonlight]{10000001} && \bitbox{8}[bgcolor=bfcommonlight]{\$42} && \bitbox[]{8}{} && \bitbox{8}[bgcolor=bfauxlight]{\$10} \\
+		\bitbox[]{8}{} & \bitboxes*{1}[bgcolor=bfcommonlight]{10000001} & \bitbox{8}[bgcolor=bfcommonlight]{\$42} & \bitbox[]{8}{} & \bitbox{8}[bgcolor=bfauxlight]{\$10} \\
 		
-		\bitbox[]{8}{} && \bitheader[endianness=little]{0,7,8,15} \\ \bitbox[]{8}{\$42:} && \bitbox{8}[bgcolor=bfcommon]{ADL} && \bitbox{8}[bgcolor=bfcommon]{ADH} \\
+		\bitbox[]{8}{} & \bitheader[endianness=little]{0,7,8,15} \\ \bitbox[]{8}{\$42:} & \bitbox{8}[bgcolor=bfcommon]{ADL} & \bitbox{8}[bgcolor=bfcommon]{ADH} \\
 		
-		\bitbox[]{8}{} && \bitbox{8}[bgcolor=bfcommonlight]{\$12} && \bitbox{8}[bgcolor=bfcommonlight]{\$34} \\ \\ \\
+		\bitbox[]{8}{} & \bitbox{8}[bgcolor=bfcommonlight]{\$12} & \bitbox{8}[bgcolor=bfcommonlight]{\$34} \\ \\ \\
 		
-		\bitbox[]{8}{Výpočet:} && \bitbox{8}[bgcolor=bfcommonlight]{\$3412} && \bitbox{1}[]{+} && \bitbox{8}[bgcolor=bfauxlight]{\$10} \\
+		\bitbox[]{8}{Výpočet:} & \bitbox{8}[bgcolor=bfcommonlight]{\$3412} & \bitbox{1}[]{+} & \bitbox{8}[bgcolor=bfauxlight]{\$10} \\
 	\end{bytefield}
 \end{figure}
 
@@ -549,14 +549,14 @@ Existuje ještě jeden nepřímý režim, označovaný jako \emph{nepřímý abs
 	
 	\begin{bytefield}[bitheight=\widthof{~Sign~},
 		boxformatting={\centering\small\ttfamily}]{8}
-		\bitbox[]{8}{} && \bitheader[endianness=little]{0,7,8,15,16,23} \\
-		\bitbox[]{8}{\$F000:} && \bitbox{8}[bgcolor=bfcommon]{OZ} && \bitbox{8}[bgcolor=bfcommon]{ukazatel (LO)} && \bitbox{8}[bgcolor=bfcommon]{ukazatel (HI)} \\
+		\bitbox[]{8}{} & \bitheader[endianness=little]{0,7,8,15,16,23} \\
+		\bitbox[]{8}{\$F000:} & \bitbox{8}[bgcolor=bfcommon]{OZ} & \bitbox{8}[bgcolor=bfcommon]{ukazatel (LO)} & \bitbox{8}[bgcolor=bfcommon]{ukazatel (HI)} \\
 		
-		\bitbox[]{8}{} && \bitboxes*{1}[bgcolor=bfcommonlight]{01101100} && \bitbox{8}[bgcolor=bfcommonlight]{\$10} && \bitbox{8}[bgcolor=bfcommonlight]{\$20} \\
+		\bitbox[]{8}{} & \bitboxes*{1}[bgcolor=bfcommonlight]{01101100} & \bitbox{8}[bgcolor=bfcommonlight]{\$10} & \bitbox{8}[bgcolor=bfcommonlight]{\$20} \\
 		
-		\bitbox[]{8}{} && \bitheader[endianness=little]{0,7,8,15} \\ \bitbox[]{8}{\$2010:} && \bitbox{8}[bgcolor=bfcommon]{ADL} && \bitbox{8}[bgcolor=bfcommon]{ADH} \\
+		\bitbox[]{8}{} & \bitheader[endianness=little]{0,7,8,15} \\ \bitbox[]{8}{\$2010:} & \bitbox{8}[bgcolor=bfcommon]{ADL} & \bitbox{8}[bgcolor=bfcommon]{ADH} \\
 		
-		\bitbox[]{8}{} && \bitbox{8}[bgcolor=bfcommonlight]{\$55} && \bitbox{8}[bgcolor=bfcommonlight]{\$FA} \\
+		\bitbox[]{8}{} & \bitbox{8}[bgcolor=bfcommonlight]{\$55} & \bitbox{8}[bgcolor=bfcommonlight]{\$FA} \\
 	\end{bytefield}
 \end{figure}
 
@@ -637,7 +637,7 @@ Příklad několika záznamů je uveden v~tabulce~\ref{tab:6502-PLA}, kde např�
 
 \subsubsection{Instrukční sada}
 \label{sec:6502-instrukce}
-Instrukční sadu procesoru je možné rozdělit do několika skupin dle jejich účelu. Každá instrukce se pak dělí dle adresních režimů, které používá; to určuje i~délku vykonávání ve strojových cyklech a~také říká, zdali dojde při překročení paměťové stránky k~vykonání dalšího strojového cyklu. Nakonec je u~každé instrukce známo, jaké příznaky procesoru nastavuje. Instrukce má pro použití v~JSA symbolické textové označení, které se označuje jako mnemonika (mnemonic); příklady takových označení již byly uvedeny u~adresních režimů, například STA pro Store Accumulator. Instrukční sada je popsána nejen v~oficiálních manuálech, ale i~v~mnoha přehledných dokumentech, které jsou k~dispozici na webu; tato kapitola je tedy věnována analýze formátu takových dokumentů a~ukázce zajímavých instrukcí.
+Instrukční sadu procesoru je možné rozdělit do několika skupin dle jejich účelu. Každá instrukce se pak dělí dle adresních režimů, které používá; to určuje i~délku vykonávání ve strojových cyklech a~také říká, zdali dojde při překročení paměťové stránky k~vykonání dalšího strojového cyklu. Nakonec je u~každé instrukce známo, jaké příznaky procesoru nastavuje. Instrukce má pro použití v~JSA symbolické textové označení, které se označuje jako mnemonika (mnemonic); příklady takových označení již byly uvedeny u~adresních režimů, například STA pro Store Accumulator. Instrukční sada je popsána nejen v~oficiálních manuálech, ale i~v~mnoha přehledných dokumentech, které jsou k~dispozici na webu; tato kapitola je tedy věnována analýze formátu takových dokumentů a~ukázce pár instrukcí.
 
 Popis instrukcí většinou bývá ve formě tabulky. První tabulkou je přehled operačních znaků, kde řádky odpovídají vyšším čtyřem bitům OZ a~sloupce nižším bitům. Další tabulka je poté věnována popisům jednotlivých instrukcí. Příkladem je tabulka~\ref{tab:6502-instr-priklad}, ve které je mnemonika instrukce, seznam příznaků a~stručný popis.
 
@@ -675,7 +675,7 @@ Po spuštění dojde k~7cyklové inicializaci, nakonec se provede instrukce skok
 
 \begin{table}[ht!]
 	\centering
-	\caption{Stav registrů 6502 po restartu}\label{tab:6502-restart}.
+	\caption{Stav registrů 6502 po restartu}\label{tab:6502-restart}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|}
 		\hline
 		Registr & Hodnota \\
@@ -699,7 +699,7 @@ Přerušení se dá použít mimo jiné pro synchronizaci systémových komponen
 
 \begin{table}[ht!]
 	\centering
-	\caption{Vektory přerušení a~resetu}\label{tab:6502-vektory}.
+	\caption{Vektory přerušení a~resetu}\label{tab:6502-vektory}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|}
 		\hline
 		Přerušení & Vektor \\
@@ -796,7 +796,217 @@ Podtyp DMA pro kopírování sprajtů se označuje jako OAM DMA. Spouští se z�
 \end{note}
 
 \section{Grafický čip 2C02}
-Nedílnou součástí herní konzole je grafický výstup, tu zajišťuje čip 2C02, přezdívaný jako Picture Processing Unit (PPU). Existují dvě varianty specifické pro konkrétní trhy v~závislosti na typu výstupního signálu --- NTSC a PAL. Tento čip během zpracování grafických dat generuje přímo analogový signál, tudíž každý hodinový takt odpovídá jednomu obrazovému bodu.
+Nedílnou součástí herní konzole je grafický výstup, tu zajišťuje čip 2C02, přezdívaný jako Picture Processing Unit (PPU). 2C02 je grafickým čipem, který ve své podstatě operuje vždy nad surovými daty, pouze s~nimi umožňuje programátorovi efektivně manipulovat --- jak pozadí, tak sprajty jsou hardwarově renderovány. Tím, že PPU generuje přímo kompozitní signál, je průběh renderování pevně svázán s~rozlišením i~použitým televizním standardem. Každý hodinový takt odpovídá jednomu obrazovému bodu na televizní obrazovce.
+
+Existují dvě varianty specifické pro konkrétní trhy v~závislosti na typu výstupního signálu --- NTSC a PAL. Americká verze konzole (NES), kterou se tato práce zabývá, obsahuje variantu pro standard NTSC. Ačkoliv původní hardware oproti jiným konzolím generoval přímo tento analogový signál~\cite{Nesdev:ntsc}, není třeba se tímto při tvorbě emulátoru zabývat --- pro věrohodnost emulace stačí pouze dodržet rozlišení a~časování a~generovat obraz v~hodnotách RGB, které se i~jednoduše zobrazují na monitoru. Případné převedení do analogového signálu lze udělat dodatečně, což se používá ve formě efektů pro \enquote{zvěrohodnění} zážitku z~hraní na emulátoru.
+
+Jedná o~velice rozsáhlý čip. Analýzu je tedy třeba provést v~několika částech. Nejprve se zjistí, s~jakými daty čip pracuje, poté jak se tento čip ovládá (rozhraní, které je dostupné procesoru) a nakonec i~to, jak s~dostupnými daty čip pracuje.
+
+\subsection{Paměti a~data}
+Jak již bylo zmíněno v~úvodu, čip PPU je připojen do dvou sběrnic. Jednak je připojen do hlavní systémové sběrnice, pomocí které procesor 6502 s~čipem PPU komunikuje, což je probíráno v~podkapitole~\ref{sec:ppu-cpu-io}. Dále je připojen do své vlastní sběrnice, na kterou je připojena i~část kazety Game Pak (viz tabulka~\ref{tab:gamepak-mapovani} na straně~\pageref{tab:gamepak-mapovani}). Tabulka~\ref{tab:ppu-pametova-mapa} ukazuje rozdělení adresního prostoru vlastní sběrnice čipu PPU včetně částí zařízení, které jsou běžně v~příslušných rozsazích dostupné.
+
+\begin{table}[ht!]
+	\centering
+	\caption{Adresní prostor vlastní sběrnice PPU}\label{tab:ppu-pametova-mapa}
+	\begin{tblr}{|Q[c,m]|Q[c,m]|X[c,m]|X[c,m]}
+		\hline
+		Rozsah & Popis & Standardně připojeno \\
+		\hline[2pt]
+		\$0000--\$0FFF & Pattern table 0 & Paměť CHR~ROM/RAM kazety \\
+		\hline
+		\$1000--\$1FFF & Pattern table 1 & Paměť CHR~ROM/RAM kazety \\
+		\hline
+		\$2000--\$23FF & Nametable 0 & Vestavěná videopaměť PPU / vlastní paměť kazety \\
+		\hline
+		\$2400--\$27FF & Nametable 1 & Vestavěná videopaměť PPU / vlastní paměť kazety \\
+		\hline
+		\$2800--\$2BFF & Nametable 2 & Vestavěná videopaměť PPU / vlastní paměť kazety \\
+		\hline
+		\$2C00--\$2FFF & Nametable 3 & Vestavěná videopaměť PPU / vlastní paměť kazety \\
+		\hline
+		\$3000--\$3EFF & Zrcadla rozsahu \$2000--\$2EFF & Viz zrcadlené oblasti \\
+		\hline
+		\$3F00--\$3F1F & Paletová RAM & Vestavěná paměť PPU \\
+		\hline
+		\$3F20--\$3FFF & Zrcadla rozsahu \$3F00--\$3F1F & Viz zrcadlené oblasti \\
+		\hline		
+	\end{tblr}
+\end{table}
+
+Nakonec je čip PPU připojen zvlášť ještě k~paměti OAM obsahující sprajty, viz podkapitola~\ref{sec:ppu-oam}.
+
+\subsubsection{Paletová RAM}
+Před další diskusí je třeba popsat, jak funguje práce s~barvami v~konzoli NES. Konzole jako taková má pevně danou množinu barev, kterou může používat. Množina je dána verzí čipu v~závislosti na tom, jestli se generuje přímo kompozitní signál, nebo RGB signál, což používaly především arkádové skříňové automaty. Palety lze vygenerovat v~závislosti na různých nastaveních například nástrojem \url{https://bisqwit.iki.fi/utils/nespalette.php}.
+
+Třebaže je tato množina barev už tak omezená, není možné ji používat v~jednu chvíli celou. Množina aktivních barev je uložena v~RAM integrované přímo v~čipu PPU dostupná na sběrnici na adresách \$3F00--\$3F1F. Tato paměť obsahuje čtyři palety pro pozadí a~další čtyři pro sprajty. Úplně první barva (\$3F00) je také nazývána jako univerzální barva. Každá paleta obsahuje hodnotu tří barev ze zmiňované množiny a~dále jednu barvu, která je zrcadlem univerzální barvy pozadí. Obrázek~\ref{fig:ppu-palety} ukazuje vnitřní uspořádání paletové paměti s~ukázkou možného obsahu. Uctivý čtenář si ráčí všimnout, že první barva palety je vždy stejná, totiž taková, která je obsažena na adrese \$3F00. Jedná se  o~zrcadlo tohoto paměťového místa, a~tudíž první barvu lze zvolit pouze pro všechny palety stejnou; proto také označení univerzální barva.
+
+\begin{note}[Přepis barev pozadí]
+	Existuje způsob, jakým lze přinutit čip PPU k~přepsání prvních barev z~palet pozadí namísto zrcadlení univerzální barvy. Jedná se však o~nestandardní postup.
+\end{note}
+
+\begin{figure}[htp!]
+	\centering
+	\caption{Část paletové paměti RAM s~ukázkou hodnot barev z~množiny dostupné pro čip 2C02}\label{fig:ppu-palety}
+	
+	\begin{bytefield}[bitheight=1.5em, bitwidth=\widthof{\$0000},
+		boxformatting={\centering\small\ttfamily}]{4}
+				
+		\bitbox[]{2}{} & \bitheader{0,3} \\
+
+		\begin{rightwordgroup}{Paleta pozadí 0}
+			\bitbox[]{2}{\$3F00:} & \bitbox{1}{\$30} & \bitbox{1}[bgcolor=orange]{\$26}  & \bitbox{1}[bgcolor=red]{\$16} & \bitbox{1}[bgcolor=blue]{\textcolor{white}{\$2C}} 
+		\end{rightwordgroup} \\
+	
+		\bitbox[]{2}{} & \wordbox[]{1}{...} \\
+
+		\begin{rightwordgroup}{Paleta pozadí 3}
+			\bitbox[]{2}{\$3F0C:} & \bitbox{1}{\$30} & \bitbox{1}[bgcolor=pixel 1]{\$29} & \bitbox{1}[bgcolor=pixel 2]{\$2C} & \bitbox{1}[bgcolor=pixel 3]{\textcolor{white}{\$0D}}
+		\end{rightwordgroup} \\\\
+
+		\begin{rightwordgroup}{Paleta popředí 0}
+			\bitbox[]{2}{\$3F10:} & \bitbox{1}{\$30} & \bitbox{1}[bgcolor=violet]{\textcolor{white}{\$13}} & \bitbox{1}[bgcolor=purple]{\$04} & \bitbox{1}[bgcolor=pink]{\$33}
+		\end{rightwordgroup} \\
+	
+		\bitbox[]{2}{} & \wordbox[]{1}{...} \\
+
+		\begin{rightwordgroup}{Paleta popředí 3}
+			\bitbox[]{2}{\$3F1C:} & \bitbox{1}{\$30} & \bitbox{1}[bgcolor=yellow]{\$37} & \bitbox{1}[bgcolor=brown]{\textcolor{white}{\$08}} & \bitbox{1}[bgcolor=green]{\$29}
+		\end{rightwordgroup} \\
+		
+	\end{bytefield}
+	
+\end{figure}
+
+\subsubsection{Pattern table}
+Pattern table (volně přeložitelné jako tabulka tvarů) je část paměti typicky obsažené v~kazetě ve počtu dvou po sobě jdoucích tabulek. Zde se ukládají tvary, ze kterých se poté skládá výsledný obraz, ať už v~pozadí, nebo ve formě sprajtu. Každá pattern table obsahuje 256 dlaždic. Diagram jedné pattern table je k~nahlédnutí na obrázku~\ref{fig:ppu-pattern-table}, kde jednotlivé dlaždice jsou označeny jako D následované indexem dlaždice.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{~Struktura pattern table čipu PPU}\label{fig:ppu-pattern-table}
+	
+	\begin{bytefield}[bitheight=1.5em, bitwidth=0.15em,
+		boxformatting={\centering\small\ttfamily}]{256}
+		\bitheader[endianness=little]{0,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240} \\
+		
+		% Vytvoření pattern table pomocí vnořeného cyklu.
+		% Natlačení na jeden řádek je třeba, aby \LaTeX nevkládal \par.
+		% Pozor: to platí i pro \skippedwords, jinak je taky šoupnuté.
+		\newcounter{rowIndex}
+		\newcounter{tileIndex}
+		\newcounter{tileIndexCalculated}
+		\forloop{rowIndex}{0}{\value{rowIndex} < 4}{\forloop{tileIndex}{0}{\value{tileIndex} < 16}{\ifx\tileIndex>0 & \fi\setcounter{tileIndexCalculated}{\value{tileIndex}+\value{rowIndex} * 16}\bitbox{16}{D\arabic{tileIndexCalculated}}} \\}\skippedwords \\
+		
+		% Poslední řádek.
+		\forloop{tileIndex}{240}{\value{tileIndex} < 256}{\ifx\tileIndex>0 & \fi \bitbox{16}{D\arabic{tileIndex}}} \\ 	
+	\end{bytefield}
+\end{figure}
+
+Každá dlaždice je reprezentována dvěma v~paměti po sobě jdoucími částmi. Každá část má 8~bajtů, dohromady má tedy dlaždice 16 bajtů. Každý bajt jedné části představuje řádek obrázku; každý bit poté představuje část hodnoty pixelu. Poněvadž se dlaždice skládá ze dvou částí, je pro každý pixel definována dvoubitová hodnota. Dolní bit této hodnoty reprezentuje bit z~první části; horní bit pak ten z~druhé části. Hodnota pixelu se používá pro výběr barvy z~aktivní palety --- celkem jsou k~dispozici čtyři různé barvy, z~toho první barva je pro všechny palety stejná. Princip skládání hodnot pixelu je znázorněn na obrázku~\ref{fig:ppu-pattern-tile}, kde je ukázán i~potenciální výsledný obrázek, pokud by se používala paleta pozadí 3 z~obrázku~\ref{fig:ppu-palety}.
+
+\begin{figure}[htp!]
+	\centering
+	\caption{Ukázka složení částí dlaždic ve výsledný obraz za použití palety pozadí 3 z~obrázku~\ref{fig:ppu-palety}}\label{fig:ppu-pattern-tile}
+	
+	\begin{bytefield}[bitheight=1.5em, bitwidth=1.5em,
+		boxformatting={\centering\small\ttfamily}]{8}
+		
+		\bitbox[]{8}{část 1 (dolní bity)} & \bitbox[]{8}{+} & \bitbox[]{8}{část 2 (horní bity)} \\
+		
+        \bitheader{0,7} & \bitbox[]{8}{} & \bitheader{0,7} \\
+		
+		\bitboxes{1}{01100110} & \bitbox[]{8}{}  & \bitboxes{1}{01100110} \\
+        \bitboxes{1}{11011111} & \bitbox[]{8}{}  & \bitboxes{1}{10111111} \\
+		\bitboxes{1}{10111111} & \bitbox[]{8}{}  & \bitboxes{1}{11111111} \\
+		\bitboxes{1}{11111101} & \bitbox[]{8}{}  & \bitboxes{1}{11111111} \\
+		\bitboxes{1}{01111010} & \bitbox[]{8}{}  & \bitboxes{1}{01111110} \\
+		\bitboxes{1}{00111100} & \bitbox[]{8}{}  & \bitboxes{1}{00111100} \\
+		\bitboxes{1}{00011000} & \bitbox[]{8}{}  & \bitboxes{1}{00011000} \\
+		\\\\
+		
+		\bitbox[]{8}{} & \bitbox[]{8}{= složené dvoubitové indexy do palety} & \bitbox[]{8}{} \\\\
+		\bitbox[]{8}{} & \bitboxes{1}{03300330} & \bitbox[]{8}{} \\
+		\bitbox[]{8}{} & \bitboxes{1}{31233333} & \bitbox[]{8}{} \\
+		\bitbox[]{8}{} & \bitboxes{1}{32333333}  & \bitbox[]{8}{} \\
+		\bitbox[]{8}{} & \bitboxes{1}{33333323}  & \bitbox[]{8}{} \\
+		\bitbox[]{8}{} & \bitboxes{1}{03333230}  & \bitbox[]{8}{} \\
+		\bitbox[]{8}{} & \bitboxes{1}{00333300}  & \bitbox[]{8}{} \\
+		\bitbox[]{8}{} & \bitboxes{1}{00033000}  & \bitbox[]{8}{} \\
+	\end{bytefield}
+
+	\texttt{výsledný obraz} \\
+
+	\def\pixels{
+		{0,3,3,0,0,3,3,0},
+		{3,1,2,3,3,3,3,3},
+		{3,2,3,3,3,3,3,3},
+		{3,3,3,3,3,3,2,3},
+		{0,3,3,3,3,2,3,0},
+		{0,0,3,3,3,3,0,0},
+		{0,0,0,3,3,0,0,0}%
+	}
+
+	\begin{tikzpicture}[scale=0.5]
+		\drawpixels{\pixels}{pixel}
+	\end{tikzpicture}
+	
+\end{figure}
+
+\subsubsection{Nametable}
+Nametable je označení pro část videopaměti, která reprezentuje všechna data potřebná pro vykreslení pozadí na jedné obrazovce ($256 \times 240$ pixelů). Skládá se ze dvou částí:
+
+\begin{itemize}
+	\item indexy do pattern table (960 bajtů),
+	\item tabulka atributů (64 bajtů).
+\end{itemize}
+
+Celkem tedy jedna nametable zabírá přesně 1~KiB.
+
+První 960bajtová část definuje, z~jakých dlaždic se bude skládat obraz na pozadí. Každý bajt je indexem do pattern table. Přeneseně řečeno, nametable slouží tedy vyskládání obrazu dlaždicemi z~pattern table. Jak již bylo zmíněno, dlaždice v~pattern table je velká $8 \times 8$ pixelů, tudíž každý bajt v~nametable řídí oblast velikostně odpovídající dlaždici. Pro jeden řádek je tedy potřeba $\frac{256}{8} = 32$~bajtů a~takových řádků bude $\frac{240}{8} = 30$
+
+\begin{note}[Výběr pattern table]
+	Pomocí bajtu lze indexovat v~rámci jedné pattern table, ale již nelze vybrat, se kterou se bude pracovat (celkem jsou v~systému dvě). Výběr pattern table pro pozadí se provádí v~regitru PPUCTRL přístupnému procesoru.
+\end{note}
+
+V~této chvíli je tedy jasné, jaká dlaždice se kam umístí a~jak vypadá --- každý pixel může nabývat celkem čtyř různých hodnot, tedy čtyř různých barev. Číslo palety, ze které se barvy získávají, určuje právě druhá část nametable; tabulka atributů.
+
+Tabulka atributů se nachází vždy na konci nametable. Každý bajt tabulky určuje indexy palety pozadí pro oblast o~velikosti $32 \times 32$~pixelů, což odpovídá celkem 16 dlaždicím. Tato oblast je rozdělena na čtyři kvadranty, kdy jsou pro každý kvadrant přiděleny dva bity z~příslušného bajtu. Dvěma bity lze přesně indexovat všechny čtyři dostupné palety pro pozadí. Z~toho všeho vyplývá, že je celá scéna představovaná nametable rozdělena na čtverce obsahující $2\times2$~dlaždice, které vždy sdílejí stejnou paletu.
+
+Pořadí indexů v~bajtů přísluší jednotlivým kvadrantům v~tomto pořadí od~nejvyšších dvou bitů: dolní pravý, dolní levý, horní pravý, horní levý.
+
+Velmi pěkná ukázka je k~dispozici na stránce~\cite{Nesdev:attribute-table}
+
+\subsubsection{Object Attribute Memory}
+\label{sec:ppu-oam}
+Object Attribute Memory, běžně zkracována jako OAM, je zcela oddělená paměť čipu PPU dedikovaná pouze pro ukládání sprajtů. Nachází se mimo obě sběrnice systému, přímo k~této paměti může přistupovat pouze PPU, nebo nepřímo přes registry OAMADDR a~OAMDATA procesor. Paměť OAM má kapacitu 256 bajtů (což odpovídá i~velikosti jedné paměťové stránky). Informace příslušící jednomu sprajtu zabírají 4~bajty; tudíž kapacita odpovídá uložení 64~sprajtů.
+
+Struktura sprajtu není nikterak složitá. První bajt je souřadnice Y (řádek); druhý slouží k~výběru dlaždice z~pattern table, která bude reprezentovat sprajt; třetí obsahuje atributy, kromě výběru indexu palety pro sprajty obsahuje také informace o~překlopení dlaždice a~prioritu sprajtu; čtvrtý obsahuje souřadnici X (sloupec). Další informace jsou přehledně uvedeny na Nesdev~\cite{Nesdev:oam}.
+
+\begin{note}[Existence dvou OAM]
+	Kromě výše popsané OAM, označované jako primární, existuje i~další, takzvaná sekundární. Má poloviční kapacitu a~používá se pouze interně pro ukládání sprajtů patřící na daný obrazový řádek. Programátor k~ní tedy nemá přístup a~využívá se jen~a~pouze během procesu renderování.
+\end{note}
+
+\subsection{Vnější rozhraní}
+\label{sec:ppu-cpu-io}
+PPU je řízeno pomocí osmi registrů mapovaných do paměťového prostoru procesoru. Tyto registry jsou zrcadleny po širokém adresním rozsahu, jak bylo uvedeno v~úvodu. Tabulka~\ref{tab:ppu-registry} poskytuje přehled a~stručný popis. Pro podrobnější informace je možné čtenáře opět odkázat na:  DOPLNIT.
+
+\begin{table}[ht!]
+	\centering
+	\caption{Procesorem přístupné registry čipu PPU. Označení \enquote{-} znamená, že se používá celý bajt pro jedinou hodnotu.}\label{tab:ppu-registry}
+	\begin{tblr}{|Q[c,m]|Q[c,m]|Q[c,m]|X[l,m]|}
+		\hline
+		Označení & Adresa & Bity & Popis bitů \\
+		\hline[2pt]
+		\SetCell[r=7]{c} PPUCTRL & \SetCell[r=7]{c} \$2000 & \SetCell[r=7]{c} \texttt{VPHB SINN} & \texttt{V}: Povolení generování NMI \\ \cline{4} & & & \texttt{P}: režim PPU (0: slave, 1: master) \\ \cline{4} & & & \texttt{H}: Velikost sprajtů (0: $8\times8$, 1: $8\times16$) \\ \cline{4} & & & \texttt{B}: Výběr pattern table pro pozadí (0: první, 1: druhá) \\ \cline{4} & & & \texttt{S}: Výběr pattern table pro sprajty (0: první, 1: druhá) \\ \cline{4} & & & \texttt{I}: Způsob inkrementace indexu do videopaměti (0: přičíst 1, 1: přičíst 32) \\ \cline{4} & & & \texttt{NN}: Základ pro index do videopaměti (0: \$2000, 1: \$2400, 2: \$2800, 3: \$2C00) \\
+		\hline
+		\SetCell[r=6]{c} PPUMASK & \SetCell[r=6]{c} \$2001 & \SetCell[r=6]{c} \texttt{BGRs bMmG} & \texttt{BGR}: Zvýraznění barev (jednobitová hodnota pro modrou, zelenou a~červenou, 1 zvýraznění aktivuje) \\ \cline{4} & & & \texttt{s}: Povolení sprajtů \\ \cline{4} & & & \texttt{b}: Povolení pozadí \\ \cline{4} & & & \texttt{M}: 1: zobrazit sprajty v~levých 8~pixelech obrazovky, 0: skrýt \\ \cline{4} & & & \texttt{m}: 1: zobrazit pozadí v~levých 8~pixelech obrazovky, 0: skrýt \\ \cline{4} & & & \texttt{G}: 1: renderovat ve stupních šedi, 0: renderovat barevně \\
+		\hline		
+	\end{tblr}
+\end{table}
+
+
+\subsection{Inicializace po spuštění}
+
+\subsection{Renderování}
 
 \section{Game Pak}
 Hlavním a~jediným nativně podporovaným formátem distribuce softwaru pro konzoli NES byly kazety (cartridge) označované jako Game Pak. Tyto kazety nebyly pouze standardní pamětí typu ROM, obsahovaly i~často velmi sofistikované obvody především pro mapování paměťových segmentů označované jako mappery, které umožňovaly obejít některé hardwarové limitace konzole. Pro účely emulace je také nutné se zabývat formátem souboru, v~jakém se distribuují kopie těchto kazet; bylo totiž nutné uchovat kromě obsahu paměti i~informaci o~přídavných obvodech na kazetě.
@@ -805,7 +1015,7 @@ Každá kazeta obsahuje paměť pro program, PRG~ROM, volitelně pracovní pamě
 
 \begin{table}[ht!]
 	\centering
-	\caption{Mapování kazety do rozsahu CPU a~PPU}\label{tab:gamepak-mapovani}.
+	\caption{Mapování kazety do rozsahu CPU a~PPU}\label{tab:gamepak-mapovani}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|}
 		\hline
         Rozsah & Mapování \\
@@ -852,7 +1062,7 @@ Díky využití přepínaní bank umožňuje mapper 001 oproti mapperu 000 adres
 
 \begin{table}[ht!]
 	\centering
-	\caption{Adresy a~popis vnitřních registrů MMC1}\label{tab:mmc1-registry-adresy}.
+	\caption{Adresy a~popis vnitřních registrů MMC1}\label{tab:mmc1-registry-adresy}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|X[c,m]|}
 		\hline
         Adresa & Název & Popis \\
@@ -877,7 +1087,7 @@ Formát hlavičky je uveden v~tabulce~\ref{tab:ines}. Jednotlivá struktura je o
 
 \begin{table}[ht!]
 	\centering
-	\caption{Formát hlavičky iNES}\label{tab:ines}.
+	\caption{Formát hlavičky iNES}\label{tab:ines}
 	\begin{tblr}{|Q[c,m]|X[c,m]|}
 		\hline
 		Offset (B) & Obsah \\
@@ -949,6 +1159,9 @@ Standardní postup při čtení by se tedy dal shrnout takto:
 
 \section{Audio Processing Unit}
 \label{sec:APU}
+
+\section{Existující řešení}
+
 
 %---------------------------------------------------------------
 \chapter{Návrh}

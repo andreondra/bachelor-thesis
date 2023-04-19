@@ -87,6 +87,11 @@
 \definecolor{slavecomponent}{RGB}{250, 159, 66}
 \definecolor{interface}{RGB}{253, 214, 176}
 
+\definecolor{pixel 0}{RGB}{255, 255, 255}
+\definecolor{pixel 1}{RGB}{194, 233, 255}
+\definecolor{pixel 2}{RGB}{71, 188, 255}
+\definecolor{pixel 3}{RGB}{0, 122, 195}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % CUSTOMIZATION of this template END
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -111,6 +116,7 @@
 \usepackage{xparse}
 \usepackage{bytefield}
 \usepackage{tabularray}
+\usepackage{forloop}
 
 %theorems, definitions, etc.
 \theoremstyle{plain}
@@ -135,6 +141,7 @@
 %%%%%%%%%%%%%%%%%%%%%%
 % CUSTOM XPARSE COMMANDS
 %%%%%%%%%%%%%%%%%%%%%%
+% xparse used instead of \newcommand, because is faster and has more features.
 % Reference a signal.
 %
 % Usage:
@@ -149,6 +156,19 @@
 		\IfValueTF{#2}{[#2]}{}%
 		\IfBooleanTF{#1}{\#}{}%
 }}
+
+
+% Draw pixels from a list specified in the first argument with colors defined with
+% with prefix specified in the second argument.
+% Inspired by an answer by Paul Gaborit at https://tex.stackexchange.com/questions/157080/can-tikz-create-pixel-art-images.
+\NewDocumentCommand{\drawpixels}{mm}{
+	\foreach \line [count=\y] in #1 {
+		\foreach \pix [count=\x] in \line {
+			\draw[fill=#2 \pix] (\x,-\y) rectangle +(1,1);
+		}
+	}
+}
+
 %%%%%%%%%%%%%%%%%%%%%%
 % XPARSE COMMANDS END
 %%%%%%%%%%%%%%%%%%%%%%
