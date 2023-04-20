@@ -34,7 +34,7 @@ Práce je členěna na několik hlavních částí:
 \end{description}
 
 \begin{note*}[Terminologie]
-	Jelikož je bakalářská práce zaměřena na vzdělávací využití, kombinuje odbornost s~populárně-naučným formátem. Počítá se s~faktem, že čtenář se v~oboru informačních technologií již pohybuje, proto se používají anglické termíny tam, kde je to běžné. Nemělo by tedy například čtenáře zaskočit, že se občas jako \emph{programové vybavení} počítače označuje výrazem \emph{software} a~\emph{technické vybavení} počítače jako \emph{hardware}.
+	Jelikož je bakalářská práce zaměřena na vzdělávací využití, kombinuje odbornost s~populárně-naučným formátem. Počítá se s~faktem, že čtenář se v~oboru informačních technologií již pohybuje. Ačkoliv se v~obrozeneckém duchu používají české, nebo počeštěné výrazy, vyskytují se i~anglické termíny tam, kde je to běžné a~v~dané situaci lepší volbou. Nemělo by tedy například čtenáře zaskočit, že se občas jako \emph{programové vybavení} počítače označuje výrazem \emph{software} a~\emph{technické vybavení} počítače jako \emph{hardware}.	
 \end{note*}
 
 \begin{note*}[Značení]
@@ -326,7 +326,7 @@ Komunikace je řízena dvoufázovými systémovými hodinami, v~první fázi se 
 Kromě systémové sběrnice existuje další způsob komunikace, a~to je přerušení. Všechny procesory v~produktové řadě MCS650X obsahují celkem tři vstupy reprezentující různá přerušení: RST, IRQ a~NMI.
 
 \subsection{Architektura}
-Po diskusi vnější komunikace procesoru je vhodné se zabývat jeho architekturou, a~nejen instrukční sadou, ale i~implementačními detaily tam, kde je to nutné. Architekturou se zabývá především softwarový manuál~\cite{6502:sw-manual}.
+Po diskusi vnější komunikace procesoru je vhodné se zabývat jeho architekturou, a~nejen instrukční sadou, ale i~implementačními detaily tam, kde je to nutné. Architekturou se zabývá především softwarový manuál~\cite{mos:sw-manual}.
 
 Procesor 6502 je osmibitový, jelikož pracuje se slovem o~velikosti osmi bitů. ISA procesoru 6502 je střadačově orientovaná, pracovní registr je totiž právě pouze střadač (akumulátor). ISA definuje adresu jako 16bitové číslo ve formátu little-endian, jako první je tedy vždy uváděn nejméně významný bajt (LSB). ISA také definuje několik adresních režimů, z~toho jeden speciální, zero-page režim, který slouží jako částečná náhrada absence více registrů a~efektivně činí z~první paměťové stránky pomyslnou zápisníkovou paměť.
 
@@ -453,7 +453,7 @@ Adresní režim, který již pracuje s~hodnotami adres, se označuje jako \emph{
 	\end{bytefield}
 \end{figure}
 
-Absence univerzálních registrů je částečně suplována existencí adresním režimem \emph{nulté stránky} (zero-page). Adresa, která je uvedena za OZ, je jednobajtová. V~tomto režimu je možné indexovat pouze v~rámci jedné stránky, a~to té první (při indexování od nuly nulté) (adresní rozsah \$0000--\$00FF). Zato však tyto instrukce zabírají dva bajty v~instrukční paměti a~jejich zpracování je rychlejší. Na nultou paměťovou stránku je tak možné nahlížet jako na formu ručně spravované cache~---~v~programátorském manuálu řady MSC6500~\cite{6502:sw-manual} je zdůrazněno, že je program možné optimalizovat přesunem nejčastěji používaných hodnot právě do nulté stránky. Formát je znázorněn na obrázku~\ref{fig:6502-adr-zp}; instrukce Store Accumulator načte do akumulátoru bajt z~první paměťové stránky s offsetem \$42.
+Absence univerzálních registrů je částečně suplována existencí adresním režimem \emph{nulté stránky} (zero-page). Adresa, která je uvedena za OZ, je jednobajtová. V~tomto režimu je možné indexovat pouze v~rámci jedné stránky, a~to té první (při indexování od nuly nulté) (adresní rozsah \$0000--\$00FF). Zato však tyto instrukce zabírají dva bajty v~instrukční paměti a~jejich zpracování je rychlejší. Na nultou paměťovou stránku je tak možné nahlížet jako na formu ručně spravované cache~---~v~programátorském manuálu řady MSC6500~\cite{mos:sw-manual} je zdůrazněno, že je program možné optimalizovat přesunem nejčastěji používaných hodnot právě do nulté stránky. Formát je znázorněn na obrázku~\ref{fig:6502-adr-zp}; instrukce Store Accumulator načte do akumulátoru bajt z~první paměťové stránky s offsetem \$42.
 
 \begin{figure}[ht!]
 	\centering
@@ -484,12 +484,12 @@ Absence univerzálních registrů je částečně suplována existencí adresní
 \end{figure}
 
 \subsubsection{Adresní režimy s~indexací}
-Složitější adresní režimy přinášejí další možnost přístupu k~datům v~paměti. Do této chvíle byly uvedeny pouze takové režimy, které disponují pouze pevně stanovenou adresou. Často je však nutné adresy měnit, nebo vytvářet zcela dynamicky. Takový typ adres označuje manuál~\cite{6502:sw-manual} jako počítané adresy. Pro práci s~počítanými adresami obsahuje ISA speciální adresní režimy využívající indexovací registry: absolutní režim s~indexací a~režim nulté stránky s~indexací.
+Složitější adresní režimy přinášejí další možnost přístupu k~datům v~paměti. Do této chvíle byly uvedeny pouze takové režimy, které disponují pouze pevně stanovenou adresou. Často je však nutné adresy měnit, nebo vytvářet zcela dynamicky. Takový typ adres označuje manuál~\cite{mos:sw-manual} jako počítané adresy. Pro práci s~počítanými adresami obsahuje ISA speciální adresní režimy využívající indexovací registry: absolutní režim s~indexací a~režim nulté stránky s~indexací.
 
 \begin{example}[Kopírování souvislých dat bez indexace]
 Jedním ze základních řídicích struktur programovacích jazyků jsou cykly, které mohou posloužit jako nástroj pro práci s~bloky dat. Typickým příkladem nechť je kopírování dat z~jednoho paměťového místa na jiné. Ve střadačové architektuře se provádí načtením do střadače a~uložením.
 
-Byla-li by implementace provedena pouze za použitím pevných adres, muselo by se pro každé paměťové místo uvést instrukci načtení i~instrukci zápisu. Vytváří-li se adresy dynamicky, je možné provést operace v~cyklu. Ačkoliv existuje způsob úpravy pevných adres za běhu programu pomocí techniky samomodifikujícího se kódu (viz stranu 72 manuálu~\cite{6502:sw-manual}), představují adresní režimy s~indexací elegantnější alternativu nevyžadující přepisovatelnou instrukční paměť.
+Byla-li by implementace provedena pouze za použitím pevných adres, muselo by se pro každé paměťové místo uvést instrukci načtení i~instrukci zápisu. Vytváří-li se adresy dynamicky, je možné provést operace v~cyklu. Ačkoliv existuje způsob úpravy pevných adres za běhu programu pomocí techniky samomodifikujícího se kódu (viz stranu 72 manuálu~\cite{mos:sw-manual}), představují adresní režimy s~indexací elegantnější alternativu nevyžadující přepisovatelnou instrukční paměť.
 \end{example}
 
 Nechť je jako první uveden \emph{absolutní adresní režim s~indexací}. Tento režim přidává absolutnímu režimu možnost přičíst k~původní adrese i~offset z~registru X, nebo Y; dle zvoleného registru se tak jedná o~dva různé adresní režimy. Adresa pevně určená instrukcí je nazývaná jako základová (base). Výsledná adresa je vypočtena jednoduše: $zakladova\_adresa + offset$. Struktura je stejná jako u standardního absolutního režimu na obrázku~\ref{fig:6502-adr-abs}.
@@ -586,9 +586,9 @@ Instrukční cyklus odpovídá standardnímu cyklu procesoru, jako uvádí prof.
 		\node (aux) [left=2cm of IC] {};
 		
 		\draw [arrow] (start) -- (IC);
-		\draw [arrow] (IC) -- (IS);
+		\draw [arrow] (IC) -- node[anchor=south] {ano} (IS);
 		\draw [arrow, <-] (IF) -| (IS);
-		\draw [arrow] (IC) -- (IF);
+		\draw [arrow] (IC) -- node[anchor=east] {ne} (IF);
 		\draw [arrow] (IF) -- (ID);
 		\draw [arrow] (ID) -- (EX);
 		\draw [arrow] (EX) -| (aux);
@@ -605,10 +605,10 @@ Existují však výjimky. U~některých instrukcí pracujících s~pamětí mů�
 Poslední výjimkou jsou instrukce větvení. Dojde-li ke kladnému vyhodnocení podmínky, musí se vykonat jeden strojový cyklus navíc; to je způsobeno nutností přičíst offset k~programovému čítači. Dojde-li navíc k~překročení paměťové stránky, musí se kvůli přičtení přenosu provést ještě další strojový cyklus. Abych to shrnul, je-li proveden skok, který navíc překračuje stránku, provedou se navíc celkem dva strojové cykly.
 
 \begin{note}[6502 a pipelining]
-	Procesor 6502 zároveň provádí více činností --- operace na vnitřní sběrnici provádí souběžně s~operacemi na vnější sběrnici. Zatímco na vnější sběrnici se připravuje operační znak a~příslušné adresy, na vnitřní probíhají výpočty (inkrementace programového čítače, operace na aritmeticko-logické jednotce a~další). Díky pipeliningu je možné instrukce zpracovat v~méně cyklech. Pro účely emulace to však není relevantní a~zájemci si mohou o~problematice více přečíst v~manuálu~\cite{6502:sw-manual}.
+	Procesor 6502 zároveň provádí více činností --- operace na vnitřní sběrnici provádí souběžně s~operacemi na vnější sběrnici. Zatímco na vnější sběrnici se připravuje operační znak a~příslušné adresy, na vnitřní probíhají výpočty (inkrementace programového čítače, operace na aritmeticko-logické jednotce a~další). Díky pipeliningu je možné instrukce zpracovat v~méně cyklech. Pro účely emulace to však není relevantní a~zájemci si mohou o~problematice více přečíst v~manuálu~\cite{mos:sw-manual}.
 \end{note}
 
-Podrobný rozpis vykonávaných úkonů při zpracování instrukcí je s~přesností na strojové cykly uveden na v~příloze A hardwarového manuálu~\cite{6502:hw-manual}.
+Podrobný rozpis vykonávaných úkonů při zpracování instrukcí je s~přesností na strojové cykly uveden na v~příloze A hardwarového manuálu~\cite{mos:hw-manual}.
 
 \subsubsection{Dekódování instrukcí}
 \label{sec:6502-dekodovani-instrukci}
@@ -803,7 +803,7 @@ Existují dvě varianty specifické pro konkrétní trhy v~závislosti na typu v
 Jedná o~velice rozsáhlý čip. Analýzu je tedy třeba provést v~několika částech. Nejprve se zjistí, s~jakými daty čip pracuje, poté jak se tento čip ovládá (rozhraní, které je dostupné procesoru) a nakonec i~to, jak s~dostupnými daty čip pracuje.
 
 \subsection{Paměti a~data}
-Jak již bylo zmíněno v~úvodu, čip PPU je připojen do dvou sběrnic. Jednak je připojen do hlavní systémové sběrnice, pomocí které procesor 6502 s~čipem PPU komunikuje, což je probíráno v~podkapitole~\ref{sec:ppu-cpu-io}. Dále je připojen do své vlastní sběrnice, na kterou je připojena i~část kazety Game Pak (viz tabulka~\ref{tab:gamepak-mapovani} na straně~\pageref{tab:gamepak-mapovani}). Tabulka~\ref{tab:ppu-pametova-mapa} ukazuje rozdělení adresního prostoru vlastní sběrnice čipu PPU včetně částí zařízení, které jsou běžně v~příslušných rozsazích dostupné.
+Jak již bylo zmíněno v~úvodu, čip PPU je připojen do dvou sběrnic. Jednak je připojen do hlavní systémové sběrnice, pomocí které procesor 6502 s~čipem PPU komunikuje, což je probíráno v~podkapitole~\ref{sec:ppu-cpu-io}. Dále je připojen do své vlastní sběrnice, na kterou je připojena i~část kazety Game Pak (viz tabulka~\ref{tab:gamepak-mapovani} na straně~\pageref{tab:gamepak-mapovani}). Tabulka~\ref{tab:ppu-pametova-mapa} ukazuje rozdělení adresního prostoru vlastní sběrnice čipu PPU včetně částí zařízení, které jsou běžně v~příslušných rozsazích dostupné. Kromě zvenku přístupných pamětí obsahuje PPU ještě mnoho pracovních registrů, které jsou popsány v~sekci~\ref{ppu:pracovni-registry}.
 
 \begin{table}[ht!]
 	\centering
@@ -989,7 +989,7 @@ Struktura sprajtu není nikterak složitá. První bajt je souřadnice Y (řáde
 \label{sec:ppu-cpu-io}
 PPU je řízeno pomocí osmi registrů mapovaných do paměťového prostoru procesoru. Tyto registry jsou zrcadleny po širokém adresním rozsahu, jak bylo uvedeno v~úvodu. Tabulka~\ref{tab:ppu-registry} poskytuje přehled a~stručný popis. Pro podrobnější informace je možné čtenáře opět odkázat na~\cite{Nesdev:ppu-registers}.
 
-\begin{table}[htp!]
+\begin{table}[p!]
 	\centering
 	\caption{Procesorem přístupné registry čipu PPU. Označení \enquote{-} znamená, že se používá celý bajt pro jedinou hodnotu.}\label{tab:ppu-registry}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|X[l,m]|}
@@ -1006,7 +1006,7 @@ PPU je řízeno pomocí osmi registrů mapovaných do paměťového prostoru pro
 		\hline
 		OAMDATA & \$2004 & čtení i~zápis & - & čtení dat z~OAM, nebo zápis na adresu zvolenou pomocí OAMADDR; zápis autoinkrementuje adresu \\
 		\hline
-		PPUSCROLL & \$2005 & zápis ($2\times$) & - & zápis dvoubajtové hodnoty určující posuv ve videopaměti (která část se bude zobrazovat na obrazovce) \\
+		PPUSCROLL & \$2005 & zápis ($2\times$) & - & zápis aktivní adresy na grafické sběrnici (uzpůsobené pro práci s~plynulým posuvem)) \\
 		\hline
 		PPUADDR & \$2006 & zápis ($2\times$) & - & zápis aktivní adresy na grafické sběrnici \\
 		\hline
@@ -1015,15 +1015,152 @@ PPU je řízeno pomocí osmi registrů mapovaných do paměťového prostoru pro
 	\end{tblr}
 \end{table}
 
+\subsection{Pracovní registry}
+PPU obsahuje také dvě skupiny pracovních registrů sloužící k~průběžnému ukládání vyhodnocovaných a~následně vykreslovaných dat, ale i~pro přístup na grafickou sběrnici zvenčí. První skupina souvisí s~přístupem na videopaměti, což je prováděno nejen programátorem, ale i~čipem PPU samotným. Druhá skupina slouží k~vykreslování sprajtů.
+
+\subsubsection{Pozadí a~práce s~videopamětí}
+Data pro vykreslování pozadí jsou uložena ve videopaměti (VRAM), se kterou kromě programátora při zápisu do této paměti pracuje i~PPU při vykreslování obrazu na obrazovku televizoru. Pro adresaci v~rámci paměti se používají dva 15bitové registry, tyto registry jsou sdíleny pro obě aktivity; jak modifikace programátorem, tak čtení samotným čipem. Tabulka~\ref{tab:ppu-vram} ukazuje všechny registry používané pro indexaci ve videopaměti a~jejich abstrahovaný význam v~souvislosti s~posuvem souřadnic na obrazovce.
+
+\begin{table}[htp!]
+	\centering
+	\caption{Pracovní registry pro práci s~videopamětí}\label{tab:ppu-vram}
+	\begin{tblr}{|Q[c,m]|Q[c,m]|Q[c,m]|X[l,m]|}
+		\hline
+		Označení & Popis & Bity & Popis bitů \\
+		\hline[2pt]
+		\SetCell[r=4]{c} V & \SetCell[r=4]{c} Aktivní adresa do VRAM & \SetCell[r=4]{c} \texttt{yyy NNYY YYYX XXXX} & \texttt{y}: jemný posuv souřadnice~Y \\ \cline{4} & & & \texttt{N}: index nametable ve VRAM \\ \cline{4} & & & \texttt{Y}: hrubý posuv souřadnice~Y \\ \cline{4} & & & \texttt{X}: hrubý posuv souřadnice~X \\
+		\hline
+        T & Dočasná adresa do VRAM & \texttt{yyy NNYY YYYX XXXX} & Stejný jako u~registru V. \\
+		\hline
+		X & Jemný posuv souřadnice X & \texttt{xxx} & - \\
+		\hline
+		W & Indikace pořadí zápisu & \texttt{w} & Hodnota 0 pro první, hodnota 1 pro druhý zápis. \\
+		\hline
+	\end{tblr}
+\end{table}
+
+Registr T je přístupný pomocí registrů \$2000 (PPUCTRL), \$2005 (PPUSCROLL) a~\$2006 (PPUADDR). Slouží k~úpravě programátorem, nepoužívá se pro samotnou indexaci. Do registru PPUCTRL stačí zapsat jednou a~přenáší se do T pouze index nametable. Do zbývajících dvou registrů se musí zapsat dvakrát, oba sdílejí stejný přepínač pořadí (W) a~oba slouží k~úpravě posuvů. Registr PPUSCROLL je zaměřený na úpravu před začátkem vykreslování snímku pro nastavení posuvu v~rámci videopaměti (zjednodušeně řečeno: tímto se nastavuje okno do videopaměti, které je viditelné na obrazovce, díky principu zrcadlení paměti je takto možné zobrazit části více nametable zároveň). Registr PPUADDR je poté zaměřen na práci se surovými daty vkládané do paměti programátorem pomocí registru PPUDATA, pro adresu do dočasného registru T vkládá v~jiném pořadí a~navíc při druhém zápisu rovnou data aktualizuje i~v~aktivním registru V --- počítá se s~tím, že programátor bude do videopaměti přistupovat okamžitě.
+
+Registr V již slouží pro přímou indexaci ve videopaměti. Horizontální posuvy jsou aktualizovány registrem T buďto okamžitě při druhém zápisu do registru PPUADDR, nebo je aktualizován průběžně v~každém obrazovém bodu 257 každého obrazového řádku. Dále je hodnota posuvu souřadnice Y průběžně aktualizována v~obrazovém bodu 256 každého řádku. Vertikální posuvy jsou aktualizovány registrem T poté na konci intervalu VBlank v~bodech 280--304. Nakonec je hodnota V inkrementována dle nastavení v~PPUCTRL vždy při čtení, nebo zápisu do PPUDATA.
+
+Další informace, příklady a~podrobnosti lze nalézt na příslušné stránce Nesdev:~\cite{Nesdev:ppu-scroll}.
+
+Kromě pracovních registrů jsou v~čipu obsaženy i~posuvné registry, sloužící k~ukládání pixelů a~metadat aktuálně vykreslovaných. Jsou to dva 16bitové registry pro vzory zkopírované z~pattern table a~dva 8bitové pro ukládání souvisejících atributů.
+
+\subsubsection{Sprajty}
+Pro práci se sprajty kromě hlavní a~vedlejší OAM existuje i~osm párů 8bitových posuvných registrů uchovávající vzory z~pattern table pro 8 sprajtů vykreslovaných na aktivním obrazovém řádku. Dalších osm klopných obvodů uchovává pro tyto sprajty atributy a~osm čítačů uchovává horizontální pozice (souřadnice X).
+
 
 \subsection{Inicializace po spuštění}
+Všechny registry u~PPU je možné po spuštění vynulovat. Dočasné paměti jako OAM a~paletová RAM nemají definovaný stav po spuštění; od programátora se očekává, že tuto paměť korektně inicializuje.
 
 \subsection{Renderování}
+Proces renderování obrazu je pevně spjat s~jeho průběžným vykreslováním na obrazovku. Po načtení veškerých potřebných dat do pamětí a~nastavení čipu pomocí registrů je důležité se zabývat, jak čip s~dodanými daty pracuje. Přehledný, komunitou vytvořený, diagram celého procesu včetně operací na pozadí je součástí přílohy~\ref{apx:ppu}.
+
+\subsubsection{Pozadí}
+Proces vykreslování pozadí probíhá průběžně během celého televizního snímku. Sekvence kroků se liší dle obrazového řádku. Jelikož jeden hodinový takt odpovídá přesně jednomu obrazovému bodu výstupního signálu, jsou operace PPU pevně svázány s~rozlišením obrazu. Název pro časový úsek odpovídající jednomu obrazovému bodu v~rámci řádku je \emph{cyklus}.
+
+Na viditelných řádcích (0-239) se provádí sled vnitřních (negenerující výstup) i~vnějších (generující výstup) operací. Sled vnitřních operací je uvedený v~tabulce~\ref{ppu:pozadi-cykly}. Pro načtení příslušného řádku jedné dlaždice z~pattern table (dle indexu v~nametable) jsou třeba 4 přístupy do paměti, na tabulce jsou rozepsány pro cykly 1--8. Po provedení přístupů potřebných pro jednu dlaždici dojde k~naplnění vnitřních posuvných registrů, které mohou generovat samotný výstup na obrazovku, což už se týká vnějších operací. K~těm dochází v~cyklech 4--256, kdy se generuje obrazový bod za použití bitů z~naplněných posuvných registrů. To, jaký konkrétní bit se vybere, závisí na hodnotě vnitřního registru uchovávajícího jemný posuv souřadnice X. Registry vykonají posuv a~pokračuje další cyklus. Před výstupem na obrazovku se ještě vybírá mezi pixelem pozadí a~popředí, tomu je věnována sekce~\ref{sec:ppu-priority}.
+
+\begin{table}[ht!]
+	\centering
+	\caption{Vnitřní operace PPU během viditelných obrazových řádků}\label{tab:ppu-renderovani}
+	\begin{tblr}{|Q[c,m]|X[c,m]|}
+		\hline
+		Cyklus & Operace \\
+		\hline[2pt]
+		0 & Žádná. \\
+		\hline
+		1--2 & Načtení bajtu z~nametable; vyhodnocování sprajtů. \\
+		\hline
+		3--4 & Načtení bajtu z~tabulky příznaků; vyhodnocování sprajtů. \\
+		\hline
+		5--6 & Načtení bajtu z~první (spodní) části dlaždice z~pattern table; vyhodnocování sprajtů. \\
+		\hline
+		7--8 & Načtení bajtu z~druhé (horní) části dlaždice z~pattern table; vyhodnocování sprajtů. \\
+		\hline
+		9--256 & Stejná posloupnost jako pro cykly 1--8. \\
+		\hline
+		257--320 & Proces načítání dat pro sprajty. \\
+		\hline
+		321--336 & Načtení prvních dvou dlaždic pro následující řádek (stejně jako v~cyklech 1--8). \\
+		\hline
+		337--340 & Načítání bajtů z~nametable (účel pro PPU je neznámý, některé mappery, například MMC5, tyto přístupy detekuje za účelem počítání obrazových řádků). \\
+		\hline
+	\end{tblr}
+\end{table}
+
+Po viditelných řádcích následuje řádek 240 (post-renderovací). Od řádku 240 až do předposledního PPU nepřistupuje PPU do videopaměti, avšak příznak intervalu vertikální prodlevy mezi snímky (VBlank) je nastaven až v~prvním cyklu řádku 241, v~ten moment je vyvoláno i~NMI. Od této chvíle je tedy programátor informován o~možnosti bezpečně přistupovat do videopaměti a~může její obsah libovolně upravovat až do řádku 260.
+
+Poslední řádek, označovaný jako 261 (pre-renderovací), provádí stejné paměťové operace, jako se dějí u~viditelných, akorát nedochází k~vykreslování na obrazovku. Zde se připravují vnitřní registry obsahem patřící na první viditelný řádek.
+
+\subsubsection{Popředí}
+Vykreslování sprajtů, tedy obsahu popředí, je u~PPU zařízeno hardwarově. Nemusí být tedy vloženy softwarem do průběžně vykreslované videopaměti, stačí správně zavést obrazová data do paměti OAM a~nakonfigurovat hardwarové vykreslování.
+
+Na každém řádku nejprve probíhá proces vyhodnocování, kdy se rozhoduje, které sprajty budou vykresleny na řádku následujícím:
+\begin{enumerate}
+	\item Inicializace vedlejší OAM hodnotou \$FF.
+	\item Přečtení hlavní OAM a~vybrání prvních osm sprajtů, které mají být vykresleny na řádku (dle souřadnice Y, která je obsažena v~prvním bajtu každého sprajtu).
+	\item Kontrola, jestli není v~hlavní OAM definováno více než osm aktivních sprajtů na jednom řádku (obsahuje hardwarovou chybu).
+	\item Inicializace vykreslovací pipeline.
+\end{enumerate}
+
+Samotné vykreslování probíhá souběžně s~pipeline řešící pozadí. V~každém cyklu se dekrementují čítače uchovávající horizontální souřadnice sprajtů pro daný řádek. Je-li nějaký čítač nulový, začne se sprajt postupně vykreslovat pixel po pixelu --- dojde k~postupnému vysouvání dat z~posuvných registrů příslušící danému sprajtu. Je-li aktivních více sprajtů, vybere se ten, který má na výstupu zrovna neprůhledný pixel (nenulová hodnota) a~zároveň má nejmenší index v~paměti, a~pošle se do multiplexeru, kde se vyhodnotí, jestli se vykreslí pixel sprajtu, nebo pozadí, čemuž se věnuje sekce~\ref{sec:ppu-priority}.
+
+\begin{note}[Chyba v~inkrementaci]
+Chyba v~kontrole popisovaná v~bodu 3 se projevuje chybnou inkrementací. První sprajt po nalezení osmi aktivních sprajtů se vyhodnotí správně, poté ale autoinkrementace způsobí vyhodnocování jiných bajtů namísto toho uchovávající souřadnici Y. Jedná se právě o~jednu z~chyb, kterou je také nutné emulovat v~případě, že je třeba spouštět software, který se na tyto chyby spoléhá (což je ale velice vzácné; většina programů se na špatně definované či chybné chování nespoléhala).
+\end{note}
+
+Podrobnější popis je k~dispozici na stránce~\cite{Nesdev:ppu-sprites}.
+
+\subsubsection{Výběr pixelu k~vykreslení (priority)}
+\label{sec:ppu-priority}
+Těsně před vykreslením se pixel pozadí a~pixel popředí (sprajtu) účastní rozhodovacího procesu. Pixel pozadí je vždycky ten, který byl zrovna vysunut z~posuvných registrů pozadí. Pixel popředí je pixel patřící takovému sprajtu, který má nejvyšší prioritu dle nejnižšího indexu a~zároveň je neprůhledný-nenulový (jinak se zvolí další sprajt, po vyčerpání všech osmi sprajtů jde na výstup nulová hodnota sprajtu); nebere se ohled na nastavenou prioritu v~atributech sprajtu.
+
+\begin{note}[Zanedbání priorit a~z~toho plynoucí zvláštnosti]
+	Jak bylo uvedeno, do rozhodování vstupuje pixel sprajtu, který je neprůhledný a~má nejnižší index, i~když má tento sprajt v~atributech nastaveno, že prioritu má pozadí. Může se tedy stát, že přestože v~seznamu osmi aktivních sprajtů pro obrazový řádek existuje prioritní sprajt, dojde stejně k~vykreslení pozadí, protože se zkrátka priorita sprajtu v~moment vstupu do rozhodovacího procesu nebere v~potaz.
+\end{note}
+
+Samotný rozhodovací proces spočívá v~několika krocích, kdy se nejprve kontroluje \enquote{nulovost} pixelu. Nulová hodnota pixelu totiž indexuje v~paletě univerzální barvu pozadí, což je bráno jako transparentní pixel. Nejsou-li žádný z~pixelů nulové, vykreslí se pixel dle nastavené priority v~atributech sprajtu. Tento proces je graficky znázorněn na obrázku~\ref{fig:ppu-vyber-pixelu}.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{Proces výběru pixelu k~vykreslení}\label{fig:ppu-vyber-pixelu}
+	\begin{tikzpicture}[node distance=2cm] 
+		\tikzstyle{akce} = [rectangle, minimum width=3.5cm, minimum height=1cm, text centered, draw=black, fill=fcaction]
+		\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=fcstart]
+		\tikzstyle{vetveni} = [diamond, aspect=2, minimum width=3.5cm, minimum height=1cm, text centered, draw=black, fill=fcbranch, yshift=0-0.5cm, align=center]
+		\tikzstyle{arrow} = [thick,->,>=stealth]
+		
+		\node (START) [startstop] {Načtení pixelů};
+		\node (BOTHZERO) [vetveni, below of=START] {Oba pixely\\nulové?};
+		\node (RENDERUC) [akce, right of=BOTHZERO, xshift=3.5cm, align=center] {Vykresli univerzální\\barvu (\$3F00)};
+		\node (BGZERO) [vetveni, below of=BOTHZERO] {Pixel pozadí\\nulový?};
+		\node (SPRZERO) [vetveni, below of=BGZERO] {Pixel sprajtu\\nulový?};
+		\node (PRIOCHECK) [vetveni, below of=SPRZERO] {Kdo má prioritu?};
+		\node (RENDERSPR) [akce, left of=PRIOCHECK, xshift=0-3.5cm] {Vykresli pixel sprajtu};
+		\node (RENDERBG) [akce, right of=PRIOCHECK, xshift=3.5cm] {Vykresli pixel pozadí};
+		\node (STOP) [startstop, below of=PRIOCHECK] {Konec};
+
+		
+ 		\draw [arrow] (START) -- (BOTHZERO);
+		\draw [arrow] (BOTHZERO) -- node[anchor=south] {ano} (RENDERUC);
+    	\draw [arrow] (BOTHZERO) -- node[anchor=east] {ne} (BGZERO);
+		\draw [arrow] (BGZERO) -- node[anchor=east] {ne} (SPRZERO);
+		\draw [arrow] (SPRZERO) -- node[anchor=east] {ne} (PRIOCHECK);
+		\draw [arrow] (PRIOCHECK) -- node[anchor=south] {sprajt} (RENDERSPR);
+		\draw [arrow] (PRIOCHECK) -- node[anchor=south] {pozadí} (RENDERBG);
+		\draw [arrow, <-] (STOP) -| (RENDERBG);
+		\draw [arrow, <-] (STOP) -| (RENDERSPR);
+		\draw [arrow] (BGZERO) -| node[anchor=south] {ano} (RENDERSPR);
+		\draw [arrow] (SPRZERO) -| node[anchor=south] {ano} (RENDERBG);
+	\end{tikzpicture} 
+\end{figure}
 
 \section{Game Pak}
 Hlavním a~jediným nativně podporovaným formátem distribuce softwaru pro konzoli NES byly kazety (cartridge) označované jako Game Pak. Tyto kazety nebyly pouze standardní pamětí typu ROM, obsahovaly i~často velmi sofistikované obvody především pro mapování paměťových segmentů označované jako mappery, které umožňovaly obejít některé hardwarové limitace konzole. Pro účely emulace je také nutné se zabývat formátem souboru, v~jakém se distribuují kopie těchto kazet; bylo totiž nutné uchovat kromě obsahu paměti i~informaci o~přídavných obvodech na kazetě.
 
-Každá kazeta obsahuje paměť pro program, PRG~ROM, volitelně pracovní paměť pro program, PRG~RAM. Tyto jsou mapovány do rozsahu procesoru. Dále obsahuje buďto nepřepisovatelnou paměť s~grafickými podklady (CHR~ROM), nebo pracovní paměť (CHR~RAM), do které se grafické podklady nahrály za běhu. Tyto paměti jsou mapovány do rozsahu PPU. Standardní mapování kazety do rozsahu CPU a~PPU je uvedeno v~tabulce~\ref{tab:gamepak-mapovani}. Toto mapování také určuje velikost okna, tedy část paměti, která může být najednou viditelná pro CPU či PPU, pakliže mapper umožňuje přepínat paměťové banky.
+Každá kazeta obsahuje paměť pro program, PRG~ROM, volitelně pracovní paměť pro program, PRG~RAM. Tyto jsou mapovány do rozsahu procesoru. Dále obsahuje buďto paměť pouze pro čtení s~grafickými podklady (CHR~ROM), nebo pracovní paměť (CHR~RAM), do které se grafické podklady nahrály za běhu. Tyto paměti jsou mapovány do rozsahu PPU. Standardní mapování kazety do rozsahu CPU a~PPU je uvedeno v~tabulce~\ref{tab:gamepak-mapovani}. Toto mapování také určuje velikost okna, tedy část paměti, která může být najednou viditelná pro CPU či PPU, pakliže mapper umožňuje přepínat paměťové banky.
 
 \begin{table}[ht!]
 	\centering
@@ -1171,6 +1308,7 @@ Standardní postup při čtení by se tedy dal shrnout takto:
 
 \section{Audio Processing Unit}
 \label{sec:APU}
+Součástí procesoru Ricoh~2A03 je také zvukový syntezátor, přezdívaný jako Audio Processing Unit (APU).
 
 \section{Existující řešení}
 
