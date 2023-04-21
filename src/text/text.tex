@@ -301,9 +301,19 @@ Zvoleným jazykem pro implementaci je C++ ve verzi C++20. Splňuje totiž veške
 	Toolchain je anglický termín pro kolekci nástrojů využívaných při vývoji. Typicky se jedná o~soubor prostředí pro vývoj: textový editor pro psaní zdrojového kódu, kompilátor pro překlad do strojového kódu, linter pro kontrolu syntaktických chyb (dnes existují nástroje i~pro hledání různých sémantických chyb, například nástroj clang-tidy), debugger.
 \end{definition}
 
+Použití editoru se týká jen programátora, není tedy důležité toto rozhodnutí stanovit před začátkem projektu; nebude mít žádný vliv na výsledný projekt. Je však vhodné vyžadovat editor nabízející zvýrazňování syntaxe a~snadnou integrací s~dalšími částmi toolchainu, ať už se jedná o~pouhý editor, nebo celé integrované vývojové rozhraní (IDE). Pro účely projektu byl mezi dalšími možnostmi jako Visual Studio Code a~Qt Creator zvolen CLion (integrace s~CMake, přehledný grafický debugger, vestavěný linter).
+
+Při návrhu toolchainu je brán v~potaz jednoduchost použití tak, aby šlo pokud možno vše zařídit automaticky: od stažení závislostí, přes kompilaci, testování i~generování dokumentace. Zároveň je z~hlediska přístupnosti vhodné, aby šel program zkompilovat na více než jedné platformě za pomocí stejného nástroje. Pro popis postupu kompilace se v~C/C++ projektech často používá Makefile; ten však není možné jednoduše použít na jiných platformách (například Windows). Pro abstrakci nad nástroji jako Make existuje CMake. Ten se jeví jako mnohem vhodnější řešení, jelikož umí vše vyžadované včetně generování Makefile, projektu pro Visual Studio, kompilování pro WebAssembly a~další. Bude tedy zvolen CMake.
+
 \subsection{Správa zdrojového kódu}
+Pro udržitelný vývoj většího projektu je vždy dobré mít přehled nad změnami, potažmo jednotlivými verzemi projektu. Možností verzování je několik. Nejjednodušší je prosté ukládání do několika složek v~souborovém systému, což ale brzy způsobí chaos a~špatně se synchronizují kolizní změny v~případě využití synchronizované složky. Standardem je dnes používání systémů správy verzí. Existují dvě možnosti: centralizovaná a~distribuovaná. Pro tento projekt byla zvolena distribuovaná, poněvadž umožňuje pracovat off-line a~téměř vždy existují alespoň dvě celé kopie repozitáře (lokální a~serverová). Konkrétním nástrojem byl zvolen Git, jelikož je standardem a~nabízí veškeré očekávané funkcionality distribuovaného systému pro správu verzí: lokální práci s~repozitářem, práce s~verzemi a~vývojovými větvemi, snadná komunikace se serverem, navíc i~jednoduché podepisování změň pomocí asymetrických kryptografických nástrojů.
+
+Aby byl projekt v~rámci edukativnosti co nejdostupnější, je nutné použít veřejně přístupné úložiště i~s~možnostmi spolupráce a~přijímání změň od dobrovolníků. Velice známou platformou je \emph{GitHub}, který zdarma nabízí nejen umístění repozitáře, ale i~různé nástroje pro týmovou spolupráci, například trasování chyb a~úkolů. Vhod přijde i~možnost přímo na GitHubu jednoduše provozovat on-line dokumentaci.
 
 \subsection{Dokumentace}
+Dokumentace je nedílnou součástí projektu. Jednou z~možností, jak takovou dokumentaci tvořit, je průběžně vyplňovat externí textový dokument s~popisem kódu. Tato možnost je vhodná jen pro velice primitivní programy. Je možné totiž využít možností psaní dokumentace přímo v~kódu. Využívá se funkcionality komentářů, které jsou obohaceny o~možnosti vyplňování dalších údajů o~jednotlivých funkcích i~třídách; takovým komentářům se říká dokumentační. Z~takových komentářů lze pak jednoduše dokumentaci vygenerovat; proto je zvolena tato možnost.
+
+Pro konkrétní zvolený programovací jazyk, C++, existuje nástroj \emph{Doxygen}. Ten za pomocí speciální syntaxe v~komentářích vygeneruje například i~popisy parametrů funkcí, návratových hodnot, popřípadě možných vyvolaných výjimek. Takto vygenerovanou dokumentace již je možné číst lokálně i~na serveru. Výstup programu Doxygen lze však dále zpracovat a~vytvořit přehlednější dokumentaci, což je velice důležité, pakliže je požadováno využití ve výuce. Pomocí nástrojů \emph{Breathe} a~\emph{Exhale} dojde k~převedení do formátu podporovaného nástrojem \emph{Sphinx}, který umožňuje přidávat další dokumentační stránky ve formátu reStructuredText a~použití velmi přehledných šablon (například šablona ReadTheDocs používaná pro mnoho open-source projektů, jmenovitě admesh, Zoneminder a~další). Celý proces generování dokumentace lze automatizovat nástrojem CMake, což ještě zjednoduší průběžné úpravy dokumentace. Z~toho důvodu bude implementována také automatizace.
 
 \subsection{Testování}
 Aby byl zajištěn soulad s~požadavky, je nutné program testovat. Úkolem této části je stanovit požadavky na testy a~na tom základu navrhnout vhodné metodiky a~nástroje.
@@ -314,11 +324,119 @@ Spouštění testů v~základní formě vyžaduje akci programátora, což přin
 
 Specifikem bakalářské práce je fakt, že implementuje emulaci systému, od které se očekává, že bude věrně napodobovat emulovaný systém. Dalším požadavkem je proto možnost \emph{spouštět testy ve formě strojového kódu} pro danou platformu s~možností automatického vyhodnocení. Pro archaické systémy vzniklo již mnoho testů, které mají za úkol porovnat funkci s~reálným systémem. Sofistikované testy umožňují vybrat druh výstupu, kdy součástí bývá i~zápis výsledků do vybraného místa v~paměti.
 
-Jak bylo uvedeno v~kapitole \ref{sec:teorie-testovani}, testy se dají provádět ručně i~automaticky. Jelikož je požadováno průběžné testování, je nejvhodnější co nejvíce testů automatizovat. To vyžaduje nástroj pro spouštění a~řízení testů. Součástí nástroje CMake je CTest, který je využit i~v~této práci.
-
-Pro samotné psaní testů již není třeba další komponenty, 
+Jak bylo uvedeno v~kapitole \ref{sec:teorie-testovani}, testy se dají provádět ručně i~automaticky. Jelikož je požadováno průběžné testování, je nejvhodnější co nejvíce testů automatizovat. To vyžaduje nástroj pro spouštění a~řízení testů. Součástí nástroje CMake je CTest, který je využit i~v~této práci. Pro samotné psaní testů již není třeba další komponenty, avšak využití dalších nástrojů může testování dále zjednodušit a~standardizovat jejich strukturu. Pro účely této práce byl zvolen Google Test. Umožňuje testovat konkrétní hodnoty, ověřovat vyvolané výjimky i~vytvářet znovupoužitelné struktury pro testování jednotným způsobem; díky tomu budou testy přehlednější. Výhodou je integrace Google Test se systémem CMake, proto je možné po úvodním nastavení testy vytvářet jako jednotlivé zdrojové soubory bez dalších úprav.
 
 \section{Emulační platforma}
+\subsection{Stanovení požadavků}
+\label{sec:navrh-pozadavky}
+
+Aby byl projekt co nejuniverzálnější, bude v~rámci projektu vyvinuta platforma zjednodušující vývoj libovolného emulátoru historického systému. Na základě důkladné analýzy konzole NES je možné vytvořit seznam požadavků pro takovou platformu, což poslouží jako reference pro návrh.
+
+Klíčovým požadavkem pevně souvisejícím s~principem fungování číslicového hardwaru je modularita, což představuje dělení na \emph{nezávislé komponenty}. Hardware vždy tvoří více nezávislých komponent, v~případě NES se i~ve vyšší úrovni abstrakce jedná třeba o~procesor, grafický čip a~kazetu. Samotné dělení na komponenty bude představovat implementace v~třídách v~rámci OOP, avšak je rozumné vyžadovat, aby měly komponenty stejné komunikační rozhraní tak, aby se daly univerzálně propojovat.
+
+První požadavek přirozeně vytváří další: po navržení jednotného rozhraní pro komponenty musí být navržen \emph{způsob vzájemné komunikace} a~to ideálně takový, který odpovídá skutečné implementaci a~zároveň je rozumně efektivní.
+
+Třetím požadavkem je vytvoření \emph{abstrakce celého systému}, v~jehož rámci se budou komponenty propojovat. Očekává se, že emulátor bude nabízet více různých systémů, proto je namístě vyžadovat jednotné rozhraní pro všechny systémy. Takové rozhraní by mělo obsahovat možnost řízení běhu systému přirozeně pomocí hodinového signálu; zároveň i~možnost, jak získávat různé informace o~systému.
+
+Jakmile bude v~emulátoru existovat množina komponent jako součást systému, je možné uvažovat o~\emph{monitorování vnitřního stavu}. Bude nutné vytvořit jednoduchý způsob, jakým je možné pracovat s~celým systémem i~jednotlivými komponentami až na úroveň registrů a~obsahu paměti.
+
+Kromě vnitřního stavu je přirozené očekávat, že bude emulátor nabízet i~běžně externě přístupné rozhraní, tedy reprezentaci \emph{vnějšího stavu systému}. Pro zachování univerzálnosti je nutné vytvořit univerzální řešení umožňující reprezentovat obrazový výstup (v~případě NES se jedná o~výstup herní grafiky z~čipu PPU na televizor; v~případě jiných soudobých systémů může jít o~výstup terminálu), zvukový výstup (u~NES je to zajištěno čipem APU; jinde, například u~Commodore~64 čipem 6581~SID, u~Atari čipem POKEY~\dots) a~uživatelský vstup (herní ovladače u~NES, klávesnice u~domácích mikropočítačů).
+
+Pro shrnutí následuje seznam zjištěných požadavků:
+\begin{itemize}
+	\item dělení na nezávislé komponenty,
+	\item způsob komunikace mezi komponentami,
+	\item abstrakce celého systému zastřešujícího komponenty,
+	\item monitorování vnitřního stavu komponent,
+	\item reprezentace vnějšího stavu systému.
+\end{itemize}
+
+\subsection{Porovnání s~původními návrhy}
+Požadavky přímo nevyplývající ze zadání se objevovaly postupně při vývoji několika prvních verzí emulační platformy; až posléze vznikl ucelený seznam popsaný v~části~\ref{sec:navrh-pozadavky}. Pro úplnost a~pochopení požadavků je vhodné připomenout nedostatky původních verzí.
+
+\subsubsection{Platforma 1.0}
+První platforma vznikla čistě pro účely experimentování. Hlavní cíl bylo rychle vytvořit funkční prostředí, ve kterém je možné implementovat emulovaný hardware. Velkou výhodou první platformy tedy bylo to, že byla implementována velice rychle.
+
+Rozhraní komponent bylo různé a~systém byl ve své podstatě reprezentován třídou pro sběrnici. Tato vlastnost se projevila okamžitě při nutnosti testovat procesor 6502 zvlášť v~omezeném systému; bylo nutné buď duplikovat kód, nebo se kód stával rychle nepřehledným. I~z~toho důvodů byl jako požadavek pro další platformy stanovena především univerzální modularita.
+
+Další velice nepříjemnou vlastností plynoucí z~absence modularity byla neexistence univerzálního způsobu prezentace stavů systému; vše bylo řešeno vystavením všech registrů a~pamětí přímo, nebo pomocí getterů. Často tedy docházelo k~porušení zapouzdření. Příklad takového špatného přístupu je ve výpisu kódu~\ref{list:navrh-platforma1.0}.
+
+\begin{listing}
+	\caption{Zobrazení stavů registru \enquote{V} PPU na~platformě~1.0}
+	\label{list:navrh-platforma1.0}
+	\begin{minted}{cpp}
+ImGui::Text("V nameY: %u", m_bus.getPPU().m_internalRegisters.v.bits.nameY);
+ImGui::Text("V nameX: %u", m_bus.getPPU().m_internalRegisters.v.bits.nameX);
+ImGui::Text("V fineY: %u", m_bus.getPPU().m_internalRegisters.v.bits.fineY);
+ImGui::Text("V coY: %u",   m_bus.getPPU().m_internalRegisters.v.bits.coarseY);
+ImGui::Text("V coX: %u",   m_bus.getPPU().m_internalRegisters.v.bits.coarseX);
+	\end{minted}
+\end{listing}
+
+Poslední velkou nevýhodou této platformy byla vázanost na jeden video i~audio backend. To znemožňovalo jednoduchou výměnu těchto komponent a~snadnou přenositelnost na jiné platformy. I~tato nevýhoda byla eliminována v~poslední verzi platformy.
+
+Další nevýhody plynuly spíše pro uživatele, jednou z~nich byla například i~absence systému dokování oken, což vždy vyústilo v~nepřehledné uživatelské rozhraní. Velice špatně byl i~řešen zvukový výstup, samotná emulace probíhala ve stejném vlákně, jako callback pro zvukový ovladač, což vedlo k~trháním a~dalším zvukovým artefaktům.
+
+\subsubsection{Platforma 1.5}
+Mezikrok mezi platformami byl spíše prostorem pro vyzkoušení různých technik abstrakce grafického rozhraní. Jako první vznikla knihovna Elements, umožňující definovat soubor datových struktur k~ zobrazení bez závislosti nejen na grafickém backendu, ale i~na celé grafické knihovně. Projekt je dostupný na~\url{https://github.com/andreondra/elements}.
+
+Myšlenkou bylo vytvořit třetí vrstvu abstrakce, jako ukazuje diagram~\ref{fig:navrh-abstrakce-grafiky}. Důvod takového uvažování vznikl z~prosté myšlenky. První platforma řešila zobrazování vnitřního stavu komponent externě, tudíž do nich musela nějakým způsobem zasahovat (například přes gettery). To způsobilo vazbu mezi více třídami; zobrazování bylo vázáno na vnitřní implementaci a~nabízené rozhraní dané komponenty, které nebylo jednotné. Bylo navrženo, že by komponenta měla být zodpovědná sama za zobrazování vnitřních hodnot tak, aby na tyto informace nemuselo být vázáno okolí. Komponenta by pouze zveřejnila nutné rozhraní pro komunikaci. Aby však komponenta nebyla vázána na konkrétní grafickou knihovnu, byla vytvořena idea další abstrakce.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{Úrovně abstrakce práce s~grafikou}\label{fig:navrh-abstrakce-grafiky}
+	\begin{tikzpicture}[node distance=2cm] 
+		\tikzstyle{uroven} = [rectangle, rounded corners, minimum width=5cm, minimum height=1cm,text centered, draw=black]
+		\tikzstyle{arrow} = [thick,->,>=stealth]
+		
+		\node (elements) [uroven, fill=headbackgroundgray] {Elements};
+		\node (gui) [uroven, below of=elements] {GUI knihovna};
+		\node (backend) [uroven, below of=gui] {Grafický backend};
+		
+		\draw [arrow] (elements) -- (gui);
+		\draw [arrow] (gui) -- (backend);
+	\end{tikzpicture}
+\end{figure}
+
+Úkolem knihovny Elements bylo poskytnout takové prostředky, pomocí kterých by programátor v~dané komponentě definoval, jaké proměnné a~v~jaké formě se mají zobrazovat v~grafickém rozhraní (otázka \emph{Co?}). Vše ostatní by řešila knihovna (otázka \emph{Jak?}). Třída představující abstrahovanou proměnnou a~další datové struktury byla označena jako Element. Každá část dat, která měla být reprezentována jakýmkoliv způsobem, by byla Element, ať už obsah registru, obsah paměti nebo surový grafický výstup. Tyto Elementy by byly strukturovány do balíčků označované jako Package. Takto bylo možné z~libovolné komponenty pomocí společného rozhraní \emph{getElements} získat abstraktní definici uživatelského rozhraní nezávislého na aktuální vnitřní reprezentaci.
+
+Elementy umožňovaly získávat data nejen přímo, ale i~pomocí funkcí, bylo tedy možné hodnoty před zobrazením ještě upravit. Příkladem tvorby balíčku je kód ve~výpisu~\ref{list:navrh-elements-package}. Takový kód je prakticky spustitelný, v~repozitáři projektu je součástí příkladu v~souboru \texttt{main.cpp}.
+
+\begin{listing}
+	\caption{Tvorba Package z~Elementů}
+	\label{list:navrh-elements-package}
+	\begin{minted}{cpp}
+Elements::Package pkg("Test package", Elements::Types::Dock::LEFT);
+pkg.addElements({
+	new Elements::Text("Example text received via getter:"),
+	new Elements::Text(getCurrentInstruction()),
+	new Elements::Number("Number 8", &number8),
+	new Elements::Number("Number 16", &number16),
+	new Elements::Number("Number 32", &number32),
+	new Elements::Number("Number Int", &numberInt),
+	new Elements::Number("Number 64", &number64),
+	new Elements::Separator(),
+	new Elements::Number("Number dbl", &numberDbl),
+	new Elements::Separator(),
+	new Elements::Bool("Check me!", &exampleBoolean),
+	new Elements::Separator(),
+	new Elements::Memory("Example Mem", memory, sizeof(memory), 0, false),
+	new Elements::Separator(),
+	new Elements::Text("This is a beginning of custom rendering!"),
+	new Elements::Display("Display Example", pixeldata, true),
+	new Elements::Text("This is the end of custom rendering!")
+});
+	\end{minted}
+\end{listing}
+
+Definice proměnných a~dalších struktur k~zobrazení měla probíhat ve veřejné metodě třídy komponenty. Vznikly dva návrhy, jak by se definice mohla řešit: \emph{rekurzivně} a~\emph{registrací}.
+
+
+\subsection{Návrh platformy 2.0}
+
+\section{Emulace konzole}
+
+\subsection{Integrace do platformy}
 
 %---------------------------------------------------------------
 \chapter{Implementace}
