@@ -433,13 +433,10 @@ Definice proměnných a~dalších struktur k~zobrazení měla probíhat ve veře
 
 Rekurzivní metoda počítala s~tím, že by funkce getElements vždy vrátila balíček, který by se začlenil do balíčku nadřazené komponenty. Takto by i~vznikla stromová struktura reprezentující hierarchii komponent. Registrační metoda by pak jako argument obdržela kontext, do kterého by vložila potřebné informace o~datech k~zobrazení bez nutnosti zanoření.
 
-Nakonec se ukázalo, že spousta dalších funkcionalit knihovny Elements by už přímo musela souviset s~emulací (například Elementy pro řízení časování); také vývoj abstrakce nad všemi potřebnými typy zobrazovaných dat by zabrala příliš mnoho času. Od vývoje knihovny bylo ustoupeno ve prospěch zcela nové platformy postavené na knihovně Dear ImGui.
+Nakonec se ukázalo, že spousta dalších funkcionalit knihovny Elements by už přímo musela souviset s~emulací (například Elementy pro řízení časování); také vývoj abstrakce nad všemi potřebnými typy zobrazovaných dat by zabrala příliš mnoho času. Od vývoje knihovny bylo ustoupeno ve prospěch zcela nové platformy.
 
 \subsection{Návrh platformy 2.0}
 Úkolem platformy druhé verze bylo již vytvořit univerzální multiplatformní prostředí pro vývoj emulátorů. Průběžným vývojem se objevilo mnoho problémů a~jejich řešení, což vyústilo v~celistvý seznam požadavků uvedený v~\ref{sec:navrh-pozadavky}. Nyní je již možné vytvořit konkrétní návrh pro implementaci.
-
-\subsubsection{Pomocné knihovny}
-Aby byla naplněna filosofie celé platformy, je třeba se nejprve zamyslet nad volbou dalších nástrojů, které pomohou k~dosažení cíle.
 
 \subsubsection{Modularita: třída Component}
 První požadavek hovoří o~modularitě a~univerzálním rozhraní. Bude tedy implementována abstraktní třída \emph{Component}, která zastřeší veškeré komponenty obsažené v~systému, ať už to je složitější prvek jako procesor, nebo jednodušší prvky: paměti, sběrnice. Komponenty by měly poskytovat následující funkcionality:
@@ -455,10 +452,31 @@ Jediný problém, který při návrhu nastal, byla prostá otázka: co když ně
 
 Díky existenci jednotného rozhraní bude možné s~komponentami pracovat hromadně; například zobrazování rozhraní bude spočívat v~zavolání stejné funkce napříč všemi komponentami v~jednom kontejneru.
 
-\subsubsection{Komunikace: třídy Port a~Connector}
-Při návrhu komunikace mezi komponentami musí být brána v~potaz i~reálná implementace. Lze vyjít z~hardwarového schématu konzole, které je obsahem příloh jako obrázek~\ref{fig:nes001-hw}.
+\subsubsection{Komunikace}
+Při návrhu komunikace mezi komponentami musí být brána v~potaz i~reálná implementace. Lze vyjít z~hardwarového schématu konzole, které je obsahem příloh jako obrázek~\ref{fig:nes001-hw}. Na obrázku je patrné, že komponenty obsahují jednak adresní (A), datové (D) a~řídicí  (R/W) signály tvořící sběrnici, jednak jednotlivé signály (NMI, IRQ, INT\dots). Při komunikaci na sběrnici je vždy nějaký prvek, který je řídicí a~přes sběrnici (nebo přímo) přistupuje ke komponentám. Popsané chování lze emulovat tak, že řízená komponenta vystaví rozhraní, kterým ji lze ovládat, a~řídicí komponenta toto rozhraní využije.
+
+Otázkou, kterou je třeba již v~návrhové fázi vyřešit je, zdali zůstane úroveň abstrakce u~jednotlivých signálu i~v~případě rozhraní pro sběrnici. Komunikaci je možné řešit stejně jako u~reálného hardwaru --- vystavení adresy a~příslušného řídicího stavu, poté přenos dat. Ukázalo se však, že ačkoliv by přístup věrně napodobil realitu, přinesl by zbytečné komplikace, přestože by výsledek byl stejný, jako u~abstraktnějších řešení. Případný zájemce o~vývoj vlastní komponenty by mohl být odrazen komplikovaností realistického přístupu. Výsledné řešení je kompromisem: ponechat možnost řízení na úrovni jednotlivých signálu, což by mohly navíc využít jednoduché signály (přerušení, hodinový signál) ; zároveň však i~zavést možnost, jak přenést všechny tři komunikační informace najednou (adresu, data i~řízení).
+
+\subsubsection{Abstrakce systému}
+Po vymyšlení reprezentace komponent a~jejich vzájemné komunikace je možné navrhnout abstrakci systému. Systém by měl poskytnout pro komponenty místo (stejně, jako jsou například v~NES v~krabičce na desce plošných spojů). To bude vyřešeno jednoduchým kontejnerem. Mělo by možné pomocí systému řídit celou emulaci až na úrovni jednotlivých cyklů, bude tedy dedikována metoda pro zaslání hodinového taktu do všech komponent.
+
+Dále by měla existovat metoda umožňující běh v~reálném čase, která bude taktovací metodu využívat. Není možné běžící vlákno uspávat na časový úsek odpovídající prodlevě mezi jednotlivými takty o~frekvenci v~jednotkách megahertz, proto je vhodné takových taktů provést více. To, kolik taktů je nutné provést, záleží na četnosti volání zodpovědné metody. Nabízí se jednoduchý výpočet: $pocet\_volani= \frac{f_{taktovaci}}{f_{volani}}$.
+
+Díky tomu, že komponenty budou součástí jednoho kontejneru, je vhodné vytvořit i~metody, které automaticky zařídí přenos všech grafických i~zvukových informací.
+
+\subsubsection{Reprezentace vnitřních i~vnějších stavů}
+Poslední dva požadavky spolu úzce souvisí. Pro reprezentaci grafických dat bude vybrána vhodná grafická knihovna. Možností jsou dle návrhových vzorů dvě: \emph{immediate mode} a~\emph{retained} mode. Dle prvního návrhového vzoru vykreslování probíhá přímo v~místě volání příslušných funkcí grafické knihovny. Dle druhého je tato zodpovědnost přenechána grafické knihovně. Požadavkem je jednoduchost a~možnost přímo reprezentovat požadované údaje, což naplňuje první návrhový vzor.
+
+Nejpoužívanější a~nejlépe podporovanou immediate mode knihovnou je Dear ImGui.  Nabízí jednotné rozhraní nezávislé na subsystému řešící spolupráci s~konkrétní platformou (renderovací backend). Je možné vybrat mnoho backendů (OpenGL, SDL2, DirectX a~další). Platforma~1.0 používala jako backend knihovnu SDL2. Znalost konkrétního backendu přinesla široké možnosti optimalizace (práce přímo s~texturami), avšak i~určitá omezení v~podobě nemožnost kompilovat pro platformy nepodporované tímto backendem.
+
+Rozumnějším řešením je umožnit tyto backendy vybírat dynamicky a~pokud možno bez nutného zásahu programátora. Existuje projekt Hello~ImGui, který nabízí celý sestavovací skript postavený na CMake a~zároveň i~funkce zajišťující potřebné inicializace ovladačů, což přinese další zjednodušení i~flexibilitu. Pro bakalářskou práci bude zvoleno rozšíření označené jako ImGui~Bundle, které navíc obsahuje například funkcionality pro výběr souborů.
+
+Díky použití knihovny Dear ImGui je možné přenechat vykreslování na každé komponentě, kdy každá funkce reprezentuje jedno okno. Aby mohly komponenty zobrazovat oken více, bude zodpovědná funkce vracet kontejner obsahující renderovací rutiny. C++ pro ukládání function-like objektů nabízí \texttt{std::function}. Objekty této třídy lze navíc ukládat do kontejnerů, což přesně odpovídá požadované funkcionalitě. Vrátí-li každá komponenta kolekci vykreslovacích funkcí, může systém tyto kolekce sloučit, zpracovat a~předat k~vykreslení.
+
+
 
 \section{Emulace konzole}
+
 
 \subsection{Integrace do platformy}
 
