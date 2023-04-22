@@ -431,8 +431,32 @@ pkg.addElements({
 
 Definice proměnných a~dalších struktur k~zobrazení měla probíhat ve veřejné metodě třídy komponenty. Vznikly dva návrhy, jak by se definice mohla řešit: \emph{rekurzivně} a~\emph{registrací}.
 
+Rekurzivní metoda počítala s~tím, že by funkce getElements vždy vrátila balíček, který by se začlenil do balíčku nadřazené komponenty. Takto by i~vznikla stromová struktura reprezentující hierarchii komponent. Registrační metoda by pak jako argument obdržela kontext, do kterého by vložila potřebné informace o~datech k~zobrazení bez nutnosti zanoření.
+
+Nakonec se ukázalo, že spousta dalších funkcionalit knihovny Elements by už přímo musela souviset s~emulací (například Elementy pro řízení časování); také vývoj abstrakce nad všemi potřebnými typy zobrazovaných dat by zabrala příliš mnoho času. Od vývoje knihovny bylo ustoupeno ve prospěch zcela nové platformy postavené na knihovně Dear ImGui.
 
 \subsection{Návrh platformy 2.0}
+Úkolem platformy druhé verze bylo již vytvořit univerzální multiplatformní prostředí pro vývoj emulátorů. Průběžným vývojem se objevilo mnoho problémů a~jejich řešení, což vyústilo v~celistvý seznam požadavků uvedený v~\ref{sec:navrh-pozadavky}. Nyní je již možné vytvořit konkrétní návrh pro implementaci.
+
+\subsubsection{Pomocné knihovny}
+Aby byla naplněna filosofie celé platformy, je třeba se nejprve zamyslet nad volbou dalších nástrojů, které pomohou k~dosažení cíle.
+
+\subsubsection{Modularita: třída Component}
+První požadavek hovoří o~modularitě a~univerzálním rozhraní. Bude tedy implementována abstraktní třída \emph{Component}, která zastřeší veškeré komponenty obsažené v~systému, ať už to je složitější prvek jako procesor, nebo jednodušší prvky: paměti, sběrnice. Komponenty by měly poskytovat následující funkcionality:
+\begin{itemize}
+	\item práce s~piny (porty) na čipu --- (pouze) pomocí nich komponenta komunikuje s~okolím,
+	\item práce s~metadaty --- každá komponenta má svůj název,
+	\item inicializace --- navrácení komponenty do stavu po spuštění (restart),
+	\item vytvoření rozhraní pro monitoring vnitřních i~vnějších stavů --- bude čistě v~režii komponenty, aby se nemusely interní informace vystavovat ven,
+	\item rozhraní pro zvukový výstup.
+\end{itemize}
+
+Jediný problém, který při návrhu nastal, byla prostá otázka: co když nějaká z~výše uvedených funkcionalit ve skutečném hardwaru k~dispozici? Možností bylo specializovat komponenty dle typu zařízení (pasivní: paměť, aktivní: procesor~\dots). Toto řešení bylo rychle zavrženo, anžto by popíralo myšlenku zcela unifikovaného rozhraní. Výsledné řešení je prozaické: zkrátka dojde k~navrácení \enquote{prázdných} hodnot (odpovídá to realitě, absence funkcionality totiž odpovídá prázdnotě). Konkrétní definice prázdnoty je implementačně závislá: prázdný kontejner, vyvolání výjimky, vrácení hodnoty přiřazené prázdnotě. Například prázdný kontejner může být vrácen tam, kde se vždy vrací skupina hodnot (seznam grafických prvků), vyvolání výjimky může být vhodné tam, kde by běh aplikace již neměl smysl (programátor zvolí neexistující port), speciální hodnota reprezentující prázdnotu může být navrácena u~jednoduchých typů (například je-li zvuk reprezentován párem čísel, absence zvuku odpovídá nule).
+
+Díky existenci jednotného rozhraní bude možné s~komponentami pracovat hromadně; například zobrazování rozhraní bude spočívat v~zavolání stejné funkce napříč všemi komponentami v~jednom kontejneru.
+
+\subsubsection{Komunikace: třídy Port a~Connector}
+Při návrhu komunikace mezi komponentami musí být brána v~potaz i~reálná implementace. Lze vyjít z~hardwarového schématu konzole, které je obsahem příloh jako obrázek~\ref{fig:nes001-hw}.
 
 \section{Emulace konzole}
 
