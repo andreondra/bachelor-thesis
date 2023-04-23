@@ -1,3 +1,12 @@
+## Citace
+https://citace.fsv.cuni.cz/CITFSV-13.html
+
+## NES
 https://archive.org/details/6502softwaredesi0000scan
 https://en.wikibooks.org/wiki/NES_Programming
 https://www.nesdev.org/NESDoc.pdf
+https://www.pagetable.com/?p=39
+https://www.weihenstephan.org/~michaste/pagetable/6502/6502.jpg
+http://web.archive.org/web/20210405071537/http://visual6502.org/wiki/index.php?title=6507_Decode_ROM
+http://visual6502.org/docs/6502_in_action_14_web.pdf
+https://raw.githubusercontent.com/wangjohn/mit-courses/master/6.033/Principles%20of%20Computer%20System%20Design%20An%20Introduction-2009.pdf

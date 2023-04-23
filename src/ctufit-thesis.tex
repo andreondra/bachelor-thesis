@@ -74,9 +74,23 @@
 
 \setcounter{secnumdepth}{4} % numbering sections; 4: subsubsection
 
+\definecolor{bfcommon}{RGB}{250, 159, 66}
+\definecolor{bfcommonlight}{RGB}{253, 214, 176}
+\definecolor{bfaux}{RGB}{71, 188, 255}
+\definecolor{bfauxlight}{RGB}{194, 233, 255}
+
+\definecolor{fcaction}{RGB}{253, 214, 176}
+\definecolor{fcbranch}{RGB}{194, 233, 255}
+\definecolor{fcstart}{RGB}{250, 159, 66}
+
 \definecolor{mastercomponent}{RGB}{71, 188, 255}
 \definecolor{slavecomponent}{RGB}{250, 159, 66}
 \definecolor{interface}{RGB}{253, 214, 176}
+
+\definecolor{pixel 0}{RGB}{255, 255, 255}
+\definecolor{pixel 1}{RGB}{194, 233, 255}
+\definecolor{pixel 2}{RGB}{71, 188, 255}
+\definecolor{pixel 3}{RGB}{0, 122, 195}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % CUSTOMIZATION of this template END
@@ -89,7 +103,7 @@
 %%%%%%%%%%%%%%%%%%%%%%
 \usepackage{dirtree}
 \usepackage{lipsum,tikz}
-\usetikzlibrary{positioning}
+\usetikzlibrary{positioning, shapes.geometric, calc, arrows, decorations.pathreplacing}
 \usepackage{csquotes}
 \usepackage[style=iso-numeric]{biblatex}
 \addbibresource{text/bib-database.bib}
@@ -97,6 +111,12 @@
 \usepackage{minted} % typesetting of sources
 \counterwithin{listing}{chapter}
 \usepackage{epigraph}
+\usepackage{tikz-timing}
+\usetikztiminglibrary[rising arrows]{clockarrows}
+\usepackage{xparse}
+\usepackage{bytefield}
+\usepackage{tabularray}
+\usepackage{forloop}
 
 %theorems, definitions, etc.
 \theoremstyle{plain}
@@ -116,6 +136,41 @@
 %theorems, definitions, etc. END
 %%%%%%%%%%%%%%%%%%%%%%
 % DEMO CONTENTS SETTINGS END
+%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%
+% CUSTOM XPARSE COMMANDS
+%%%%%%%%%%%%%%%%%%%%%%
+% xparse used instead of \newcommand, because is faster and has more features.
+% Reference a signal.
+%
+% Usage:
+%
+%     \signal[3::0]{C/BE}    ->   C/BE[3::0]
+%     \signal*{AD}           ->   AD#
+%     \signal*[3::0]{C/BE}   ->   C/BE[3::0]#
+%
+% By Nathan Typanski from: https://nathantypanski.com/blog/2014-10-29-tikz-timing.html#fn1\textbf
+\NewDocumentCommand{\signal}{som}{\texttt{%
+		#3%
+		\IfValueTF{#2}{[#2]}{}%
+		\IfBooleanTF{#1}{\#}{}%
+}}
+
+
+% Draw pixels from a list specified in the first argument with colors defined with
+% with prefix specified in the second argument.
+% Inspired by an answer by Paul Gaborit at https://tex.stackexchange.com/questions/157080/can-tikz-create-pixel-art-images.
+\NewDocumentCommand{\drawpixels}{mm}{
+	\foreach \line [count=\y] in #1 {
+		\foreach \pix [count=\x] in \line {
+			\draw[fill=#2 \pix] (\x,-\y) rectangle +(1,1);
+		}
+	}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%
+% XPARSE COMMANDS END
 %%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document} 
@@ -200,6 +255,14 @@ i~množstevně neomezené.
 %%%%%%%%%%%%%%%%%%%
 \chapter{Seznam zkratek}
 \begin{tabular}{rl}
+	ASIC & Application Specific Integrated Circuit \\
+	PLA & Programmable Logic Array \\
+	A & akumulátor \\
+	S & stack pointer \\
+	PC & program counter \\
+OZ & operační znak \\
+ADL & address low \\
+ADH & address high \\
 NMI & non-maskable interrupt\\
 IRQ & interrupt request\\
 OOP & objektově orientované programování \\
@@ -210,6 +273,7 @@ PAL &  Phase Alternating Line\\
 CPU & central processing unit\\
 ROM & read only memory\\
 RAM & random access memory\\
+OAM & object attribute memory\\
 JSA & jazyk symbolických adres\\
 NES & Nintendo Entertainment System\\
 FC & Family Computer\\
