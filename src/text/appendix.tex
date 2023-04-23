@@ -22,6 +22,8 @@ Diagram na obrázku~\ref{ppu:renderovani} ukazuje proces vykreslování v~čipu 
 \chapter{Knihovna ImInputBinder}
 \label{apx:binder}
 
-Knihovna ImInputBinder vznikla jako rozšíření pro projekt Universal System Emulator.
+Knihovna ImInputBinder vznikla během vývoje projektu Universal System Emulator jako rozšíření knihovny Dear~ImGui. Slouží jako centrální bod odchytávání uživatelského vstupu přes klávesnici a~herní periferie. Kromě samotného zpracování vstupu a~vyvolání akce umožňuje také změnit přiřazení kláves a~to ukládat do souboru. Návod k~použití i~samotná knihovna je k~dispozici ve veřejném repozitáři: \url{https://github.com/andreondra/ImInputBinder}, zde následuje jen meditace nad návrhovými rozhodnutími, které byly během vývoje učiněny.
 
+První otázkou bylo míra dodržování návrhových principů knihovny Dear~ImGui. Běžně jsou komponenty navrženy tak, že není nutná žádná reprezentace stavu, tedy není třeba vytvářet žádné instance tříd; stačí pouze zavolat statické metody. Ukázalo se, že aby byla komponenta konfigurovatelná, musí minimální vnitřní stav musí existovat, a to seznam akcí. Tento stav totiž vyžaduje nejen metoda pro vykreslení obrazovky nastavení přiřazení kláves, ale i~metoda pro aktualizaci stavů stisku kláves a~případné volání callbacků. I~kdyby byly principy dodrženy a~veškeré metody byly statické, musel by uživatel pomyslný vnitřní stav udržovat mimo a~dodávat jej metodám při každém volání, což je mnohem horší varianta z~hlediska výkonu, přehlednosti i~OOP principů (zapouzdřenost).
 
+Druhou otázkou byl způsob ukládání konfigurace. Uvažovalo se nad čistě textovým formátem, pomocí něj by se snadno a~přenositelně reprezentovala čísla, avšak by mohl nastat problém u~konců řádků (znaky carriage return a line feed), což každá platforma řeší jinak. Nakonec byl zvolen vlastní (binární) formát, který většinu hodnot ukládá jako ASCII text.
