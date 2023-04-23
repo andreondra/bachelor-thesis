@@ -12,25 +12,26 @@
 
 Technologický pokrok je nezadržitelný. Nové poznatky umožňují rychlý vývoj sofistikovaného technického vybavení výpočetních číslicových elektronických strojů --- sálových, domácích i~mobilních univerzálních i~specializovaných počítačů, vestavěných řídicích systémů a~dalších zařízení.
 
-Spolu s~technologickým pokrokem přichází mnoho nových informací. Důležitou součástí procesu učení je informace nejen získat, ale i~zpracovat a~porozumět jim, jelikož \enquote{formální osvojování jakýchkoliv faktů bez porozumění se zákonitě promítá do nízké rychlosti i~ekonomičnosti učení a~malé trvalosti paměťové stopy, včetně praktické nevyužitelnosti.}~\cite{Zacharova2012:psychologie}
+Spolu s~technologickým pokrokem přichází mnoho nových informací. Důležitou součástí procesu učení je informace nejen získat, ale i~zpracovat a~porozumět jim, neboť \enquote{formální osvojování jakýchkoliv faktů bez porozumění se zákonitě promítá do nízké rychlosti i~ekonomičnosti učení a~malé trvalosti paměťové stopy, včetně praktické nevyužitelnosti.}~\cite{Zacharova2012:psychologie}
 
 V~mnoha oblastech však obecné principy zůstávají podobné, ne-li stejné. Přirozeně se tudíž k demonstraci principů nabízí využít jednoduššího systému. Takový systém můžeme získat vytvořením modelu aktuálních složitých systémů, což se prakticky využívá například v~systémech reálného času~\cite{Kubatova2019:src-modely}. Jinou variantou řešení se zabývá tento text; využitím historického systému.
 
-Historické systémy, podobně jako ty moderní, vychází z teoretických matematických konceptů (například programovatelný počítač vycházející z Turingova stroje~\cite{Teuscher2003:turing}). Zároveň jsou poměrně jednoduché, jelikož vznikaly s~technologickými omezeními. Není tedy potřeba vytvářet abstraktní model, ale demonstrovat principy na existujícím systému, což může zvýšit atraktivitu i~užitečnost předávaných informací.
+Historické systémy, podobně jako ty moderní, vychází z teoretických matematických konceptů (například programovatelný počítač vycházející z Turingova stroje~\cite{Teuscher2003:turing}). Zároveň jsou poměrně jednoduché, protože vznikaly s~technologickými omezeními. Není tedy potřeba vytvářet abstraktní model, ale demonstrovat principy na existujícím systému, což může zvýšit atraktivitu i~užitečnost předávaných informací.
 
 Jedním ze způsobů, jak takový systém přiblížit jakémukoliv zájemci o problematiku, je přenést jej do softwaru, který bude možné spustit na běžně dostupných počítačích. Jednou z možností je takzvaná emulace; výsledný software je nazýván emulátor.
 
-Cílem bakalářské práce je vytvořit emulátor historické herní konzole \emph{Nintendo Entertainment System}. Jelikož je kladem důraz na využití ve výuce, je nutnou součástí návrhu vývoj univerzální platformy, která takový systém zvládne nejen emulovat, ale zároveň zobrazovat informace o~vnitřním stavu systému, jakožto i~umožnit jednoduché modifikace a~přidávání funkcionalit.
+Cílem bakalářské práce je vytvořit emulátor historické herní konzole \emph{Nintendo Entertainment System} (NES). Ježto je kladem důraz na využití ve výuce, je nutnou součástí návrhu vývoj univerzální platformy, která takový systém zvládne nejen emulovat, ale zároveň zobrazovat informace o~vnitřním stavu systému, jakožto i~umožnit jednoduché modifikace a~přidávání funkcionalit.
 
-Implementační část, hotová emulační platforma, je pouze dílčí výsledek práce. Samotný vývoj emulovaných komponent přináší mnoho zajímavých problémů k~řešení, proto je namístě tento proces důkladně dokumentovat a~vytvořit tak příklad pro uživatele, kteří by chtěli příkladnou implementaci rozšířit, případně na platformě vyvinout emulátor jiného systému. Dílčím cílem práce je tedy seznámit čtenáře s~vývojem a~motivovat jej  ještě důkladněji zkoumat prezentované principy.
+Implementační část, hotová emulační platforma, je pouze dílčí výsledek práce. Samotný vývoj emulovaných komponent přináší mnoho zajímavých problémů k~řešení, proto je namístě tento proces důkladně dokumentovat a~vytvořit tak příklad pro čtenáře, kteří by chtěli příkladnou implementaci rozšířit, případně na platformě vyvinout emulátor jiného systému. Dílčím cílem práce je tedy seznámit čtenáře s~vývojem a~motivovat jej  ještě důkladněji zkoumat prezentované principy.
 
 Práce je členěna na několik hlavních částí:
 \begin{description}
-	\item[Představení problematiky] V~této kapitole je představena problematika emulace v~teoretické rovině --- definují se potřebné pojmy. Kapitola popisuje jednak emulaci obecně, jednak konkrétní emulované komponenty.
-	\item[Analýza] Analytická, stěžejní kapitola práce, seznámí čtenáře s~uvažovanými variantami řešení. Dochází k~analýze existujících implementací a~k~výběru vhodných technologií a~metodik vzhledem k~emulovaným komponentám.
-	\item[Implementace] Implementační kapitola je popisem procesu tvorby emulační platformy a emulovaných komponent.
-	\item[Testování] Předposlední kapitola je zaměřena na testování projektu. Popisuje nejen průběžné testování aplikace, ale i~porovnání věrnosti s~reálným systémem. metodou spouštění necertifikovaného kódu na originálním hardwaru.
-	\item[Navazující práce] Poslední kapitola je věnována shrnutí zbývajících funkcionalit, které budou implementovány v~dalších verzích emulační platformy. Slouží také jako pobídka dalším uživatelům-vývojářům, kteří by měli zájem projekt rozšířit v~rámci sebevzdělávání.
+	\item[Představení problematiky] V~této kapitole je představena problematika emulace v~teoretické rovině --- definují se potřebné pojmy. Kapitola popisuje jednak emulaci obecně, jednak témata, se kterými se může vývojář emulátoru setkat a~měl by je proto chápat v~širších souvislostech.
+	\item[Analýza] Analytická část, stěžejní kapitola práce, se věnuje analýze konkrétního emulovaného systému. Jelikož neexistuje jeden dokument, který obsahuje vše potřebné, je nutné informace seskupit a~podat přívětivou formou. Mimo jiné tato kapitola slouží jako ukázka čtenáři, kde a~jak by mohl hledat informace pro případný svůj vlastní vývoj libovolného emulovaného systému.
+	\item[Návrh] Po zpracování potřebné teorie i~konkrétních faktů týkající se konzole je možné vytvořit vhodné řešení. V~kapitole je možné nalézti diskusi k~samotnému vývojovému procesu, který je nezbytný k~rychlému a~pohodlnému vývoji. Dále úvahy nad způsoby vytvoření univerzální emulační platformy a~nakonec i~způsob integrace konzole NES do navrženého systému.
+	\item[Implementace] Implementační kapitola je popisem procesu tvorby emulační platformy a emulovaných komponent. Ukazuje konkrétní problémy, které byly řešeny a~nabádá čtenáře k~souběžnému průzkumu zdrojového kódu.
+	\item[Testování] Předposlední kapitola je zaměřena na testování projektu. Popisuje nejen průběžné testování aplikace, ale i~porovnání věrnosti s~reálným systémem metodou spouštění necertifikovaného kódu na originálním hardwaru.
+	\item[Navazující práce] Poslední kapitola je věnována shrnutí zbývajících funkcionalit, které budou implementovány v~dalších verzích emulační platformy. Slouží především jako pobídka dalším čtenářům-vývojářům, kteří by měli zájem projekt rozšířit ať už v~rámci sebevzdělávání, nebo v~rámci vlastní závěrečné práce.
 \end{description}
 
 \begin{note*}[Terminologie]
@@ -38,9 +39,11 @@ Práce je členěna na několik hlavních částí:
 \end{note*}
 
 \begin{note*}[Značení]
-	V~textu se často používají čísla v šestnáctkové soustavě, jelikož úsporně reprezentují například paměťové adresy. Takové číslice se značí předponou amerického dolaru: \$. Desítková čísla jsou uvedena bez předpony.
+	V~textu se často používají čísla v šestnáctkové soustavě, poněvadž úsporně reprezentují například paměťové adresy. Šestnáctkové číslice se značí předponou amerického dolaru: \$. Desítková čísla jsou uvedena bez předpony.
 	
 	Dále se používají různé zkratky; jsou uvedeny v~seznamu zkratek. Neobvyklé zkratky se před jejich použitím v~textu vysvětlují.
+	
+	V~textu se taktéž vyskytují paměťové diagramy, to jest znázornění relevantních fragmentů paměti. Takové diagramy mají bajty vždy řazeny dle pořadí v~paměti zleva doprava. Jsou-li však v~těchto diagramech jednotlivé bajty rozepsány dvojkově, jsou bity (číslice) uspořádány od nejvyšší váhy po nejnižší tak, jako je zvykem u~zápisu čísel pozičních číselných soustav.
 \end{note*}
 
 %---------------------------------------------------------------

@@ -4,7 +4,8 @@ Repozitář obsahuje zdrojový kód textu bakalářské práce, která se zabýv
 Bakalářská práce vznikala v letech 2022-2023 na FIT ČVUT.
 
 ## Zkompilované PDF
-Nejnovější PDF je k dispozici v záložce [Actions](https://github.com/andreondra/bachelor-thesis/actions). Každý commit do hlavní větve spustí kompilaci, která vyprodukuje artefakt: ZIP archiv obsahující PDF práce.
+- Nejnovější PDF je k dispozici v záložce [Actions](https://github.com/andreondra/bachelor-thesis/actions). Každý commit spustí kompilaci, která vyprodukuje artefakt: ZIP archiv obsahující PDF práce.
+- PDF pouze z commitů do hlavní větve ("stabilní" vydání) je k dispozici jako [release s tagem latest](https://github.com/andreondra/bachelor-thesis/releases/tag/latest).
 
 ## Vlastní kompilace
 - Je nutné použít `biber` místo `bibtex`. TeXstudio používá jako výchozí právě `bibtex`, je to třeba přepnout v nastavení: `Options > Configure TeXstudio > Build > Default Bibliography Tool`.
@@ -20,6 +21,10 @@ Nejnovější PDF je k dispozici v záložce [Actions](https://github.com/andreo
   - epigraph.sty,
   - nextpage.sty,
   - minted.sty,
+  - bytefield.sty,
+  - tikz-timing.sty,
+  - bytefield.sty,
+  - forloop.sty,
   - tip: na Fedoře lze TeXové balíčky nainstalovat pomocí dnf: `dnf install "tex(balicek.pripona)"`.
 - Požadované další systémové balíčky na Fedoře 37:
   - texlive-collection-langczechslovak,
@@ -27,7 +32,8 @@ Nejnovější PDF je k dispozici v záložce [Actions](https://github.com/andreo
 - Alternativní řešení: instalace kompletní distribuce: texlive-scheme-full
 
 ### Ubuntu
-- V distribuci Ubuntu lze nainstalovat celou distribuci texlive pomocí `apt install texlive-full`. Případně lze použít balík `texlive-base` doplněný o `texlive-lang-czechslovak` a `texlive-latex-extra`.
+- V distribuci Ubuntu lze nainstalovat celou distribuci texlive pomocí `apt install texlive-full`. Případně lze použít balík `texlive-base` doplněný o `texlive-lang-czechslovak`, `texlive-latex-extra` a `texlive-science`.
+- Dále je nutné doinstalovat biber: `apt install biber`.
 
 ## Tipy
 - tilda (~) na české klávesnici: `pravý Alt` + `Shift` + `` ` ``
