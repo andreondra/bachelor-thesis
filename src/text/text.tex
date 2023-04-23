@@ -1328,6 +1328,8 @@ Při analýze byly získány potřebné informace o~tom, z~čeho se NES skládá
 
 Nejprve je třeba navrhnout technologie, které se pro implementaci využijí. Dále je nutné navrhnout univerzální rozšiřitelnou platformu. Nakonec se za pomocí určených technologií a~platformy navrhne, jak implementovat samotnou konzoli NES.
 
+Kapitola slouží jako přehled návrhových rozhodnutí, které vyvstaly během řešení praktické části, a~jejich odůvodnění.
+
 \section{Výběr technologií}
 Na začátku vývoje je třeba vybrat správné nástroje tak, aby byl vývoj co nejefektivnější a~nejpohodlnější. Kromě jmenovaných požadavků je nutné brát v potaz také externí požadavky, které stanovuje jednak zadání, jednak výsledky samotného bádání v~analytické části.
 
@@ -1348,9 +1350,19 @@ Zvoleným jazykem pro implementaci je C++ ve verzi C++20. Splňuje totiž veške
 	Toolchain je anglický termín pro kolekci nástrojů využívaných při vývoji. Typicky se jedná o~soubor prostředí pro vývoj: textový editor pro psaní zdrojového kódu, kompilátor pro překlad do strojového kódu, linter pro kontrolu syntaktických chyb (dnes existují nástroje i~pro hledání různých sémantických chyb, například nástroj clang-tidy), debugger.
 \end{definition}
 
+Použití editoru se týká jen programátora, není tedy důležité toto rozhodnutí stanovit před začátkem projektu; nebude mít žádný vliv na výsledný projekt. Je však vhodné vyžadovat editor nabízející zvýrazňování syntaxe a~snadnou integrací s~dalšími částmi toolchainu, ať už se jedná o~pouhý editor, nebo celé integrované vývojové rozhraní (IDE). Pro účely projektu byl mezi dalšími možnostmi jako Visual Studio Code a~Qt Creator zvolen CLion (integrace s~CMake, přehledný grafický debugger, vestavěný linter).
+
+Při návrhu toolchainu je brán v~potaz jednoduchost použití tak, aby šlo pokud možno vše zařídit automaticky: od stažení závislostí, přes kompilaci, testování i~generování dokumentace. Zároveň je z~hlediska přístupnosti vhodné, aby šel program zkompilovat na více než jedné platformě za pomocí stejného nástroje. Pro popis postupu kompilace se v~C/C++ projektech často používá Makefile; ten však není možné jednoduše použít na jiných platformách (například Windows). Pro abstrakci nad nástroji jako Make existuje CMake. Ten se jeví jako mnohem vhodnější řešení, jelikož umí vše vyžadované včetně generování Makefile, projektu pro Visual Studio, kompilování pro WebAssembly a~další. Bude tedy zvolen CMake.
+
 \subsection{Správa zdrojového kódu}
+Pro udržitelný vývoj většího projektu je vždy dobré mít přehled nad změnami, potažmo jednotlivými verzemi projektu. Možností verzování je několik. Nejjednodušší je prosté ukládání do několika složek v~souborovém systému, což ale brzy způsobí chaos a~špatně se synchronizují kolizní změny v~případě využití synchronizované složky. Standardem je dnes používání systémů správy verzí. Existují dvě možnosti: centralizovaná a~distribuovaná. Pro tento projekt byla zvolena distribuovaná, poněvadž umožňuje pracovat off-line a~téměř vždy existují alespoň dvě celé kopie repozitáře (lokální a~serverová). Konkrétním nástrojem byl zvolen Git, jelikož je standardem a~nabízí veškeré očekávané funkcionality distribuovaného systému pro správu verzí: lokální práci s~repozitářem, práce s~verzemi a~vývojovými větvemi, snadná komunikace se serverem, navíc i~jednoduché podepisování změň pomocí asymetrických kryptografických nástrojů.
+
+Aby byl projekt v~rámci edukativnosti co nejdostupnější, je nutné použít veřejně přístupné úložiště i~s~možnostmi spolupráce a~přijímání změň od dobrovolníků. Velice známou platformou je \emph{GitHub}, který zdarma nabízí nejen umístění repozitáře, ale i~různé nástroje pro týmovou spolupráci, například trasování chyb a~úkolů. Vhod přijde i~možnost přímo na GitHubu jednoduše provozovat on-line dokumentaci.
 
 \subsection{Dokumentace}
+Dokumentace je nedílnou součástí projektu. Jednou z~možností, jak takovou dokumentaci tvořit, je průběžně vyplňovat externí textový dokument s~popisem kódu. Tato možnost je vhodná jen pro velice primitivní programy. Je možné totiž využít možností psaní dokumentace přímo v~kódu. Využívá se funkcionality komentářů, které jsou obohaceny o~možnosti vyplňování dalších údajů o~jednotlivých funkcích i~třídách; takovým komentářům se říká dokumentační. Z~takových komentářů lze pak jednoduše dokumentaci vygenerovat; proto je zvolena tato možnost.
+
+Pro konkrétní zvolený programovací jazyk, C++, existuje nástroj \emph{Doxygen}. Ten za pomocí speciální syntaxe v~komentářích vygeneruje například i~popisy parametrů funkcí, návratových hodnot, popřípadě možných vyvolaných výjimek. Takto vygenerovanou dokumentace již je možné číst lokálně i~na serveru. Výstup programu Doxygen lze však dále zpracovat a~vytvořit přehlednější dokumentaci, což je velice důležité, pakliže je požadováno využití ve výuce. Pomocí nástrojů \emph{Breathe} a~\emph{Exhale} dojde k~převedení do formátu podporovaného nástrojem \emph{Sphinx}, který umožňuje přidávat další dokumentační stránky ve formátu reStructuredText a~použití velmi přehledných šablon (například šablona ReadTheDocs používaná pro mnoho open-source projektů, jmenovitě admesh, Zoneminder a~další). Celý proces generování dokumentace lze automatizovat nástrojem CMake, což ještě zjednoduší průběžné úpravy dokumentace. Z~toho důvodu bude implementována také automatizace.
 
 \subsection{Testování}
 Aby byl zajištěn soulad s~požadavky, je nutné program testovat. Úkolem této části je stanovit požadavky na testy a~na tom základu navrhnout vhodné metodiky a~nástroje.
@@ -1361,11 +1373,259 @@ Spouštění testů v~základní formě vyžaduje akci programátora, což přin
 
 Specifikem bakalářské práce je fakt, že implementuje emulaci systému, od které se očekává, že bude věrně napodobovat emulovaný systém. Dalším požadavkem je proto možnost \emph{spouštět testy ve formě strojového kódu} pro danou platformu s~možností automatického vyhodnocení. Pro archaické systémy vzniklo již mnoho testů, které mají za úkol porovnat funkci s~reálným systémem. Sofistikované testy umožňují vybrat druh výstupu, kdy součástí bývá i~zápis výsledků do vybraného místa v~paměti.
 
-Jak bylo uvedeno v~kapitole \ref{sec:teorie-testovani}, testy se dají provádět ručně i~automaticky. Jelikož je požadováno průběžné testování, je nejvhodnější co nejvíce testů automatizovat. To vyžaduje nástroj pro spouštění a~řízení testů. Součástí nástroje CMake je CTest, který je využit i~v~této práci.
-
-Pro samotné psaní testů již není třeba další komponenty, 
+Jak bylo uvedeno v~kapitole \ref{sec:teorie-testovani}, testy se dají provádět ručně i~automaticky. Jelikož je požadováno průběžné testování, je nejvhodnější co nejvíce testů automatizovat. To vyžaduje nástroj pro spouštění a~řízení testů. Součástí nástroje CMake je CTest, který je využit i~v~této práci. Pro samotné psaní testů již není třeba další komponenty, avšak využití dalších nástrojů může testování dále zjednodušit a~standardizovat jejich strukturu. Pro účely této práce byl zvolen Google Test. Umožňuje testovat konkrétní hodnoty, ověřovat vyvolané výjimky i~vytvářet znovupoužitelné struktury pro testování jednotným způsobem; díky tomu budou testy přehlednější. Výhodou je integrace Google Test se systémem CMake, proto je možné po úvodním nastavení testy vytvářet jako jednotlivé zdrojové soubory bez dalších úprav.
 
 \section{Emulační platforma}
+\subsection{Stanovení požadavků}
+\label{sec:navrh-pozadavky}
+
+Aby byl projekt co nejuniverzálnější, bude v~rámci projektu vyvinuta platforma zjednodušující vývoj libovolného emulátoru historického systému. Na základě důkladné analýzy konzole NES je možné vytvořit seznam požadavků pro takovou platformu, což poslouží jako reference pro návrh.
+
+Klíčovým požadavkem pevně souvisejícím s~principem fungování číslicového hardwaru je modularita, což představuje dělení na \emph{nezávislé komponenty}. Hardware vždy tvoří více nezávislých komponent, v~případě NES se i~ve vyšší úrovni abstrakce jedná třeba o~procesor, grafický čip a~kazetu. Samotné dělení na komponenty bude představovat implementace v~třídách v~rámci OOP, avšak je rozumné vyžadovat, aby měly komponenty stejné komunikační rozhraní tak, aby se daly univerzálně propojovat.
+
+První požadavek přirozeně vytváří další: po navržení jednotného rozhraní pro komponenty musí být navržen \emph{způsob vzájemné komunikace} a~to ideálně takový, který odpovídá skutečné implementaci a~zároveň je rozumně efektivní.
+
+Třetím požadavkem je vytvoření \emph{abstrakce celého systému}, v~jehož rámci se budou komponenty propojovat. Očekává se, že emulátor bude nabízet více různých systémů, proto je namístě vyžadovat jednotné rozhraní pro všechny systémy. Takové rozhraní by mělo obsahovat možnost řízení běhu systému přirozeně pomocí hodinového signálu; zároveň i~možnost, jak získávat různé informace o~systému.
+
+Jakmile bude v~emulátoru existovat množina komponent jako součást systému, je možné uvažovat o~\emph{monitorování vnitřního stavu}. Bude nutné vytvořit jednoduchý způsob, jakým je možné pracovat s~celým systémem i~jednotlivými komponentami až na úroveň registrů a~obsahu paměti.
+
+Kromě vnitřního stavu je přirozené očekávat, že bude emulátor nabízet i~běžně externě přístupné rozhraní, tedy reprezentaci \emph{vnějšího stavu systému}. Pro zachování univerzálnosti je nutné vytvořit univerzální řešení umožňující reprezentovat obrazový výstup (v~případě NES se jedná o~výstup herní grafiky z~čipu PPU na televizor; v~případě jiných soudobých systémů může jít o~výstup terminálu), zvukový výstup (u~NES je to zajištěno čipem APU; jinde, například u~Commodore~64 čipem 6581~SID, u~Atari čipem POKEY~\dots) a~uživatelský vstup (herní ovladače u~NES, klávesnice u~domácích mikropočítačů).
+
+Pro shrnutí následuje seznam zjištěných požadavků:
+\begin{itemize}
+	\item dělení na nezávislé komponenty,
+	\item způsob komunikace mezi komponentami,
+	\item abstrakce celého systému zastřešujícího komponenty,
+	\item monitorování vnitřního stavu komponent,
+	\item reprezentace vnějšího stavu systému.
+\end{itemize}
+
+\subsection{Porovnání s~původními návrhy}
+Požadavky přímo nevyplývající ze zadání se objevovaly postupně při vývoji několika prvních verzí emulační platformy; až posléze vznikl ucelený seznam popsaný v~části~\ref{sec:navrh-pozadavky}. Pro úplnost a~pochopení požadavků je vhodné připomenout nedostatky původních verzí.
+
+\subsubsection{Platforma 1.0}
+První platforma vznikla čistě pro účely experimentování. Hlavní cíl bylo rychle vytvořit funkční prostředí, ve kterém je možné implementovat emulovaný hardware. Velkou výhodou první platformy tedy bylo to, že byla implementována velice rychle.
+
+Rozhraní komponent bylo různé a~systém byl ve své podstatě reprezentován třídou pro sběrnici. Tato vlastnost se projevila okamžitě při nutnosti testovat procesor 6502 zvlášť v~omezeném systému; bylo nutné buď duplikovat kód, nebo se kód stával rychle nepřehledným. I~z~toho důvodů byl jako požadavek pro další platformy stanovena především univerzální modularita.
+
+Další velice nepříjemnou vlastností plynoucí z~absence modularity byla neexistence univerzálního způsobu prezentace stavů systému; vše bylo řešeno vystavením všech registrů a~pamětí přímo, nebo pomocí getterů. Často tedy docházelo k~porušení zapouzdření. Příklad takového špatného přístupu je ve výpisu kódu~\ref{list:navrh-platforma1.0}.
+
+\begin{listing}
+	\caption{Zobrazení stavů registru \enquote{V} PPU na~platformě~1.0}
+	\label{list:navrh-platforma1.0}
+	\begin{minted}{cpp}
+ImGui::Text("V nameY: %u", m_bus.getPPU().m_internalRegisters.v.bits.nameY);
+ImGui::Text("V nameX: %u", m_bus.getPPU().m_internalRegisters.v.bits.nameX);
+ImGui::Text("V fineY: %u", m_bus.getPPU().m_internalRegisters.v.bits.fineY);
+ImGui::Text("V coY: %u",   m_bus.getPPU().m_internalRegisters.v.bits.coarseY);
+ImGui::Text("V coX: %u",   m_bus.getPPU().m_internalRegisters.v.bits.coarseX);
+	\end{minted}
+\end{listing}
+
+Poslední velkou nevýhodou této platformy byla vázanost na jeden video i~audio backend. To znemožňovalo jednoduchou výměnu těchto komponent a~snadnou přenositelnost na jiné platformy. I~tato nevýhoda byla eliminována v~poslední verzi platformy.
+
+Další nevýhody plynuly spíše pro uživatele, jednou z~nich byla například i~absence systému dokování oken, což vždy vyústilo v~nepřehledné uživatelské rozhraní. Velice špatně byl i~řešen zvukový výstup, samotná emulace probíhala ve stejném vlákně, jako callback pro zvukový ovladač, což vedlo k~trháním a~dalším zvukovým artefaktům.
+
+\subsubsection{Platforma 1.5}
+\label{sec:navrh-platforma1.5}
+Mezikrok mezi platformami byl spíše prostorem pro vyzkoušení různých technik abstrakce grafického rozhraní. Jako první vznikla knihovna Elements, umožňující definovat soubor datových struktur k~ zobrazení bez závislosti nejen na grafickém backendu, ale i~na celé grafické knihovně. Projekt je dostupný na~\url{https://github.com/andreondra/elements}.
+
+Myšlenkou bylo vytvořit třetí vrstvu abstrakce, jako ukazuje diagram~\ref{fig:navrh-abstrakce-grafiky}. Důvod takového uvažování vznikl z~prosté myšlenky. První platforma řešila zobrazování vnitřního stavu komponent externě, tudíž do nich musela nějakým způsobem zasahovat (například přes gettery). To způsobilo vazbu mezi více třídami; zobrazování bylo vázáno na vnitřní implementaci a~nabízené rozhraní dané komponenty, které nebylo jednotné. Bylo navrženo, že by komponenta měla být zodpovědná sama za zobrazování vnitřních hodnot tak, aby na tyto informace nemuselo být vázáno okolí. Komponenta by pouze zveřejnila nutné rozhraní pro komunikaci. Aby však komponenta nebyla vázána na konkrétní grafickou knihovnu, byla vytvořena idea další abstrakce.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{Úrovně abstrakce práce s~grafikou}\label{fig:navrh-abstrakce-grafiky}
+	\begin{tikzpicture}[node distance=2cm] 
+		\tikzstyle{uroven} = [rectangle, rounded corners, minimum width=5cm, minimum height=1cm,text centered, draw=black]
+		\tikzstyle{arrow} = [thick,->,>=stealth]
+		
+		\node (elements) [uroven, fill=headbackgroundgray] {Elements};
+		\node (gui) [uroven, below of=elements] {GUI knihovna};
+		\node (backend) [uroven, below of=gui] {Grafický backend};
+		
+		\draw [arrow] (elements) -- (gui);
+		\draw [arrow] (gui) -- (backend);
+	\end{tikzpicture}
+\end{figure}
+
+Úkolem knihovny Elements bylo poskytnout takové prostředky, pomocí kterých by programátor v~dané komponentě definoval, jaké proměnné a~v~jaké formě se mají zobrazovat v~grafickém rozhraní (otázka \emph{Co?}). Vše ostatní by řešila knihovna (otázka \emph{Jak?}). Třída představující abstrahovanou proměnnou a~další datové struktury byla označena jako Element. Každá část dat, která měla být reprezentována jakýmkoliv způsobem, by byla Element, ať už obsah registru, obsah paměti nebo surový grafický výstup. Tyto Elementy by byly strukturovány do balíčků označované jako Package. Takto bylo možné z~libovolné komponenty pomocí společného rozhraní \emph{getElements} získat abstraktní definici uživatelského rozhraní nezávislého na aktuální vnitřní reprezentaci.
+
+Elementy umožňovaly získávat data nejen přímo, ale i~pomocí funkcí, bylo tedy možné hodnoty před zobrazením ještě upravit. Příkladem tvorby balíčku je kód ve~výpisu~\ref{list:navrh-elements-package}. Takový kód je prakticky spustitelný, v~repozitáři projektu je součástí příkladu v~souboru \texttt{main.cpp}.
+
+\begin{listing}
+	\caption{Tvorba Package z~Elementů}
+	\label{list:navrh-elements-package}
+	\begin{minted}{cpp}
+Elements::Package pkg("Test package", Elements::Types::Dock::LEFT);
+pkg.addElements({
+	new Elements::Text("Example text received via getter:"),
+	new Elements::Text(getCurrentInstruction()),
+	new Elements::Number("Number 8", &number8),
+	new Elements::Number("Number 16", &number16),
+	new Elements::Number("Number 32", &number32),
+	new Elements::Number("Number Int", &numberInt),
+	new Elements::Number("Number 64", &number64),
+	new Elements::Separator(),
+	new Elements::Number("Number dbl", &numberDbl),
+	new Elements::Separator(),
+	new Elements::Bool("Check me!", &exampleBoolean),
+	new Elements::Separator(),
+	new Elements::Memory("Example Mem", memory, sizeof(memory), 0, false),
+	new Elements::Separator(),
+	new Elements::Text("This is a beginning of custom rendering!"),
+	new Elements::Display("Display Example", pixeldata, true),
+	new Elements::Text("This is the end of custom rendering!")
+});
+	\end{minted}
+\end{listing}
+
+Definice proměnných a~dalších struktur k~zobrazení měla probíhat ve veřejné metodě třídy komponenty. Vznikly dva návrhy, jak by se definice mohla řešit: \emph{rekurzivně} a~\emph{registrací}.
+
+Rekurzivní metoda počítala s~tím, že by funkce getElements vždy vrátila balíček, který by se začlenil do balíčku nadřazené komponenty. Takto by i~vznikla stromová struktura reprezentující hierarchii komponent. Registrační metoda by pak jako argument obdržela kontext, do kterého by vložila potřebné informace o~datech k~zobrazení bez nutnosti zanoření.
+
+Nakonec se ukázalo, že spousta dalších funkcionalit knihovny Elements by už přímo musela souviset s~emulací (například Elementy pro řízení časování); také vývoj abstrakce nad všemi potřebnými typy zobrazovaných dat by zabrala příliš mnoho času. Od vývoje knihovny bylo ustoupeno ve prospěch zcela nové platformy.
+
+\subsection{Návrh platformy 2.0}
+Úkolem platformy druhé verze bylo již vytvořit univerzální multiplatformní prostředí pro vývoj emulátorů; takto vznikla verze 2.0 označována jako Universal System Emulator. Průběžným vývojem se objevilo mnoho problémů a~jejich řešení, což vyústilo v~celistvý seznam požadavků uvedený v~\ref{sec:navrh-pozadavky}.
+
+Celou platformu bude představovat třída~\emph{Emulator}. Součástí bude rozhraní pro přepínání systémů, jejich řízení a~také bude zastřešovat veškerá potřebná uživatelská nastavení. Zvýšenou péči v~návrhové části vyžaduje především systém pro nastavování preferencí. Jako první bude implementována možnost nastavit klávesy pro jednotlivé vstupy emulovaných systémů. Takové rozšíření pro knihovnu Dear~ImGui neexistuje, je tedy nutné jej naprogramovat. Jelikož je požadavek nastavování kláves využitelný i~v~jiných projektech, bude toto rozšíření vyvinuto zvlášť a~do projektu přidáno jako závislost. Jelikož se vývoj této knihovny (rozšíření) přímo netýká hlavního textu, je popsán v~příloze~\ref{apx:binder}.
+
+\subsubsection{Modularita: třída Component}
+První požadavek hovoří o~modularitě a~univerzálním rozhraní. Bude tedy implementována abstraktní třída \emph{Component}, která zastřeší veškeré komponenty obsažené v~systému, ať už to je složitější prvek jako procesor, nebo jednodušší prvky: paměti, sběrnice. Komponenty by měly poskytovat následující funkcionality:
+\begin{itemize}
+	\item práce s~piny (porty) na čipu --- (pouze) pomocí nich komponenta komunikuje s~okolím,
+	\item práce s~metadaty --- každá komponenta má svůj název,
+	\item inicializace --- navrácení komponenty do stavu po spuštění (restart),
+	\item vytvoření rozhraní pro monitoring vnitřních i~vnějších stavů --- bude čistě v~režii komponenty, aby se nemusely interní informace vystavovat ven,
+	\item rozhraní pro zvukový výstup.
+\end{itemize}
+
+Jediný problém, který při návrhu nastal, byla prostá otázka: co když nějaká z~výše uvedených funkcionalit ve skutečném hardwaru k~dispozici? Možností bylo specializovat komponenty dle typu zařízení (pasivní: paměť, aktivní: procesor~\dots). Toto řešení bylo rychle zavrženo, anžto by popíralo myšlenku zcela unifikovaného rozhraní. Výsledné řešení je prozaické: zkrátka dojde k~navrácení \enquote{prázdných} hodnot (odpovídá to realitě, absence funkcionality totiž odpovídá prázdnotě). Konkrétní definice prázdnoty je implementačně závislá: prázdný kontejner, vyvolání výjimky, vrácení hodnoty přiřazené prázdnotě. Například prázdný kontejner může být vrácen tam, kde se vždy vrací skupina hodnot (seznam grafických prvků), vyvolání výjimky může být vhodné tam, kde by běh aplikace již neměl smysl (programátor zvolí neexistující port), speciální hodnota reprezentující prázdnotu může být navrácena u~jednoduchých typů (například je-li zvuk reprezentován párem čísel, absence zvuku odpovídá nule).
+
+Díky existenci jednotného rozhraní bude možné s~komponentami pracovat hromadně; například zobrazování rozhraní bude spočívat v~zavolání stejné funkce napříč všemi komponentami v~jednom kontejneru.
+
+\subsubsection{Komunikace: třídy Port a~Connector}
+\label{sec:port-connector}
+Při návrhu komunikace mezi komponentami musí být brána v~potaz i~reálná implementace. Lze vyjít z~hardwarového schématu konzole, které je obsahem příloh jako obrázek~\ref{fig:nes001-hw}. Na obrázku je patrné, že komponenty obsahují jednak adresní (A), datové (D) a~řídicí  (R/W) signály tvořící sběrnici, jednak jednotlivé signály (NMI, IRQ, INT\dots). Při komunikaci na sběrnici je vždy nějaký prvek, který je řídicí a~přes sběrnici (nebo přímo) přistupuje ke komponentám. Popsané chování lze emulovat tak, že řízená komponenta vystaví rozhraní, kterým ji lze ovládat, a~řídicí komponenta toto rozhraní využije. Pro řízenou komponentu bude vytvořena třída \emph{Connector} a~pro řídicí komponentu třída \emph{Port}. Řízená komponenta tedy nabízí několik konektorů, které si může řídicí třída připojit do svého portu, prostřednictvím nějž bude s~řízenou komponentou komunikovat. Využitím rozhraní odděleného od konkrétních komponent je možné komponenty propojovat libovolně, což bude důležité v~budoucích fázích projektu, kdy bude možné komponenty skládat do systému v~grafickém rozhraní, bude tedy nutné mít možnost dostupné rozhraní enumerovat, což je díky takto univerzálnímu návrhu možné. Grafická reprezentace komunikace komponent je na obrázku~\ref{fig:navrh-komunikace-komponent}.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{Komunikace komponent pomocí tříd Port a~Connector}\label{fig:navrh-komunikace-komponent}
+	\includegraphics[width=0.4\textwidth]{images/port_connector.pdf}
+\end{figure}
+
+Otázkou, kterou je třeba již v~návrhové fázi vyřešit je, zdali zůstane úroveň abstrakce u~jednotlivých signálu i~v~případě rozhraní pro sběrnici. Komunikaci je možné řešit stejně jako u~reálného hardwaru --- vystavení adresy a~příslušného řídicího stavu, poté přenos dat. Ukázalo se však, že ačkoliv by přístup věrně napodobil realitu, přinesl by zbytečné komplikace, přestože by výsledek byl stejný, jako u~abstraktnějších řešení. Případný zájemce o~vývoj vlastní komponenty by mohl být odrazen komplikovaností realistického přístupu. Výsledné řešení je kompromisem: ponechat možnost řízení na úrovni jednotlivých signálu, což by mohly navíc využít jednoduché signály (přerušení, hodinový signál) ; zároveň však i~zavést možnost, jak přenést všechny tři komunikační informace najednou (adresu, data i~řízení).
+
+Sdružení komunikace přináší i~otázku, jak reprezentovat šířku komunikačního kanálu. Adresní sběrnice může být u~různých systémů různě široká, tak stejně i~datová. V~prvotních fázích bylo uvažováno, že šířka může být reprezentována pomocí šablon (templates), které C++ nabízí; adresa i~data by tak byla omezena zcela nativně datovým typem (například \texttt{uint8\_t}). Ukázalo se však, že mnohem lepší alternativou je použít dostatečně široký datový typ pro historické systémy (32 bitů) a~samotné ořezávání nastavit konstruktorem. Důvody jsou dva: obsahuje-li třída šablony, je nutné vše specifikovat v~hlavičkovém souboru (nepřehledné), navíc existují i~šířky sběrnic, pro které neexistují nativní datové typy (například adresní sběrnice pro komunikaci PPU s~kazetou je široká 14~bitů).
+
+\subsubsection{Abstrakce systému: třída System}
+Po vymyšlení reprezentace komponent a~jejich vzájemné komunikace je možné navrhnout abstrakci systému. Systém by měl poskytnout pro komponenty místo (stejně, jako jsou například v~NES v~krabičce na desce plošných spojů). To bude vyřešeno jednoduchým kontejnerem. Mělo by možné pomocí systému řídit celou emulaci až na úrovni jednotlivých cyklů, bude tedy dedikována metoda pro zaslání hodinového taktu do všech komponent.
+
+Dále by měla existovat metoda umožňující běh v~reálném čase, která bude taktovací metodu využívat. Není možné běžící vlákno uspávat na časový úsek odpovídající prodlevě mezi jednotlivými takty o~frekvenci v~jednotkách megahertz, proto je vhodné takových taktů provést více. To, kolik taktů je nutné provést, záleží na četnosti volání zodpovědné metody. Nabízí se jednoduchý výpočet: $pocet\_volani= \frac{f_{taktovaci}}{f_{volani}}$.
+
+Díky tomu, že komponenty budou součástí jednoho kontejneru, je vhodné vytvořit i~metody, které automaticky zařídí přenos všech grafických i~zvukových informací.
+
+\subsubsection{Reprezentace vnitřních i~vnějších stavů}
+Poslední dva požadavky spolu úzce souvisí. Pro reprezentaci grafických dat bude vybrána vhodná grafická knihovna. Možností jsou dle návrhových vzorů dvě: \emph{immediate mode} a~\emph{retained} mode. Dle prvního návrhového vzoru vykreslování probíhá přímo v~místě volání příslušných funkcí grafické knihovny. Dle druhého je tato zodpovědnost přenechána grafické knihovně. Požadavkem je jednoduchost a~možnost přímo reprezentovat požadované údaje, což naplňuje první návrhový vzor.
+
+Nejpoužívanější a~nejlépe podporovanou immediate mode knihovnou je Dear ImGui.  Nabízí jednotné rozhraní nezávislé na subsystému řešící spolupráci s~konkrétní platformou (renderovací backend). Je možné vybrat mnoho backendů (OpenGL, SDL2, DirectX a~další). Platforma~1.0 používala jako backend knihovnu SDL2. Znalost konkrétního backendu přinesla široké možnosti optimalizace (práce přímo s~texturami), avšak i~určitá omezení v~podobě nemožnost kompilovat pro platformy nepodporované tímto backendem.
+
+Rozumnějším řešením je umožnit tyto backendy vybírat dynamicky a~pokud možno bez nutného zásahu programátora. Existuje projekt Hello~ImGui, který nabízí celý sestavovací skript postavený na CMake a~zároveň i~funkce zajišťující potřebné inicializace ovladačů, což přinese další zjednodušení i~flexibilitu. Pro bakalářskou práci bude zvoleno rozšíření označené jako ImGui~Bundle, které navíc obsahuje například funkcionality pro výběr souborů.
+
+Díky použití knihovny Dear ImGui je možné přenechat vykreslování na každé komponentě, kdy každá funkce reprezentuje jedno okno. Aby mohly komponenty zobrazovat oken více, bude zodpovědná funkce vracet kontejner obsahující renderovací rutiny. C++ pro ukládání function-like objektů nabízí \texttt{std::function}. Objekty této třídy lze navíc ukládat do kontejnerů, což přesně odpovídá požadované funkcionalitě. Vrátí-li každá komponenta kolekci vykreslovacích funkcí, může systém tyto kolekce sloučit, zpracovat a~předat k~vykreslení.
+
+Po návrh konkrétních vykreslovacích funkcí je nutné se zamyslet nad přístupem k~zobrazovaným datům. Vlastností immediate mode návrhového vzoru je to, že při vykreslování se přímo přistupuje k~datům, není tedy možné bez dalších úprav zároveň vykreslovat a~emulovat. Existují tři možnosti:
+\begin{enumerate}
+	\item Nechat běžet vykreslování i~emulaci v~jednom vlákně.
+	\item Provádět aktivity paralelně a~přístup k~datům chránit synchronizačním mechanismem (například mutex).
+	\item Provádět aktivity paralelně a~data mezi vlákny synchronizovat.
+\end{enumerate}
+
+Paralelní přístup může lákat vyšším výkonem; mohl by však přinést zbytečně vyšší složitost platformy, přestože by neměl opodstatnění. Druhá možnost se ukázala jako zcela zbytečná, jelikož by téměř vždycky mohlo běžet jen jedno vlákno, tudíž by tento přístup odpovídal výkonu první varianty. To plyne z~faktu, že jeden hodinový cyklus může ovlivnit vnitřní stav všech komponent, tudíž vykreslovací vlákno by stejně muselo čekat. Třetí varianta by počítala s~tím, že by emulované komponenty vždy vkládaly vzorek svých vnitřních stavů do fronty, ze které by si je vybíralo vykreslovací vlákno. To odpovídá synchronizačnímu problému producent-konzument. Další problém by však nastal při požadavku na úpravu vnitřních stavů: již by muselo dojít k~zasílání i~druhým směrem a~musela by se tudíž vyvinout abstraktní knihovna podobná Elements popsané v~sekci~\ref{sec:navrh-platforma1.5}, což se ukázalo jako neekonomické. Nakonec byl zvolen první přístup, který dovoluje ve vykreslovacích funkcích specifikovat zobrazení požadovaných dat přímo, a tudíž velice jednoduše. Například stav příznaku procesoru: \mintinline{cpp}|ImGui::Checkbox("C", &m_registers.status.c);|.
+
+\subsubsection{Zvukový výstup}
+Posledním problémem k~vyřešení je zvukový výstup. Zvukové zařízení (čip, karta) vyžaduje neustálý tok nových zvukových dat, který je vždy vyzvednut takzvaným callbackem běžící ve zvláštním vlákně. Dojde-li k~přerušení, vznikají různé nepříjemné vedlejší efekty (chrčení, zrnění), které jsou uživatelem zaznamenatelné citelněji, nežli občasné zpomalení uživatelského rozhraní. Jedná se tedy o~reprezentaci zpracování v~reálném čase, kde deadline je při vyprázdnění vyrovnávací paměti obsahující vzorky k~přehrání.
+
+Prvním úkolem bylo nalezení vhodné knihovny. Mezi požadavky patřila podpora více platforem (GNU/Linux, Windows, macOS, Emscripten), vestavěné filtry (dolní propust) a~vestavěné možnosti synchronizace (vyrovnávací paměť). Mezi kandidáty byly knihovny libsoundio, ffaudio, Maximilian, libnyquist a~miniaudio. Nakonec se ukázalo, že nejlepším adeptem naplňující všechny požadavky je miniaudio.
+
+Platforma by měla umožnit pracovat se zvukovým výstupem co nejjednodušeji. Veškerý zvukový výstup bude řešit zvláštní třída, která by měla miniaudio inicializovat, zaslat další vzorky k~přehrání a~zvuk spouštět i~zastavovat. Od komponent bude vyžadováno jen velice primitivní rozhraní odpovídající reálnému stavu: \emph{analogová} hodnota reprezentující amplitudu na výstupním portu. Veškeré časování bude zařízeno platformou, který se bude starat i~o~vyrovnávací paměť tak, aby nedošlo k~trhání zvuku. Očekávaný tok vzorků audio je znázorněn na diagramu~\ref{fig:navrh-audio-tok}. Takový mechanismus nabízí přímo knihovna miniaudio ve formě kruhového bufferu, který umí pracovat s~jedním producentem (emulační vlákno) a~jedním konzumentem (audio vlákno). Zde se opět ukazuje praktický výskyt synchronizačního problému producent-konzument. Zde již však oproti práce s~daty k~vykreslení je již nutné aplikovat synchronizační mechanismy.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{Tok zvukových vzorků v~platformě~2.0}\label{fig:navrh-audio-tok}
+	\includegraphics[width=1.0\textwidth]{images/tok_vzorku.pdf}
+\end{figure}
+
+\subsubsection{Shrnutí návrhu}
+Celkově se tedy platforma bude skládat ze:
+\begin{itemize}
+	\item třídy Emulator, zastřešující celý projekt včetně možnosti nastavení kláves (knihovna ImInputBinder),
+	\item třídy System, reprezentující systém, ve kterém se komponenty propojí pomocí tříd Port a~Connector,
+	\item tříd Port a~Connector, reprezentující rozhraní řídicí, respektive řízené komponenty,
+	\item třídy Component, reprezentující jednu komponentu, obsahující metody pro propojování portů a~konektorů a~pro export grafických i~zvukových vzorků,
+	\item třídy Sound abstrahující veškeré nepříjemné aspekty práce se zvukem (inicializace, správa vyrovnávací paměti, přehrávání).
+\end{itemize}
+
+\section{Emulace konzole}
+Emulační platforma je jen pomůckou pro vývoj --- nyní je třeba navrhnout, jak implementovat konkrétní komponenty. Všechny komponenty budou potomky třídy Component pro dodržení myšlenky univerzálního rozhraní napříč celým emulátorem. Většina práce bude přenesení analýz, ale některým částem je třeba věnovat zvláštní pozornost, což je popsáno v~následujícím textu.
+
+\subsection{Základní komponenty}
+Základní komponenty je záhodno navrhnout univerzálně. Součástí NES je hlavní paměť a dvě sběrnice.
+
+\subsubsection{Paměť}
+Paměť je možné reprezentovat velice jednoduše: jedná se typicky o~blok bajtů za sebou, což lze reprezentovat polem. Paměť může reagovat na různé adresní rozsahy a~může být různě velká. Součástí konstruktoru tedy budou informace o~velikosti a~o~rozsahu. Díky existenci univerzálního rozhraní Port a~Connector stačí pouze do příslušných čtecích a~zapisovacích funkcí správně nastavit přístupy dle adresního rozsahu a~nastavené velikosti.
+
+\subsubsection{Sběrnice}
+Sběrnice bude pouhým prostředníkem mezi komponentami. Stejně jako u~skutečného hardwaru bude zápis na nějakou adresu vystaven na celou sběrnici --- to, jestli komponenty zareagují, je již na jejich vnitřní implementaci (například paměť reaguje jen na určitý rozsah, ale to sběrnici nemusí zajímat). Podobně jako u~zápisu i~adresa čtení bude vystavena na celou sběrnici. Může dojít ke konfliktům (reakci více komponent). Řešení konfliktů je ale otázka arbitračních mechanismů, ne sběrnice; bude tedy stačit, když se vezme v~potaz reakce první komponenty a~sběrnice s~arbitrací nebude reprezentována touto komponentou (u~NES arbitrace není třeba).
+
+\subsection{Procesor 6502}
+U~návrhu procesoru je nejdůležitější vymyslet, jakým způsobem se budou dekódovat instrukce. Ostatní bude již přenesením analýz do implementace.
+
+Dekódování bude otázka dvou kroků: správně připravit data dle adresního režimu a~provést nad těmito daty příslušné operace. Instrukce včetně adresního režimu je jednoznačně reprezentována operačním kódem. Je tedy možné každému operačnímu kódu přiřadit jeden adresní režim a~jednu operaci. Adresní režimy jsou pro všechny instrukce společné, je tedy možné je implementovat zvlášť, nezávisle na operacích. Tím se ušetří mnoho práce, jelikož většina instrukcí existuje v~několika adresních režimech.
+
+Operační znak je u~6502 jednobajtový. Je možné jej dekódovat několika způsoby:
+\begin{enumerate}
+	\item sada podmínek (\texttt{if-else}): to by přineslo velmi dlouhý a~nepřehledný kód,
+	\item přepínač (\texttt{switch}): je to lepší varianta než předchozí, stále ale bude nutné vytvořit mnoho řádků,
+	\item vyhledávací tabulka: takto je řešeno i~dekódování v~procesoru, operační znak by mohl být pouhým indexem to takové tabulky, navíc lze tabulku implementovat přehledně tak, aby byla stejná, jako diagramy v~dokumentacích,
+	\item postupné dekódování: to je možné u~takových instrukčních sad, kde mají operační kódy nějaké schéma (například procesor CHIP-8). ISA procesoru 6502 má sice nějaké schéma instrukcí, existují však výjimky, které by se stejně musely implementovat ručně, což by dekódování zpomalilo a~kód znepřehlednilo.
+\end{enumerate}
+
+Pro účely implementace procesoru 6502 v~tomto projektu bude zvolena možnost 3., jelikož je rychlá, přehledná i~věrně napodobující fungování původního hardwaru.
+
+NES používá mírně upravenou verzi 6502 --- 2A03. Ta zároveň obsahuje zvukový syntezátor. Pro zajištění modularity bude zvukový syntezátor implementován ve zvláštní třídě a~2A03 bude pouze potomkem 6502 s~upravenými vlastnostmi.
+
+\subsection{Grafický čip 2C02 (PPU)}
+Grafický čip může být implementován na více úrovních abstrakce, což bude mít nejvyšší dopad na vykreslování pozadí.
+
+Tím, že nametable ve videopaměti přímo reprezentuje část pozadí, může být tato část renderování vyřešena prostým vykreslením obsahu nametable. To však je možné pouze pro jednoduché hry nevyužívající posuv (scrolling). Aby bylo možné hrát více her, bude nutné vykreslování řešit po cyklech přesně tak, jak je popsáno v~analytické části. Pro projekt byla zvolena druhá možnost: sice je náročnější jak na implementaci, tak na výkon procesoru, avšak je věrohodnější a~bližší k~hardwarovému vzoru.
+
+Další otázkou je reprezentace vnitřních pamětí grafického čipu. OAM~i~paletová paměť mohou být součástí PPU, jelikož je přímo používá pouze PPU (procesor musí přistupovat přes registry). Avšak videopaměť může být jak součástí PPU, tak kazety; záleží na tom, jaká konkrétní deska (mapper) byla použita. První myšlenkou je ponechat videopaměť v~PPU a~vystavit další rozhraní mezi PPU~a~kazetou, pomocí které bude kazeta PPU informovat, zdali se má vestavěná videopaměť používat a~jaký typ zrcadlení se má zvolit. Tím, že se ale kvůli zjednodušení sloučily adresní i~datové vodiče (viz část~\ref{sec:port-connector}), je vhodnější najít alternativní řešení. Tím je pevná integrace videopaměti do kazety --- stejně o~způsobu jejího používání vždy rozhoduje kazeta. Ačkoliv se takto přijde o~soulad s~hardwarovou reprezentací konzole, věrohodnost emulace to neovlivní, tudíž je možné tuto variantu zvolit.
+
+\subsection{Kazeta a~mappery}
+Kazeta jako taková je pouze obalem pro paměti a~řídicí desku, která rozhoduje o~mapování těchto pamětí (mapper). Takto to může být reprezentováno i~v~softwaru. Třída~\emph{Game Pak}, pojmenovaná po obchodním označení kazet pro NES, bude sloužit k~načtení souborům obsahujícím potřebná data (ve formátu iNES) a~vybrání správného mapperu dle zjištěných metadat v~hlavičce souboru.
+
+Reprezentace pamětí bude velice jednoduchá, jelikož nejsou přístupné jinde než v~rámci kazety, není třeba vytvářet podsběrnici a~paměti reprezentovat jako samostatné komponenty. 
+
+Mapper již bude třeba reprezentovat sofistikovaněji. Pro práci s~mapperem je třeba jednotné rozhraní. Konkrétní implementace pak bude záviset na jednotlivých typech. Protože je v~C++ možné rozhraní implementovat pouze pomocí dědičnosti, budou jednotlivé mappery potomkem třídy Mapper. To, jaký konkrétní mapper je schován za rozhraním, bude známo jen při inicializaci, což ale stačí, jelikož vstupní parametry je třeba předat pouze při konstrukci mapperu. Dále tedy může být mapper zapouzdřen a~veškerá interakce bude probíhat přes jednotné rozhraní (čtení, zápis), což odpovídá realitě.
+
+\subsection{Zvukový syntezátor APU}
+Zvukový syntezátor je vlastně skupinou registrů, které říkají, jak se má generovat zvuk. Je tedy nutné se zamyslet, na jaké úrovni abstrakce bude emulace probíhat.
+
+Je možné pouze využít parametry a~zvuk generovat jiným způsobem. Existují dva návrhy, které budou vysvětleny na jednom kanálu --- pulse. Tento kanál generuje čtvercový signál. Posílal-li by se čistý čtverec na výstup, mohlo by dojít k~nepříjemným artefaktům, které jsou způsobeny příliš rychlými změnami signálu (čtverec jsou skoky mezi žádným signálem a~signálem o~maximální amplitudě). Proto se nabízí tento signál aproximovat Fourierovou řadou pomocí sčítání sinusových signálů, vznikne tak mnohem hladší signál. Druhou možností je využít filtrovacích mechanismů, které nabízí zvolená knihovna miniaudio. Využije-li se filtr typu dolní propusti, výsledek bude stejný, ale méně výpočetně náročný. Navíc se takto věrně napodobí chování původního hardwaru: byl generován surový signál, který byl přes sadu filtrů dopraven až do reproduktorů televizoru.
+
+\subsection{Herní ovladače}
+Vzhledem k~jednoduchosti herních ovladačů není nutné vytvářet speciální návrh, jde jen o~jednoduchou sadu registrů. Jediné, co je nutné zajistit, je integrace s~knihovnou ImInputBinder, která zajistí přenos úhozů kláves do komponenty. Tím, že knihovna pracuje s~jednoduchým callbackem, jedná se pouze o~vrácení callbacku přes systém až do emulátoru.
+
+\subsection{Integrace do platformy}
+Pro přehled je na konec uveden diagram zachycující konkrétní realizaci emulátoru NES na platformě~2.0.
+
+\begin{figure}[htp!]
+	\centering
+	\caption{Integrace NES do platformy 2.0}\label{fig:navrh-prehled}
+	\includegraphics[width=1.0\textwidth]{images/navrh_prehled.pdf}
+\end{figure}
+
 
 %---------------------------------------------------------------
 \chapter{Implementace}

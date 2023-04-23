@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gaphor xmlns="http://gaphor.sourceforge.net/model" version="3.0" gaphor-version="2.14.2">
+<StyleSheet id="58d6989a-66f8-11ec-b4c8-0456e5e540ed"/>
+<Package id="58d6c2e8-66f8-11ec-b4c8-0456e5e540ed">
+<name>
+<val>Nový model</val>
+</name>
+<ownedDiagram>
+<reflist>
+<ref refid="58d6c536-66f8-11ec-b4c8-0456e5e540ed"/>
+</reflist>
+</ownedDiagram>
+<ownedType>
+<reflist>
+<ref refid="d1d0611d-e1de-11ed-89e2-69dd120c0312"/>
+<ref refid="e6bcb76d-e1de-11ed-bd3b-69dd120c0312"/>
+<ref refid="eb309d3a-e1de-11ed-9887-69dd120c0312"/>
+</reflist>
+</ownedType>
+</Package>
+<Diagram id="58d6c536-66f8-11ec-b4c8-0456e5e540ed">
+<element>
+<ref refid="58d6c2e8-66f8-11ec-b4c8-0456e5e540ed"/>
+</element>
+<name>
+<val>New diagram</val>
+</name>
+<ownedPresentation>
+<reflist>
+<ref refid="d1d0a27a-e1de-11ed-a213-69dd120c0312"/>
+<ref refid="e6bce6db-e1de-11ed-b427-69dd120c0312"/>
+<ref refid="eb30cb2f-e1de-11ed-826d-69dd120c0312"/>
+<ref refid="b148a70f-e1e1-11ed-bff7-69dd120c0312"/>
+<ref refid="4d1fb7ff-e1e0-11ed-afed-69dd120c0312"/>
+<ref refid="ee0511b2-e1e0-11ed-8320-69dd120c0312"/>
+<ref refid="ae41c737-e1e1-11ed-873e-69dd120c0312"/>
+</reflist>
+</ownedPresentation>
+</Diagram>
+<Component id="d1d0611d-e1de-11ed-89e2-69dd120c0312">
+<name>
+<val>Řídicí:Component</val>
+</name>
+<package>
+<ref refid="58d6c2e8-66f8-11ec-b4c8-0456e5e540ed"/>
+</package>
+<presentation>
+<reflist>
+<ref refid="d1d0a27a-e1de-11ed-a213-69dd120c0312"/>
+</reflist>
+</presentation>
+</Component>
+<ComponentItem id="d1d0a27a-e1de-11ed-a213-69dd120c0312">
+<matrix>
+<val>(1.0, 0.0, 0.0, 1.0, 101.99998474121094, 206.5585879347523)</val>
+</matrix>
+<top-left>
+<val>(0.0, 25.000015258789062)</val>
+</top-left>
+<width>
+<val>182.00001525878906</val>
+</width>
+<height>
+<val>64.0</val>
+</height>
+<diagram>
+<ref refid="58d6c536-66f8-11ec-b4c8-0456e5e540ed"/>
+</diagram>
+<subject>
+<ref refid="d1d0611d-e1de-11ed-89e2-69dd120c0312"/>
+</subject>
+</ComponentItem>
+<Component id="e6bcb76d-e1de-11ed-bd3b-69dd120c0312">
+<clientDependency>
+<reflist>
+<ref refid="4d97d8c1-e1e0-11ed-88ff-69dd120c0312"/>
+</reflist>
+</clientDependency>
+<name>
+<val>Řízená:Component</val>
+</name>
+<package>
+<ref refid="58d6c2e8-66f8-11ec-b4c8-0456e5e540ed"/>
+</package>
+<presentation>
+<reflist>
+<ref refid="e6bce6db-e1de-11ed-b427-69dd120c0312"/>
+</reflist>
+</presentation>
+</Component>
+<ComponentItem id="e6bce6db-e1de-11ed-b427-69dd120c0312">
+<matrix>
+<val>(1.0, 0.0, 0.0, 1.0, 101.99998474121094, 431.0)</val>
+</matrix>
+<top-left>
+<val>(0.0, 0.0)</val>
+</top-left>
+<width>
+<val>182.00001525878906</val>
+</width>
+<height>
+<val>66.99996948242188</val>
+</height>
+<diagram>
+<ref refid="58d6c536-66f8-11ec-b4c8-0456e5e540ed"/>
+</diagram>
+<subject>
+<ref refid="e6bcb76d-e1de-11ed-bd3b-69dd120c0312"/>
+</subject>
+</ComponentItem>
+<DependencyItem id="4d1fb7ff-e1e0-11ed-afed-69dd120c0312">
+<auto_dependency>
+<val>0</val>
+</auto_dependency>
+<diagram>
+<ref refid="58d6c536-66f8-11ec-b4c8-0456e5e540ed"/>
+</diagram>
+<horizontal>
+<val>0</val>
+</horizontal>
+<subject>
+<ref refid="4d97d8c1-e1e0-11ed-88ff-69dd120c0312"/>
+</subject>
+<matrix>
+<val>(1.0, 0.0, 0.0, 1.0, 200.5322448063499, 443.9999694824219)</val>
+</matrix>
+<points>
+<val>[(-14.123141286689446, -65.40079014065697), (-14.123141286689446, -12.999969482421875)]</val>
+</points>
+<head-connection>
+<ref refid="eb30cb2f-e1de-11ed-826d-69dd120c0312"/>
+</head-connection>
+<tail-connection>
+<ref refid="e6bce6db-e1de-11ed-b427-69dd120c0312"/>
+</tail-connection>
+</DependencyItem>
+<InterfaceItem id="eb30cb2f-e1de-11ed-826d-69dd120c0312">
+<matrix>
+<val>(1.0, 0.0, 0.0, 1.0, 176.40910351966045, 358.5991793417649)</val>
+</matrix>
+<top-left>
+<val>(0.0, 0.0)</val>
+</top-left>
+<width>
+<val>20.0</val>
+</width>
+<height>
+<val>20.0</val>
+</height>
+<diagram>
+<ref refid="58d6c536-66f8-11ec-b4c8-0456e5e540ed"/>
+</diagram>
+<show_attributes>
+<val>0</val>
+</show_attributes>
+<show_operations>
+<val>0</val>
+</show_operations>
+<subject>
+<ref refid="eb309d3a-e1de-11ed-9887-69dd120c0312"/>
+</subject>
+<folded>
+<val>1</val>
+</folded>
+</InterfaceItem>
+<Interface id="eb309d3a-e1de-11ed-9887-69dd120c0312">
+<name>
+<val>Connector</val>
+</name>
+<package>
+<ref refid="58d6c2e8-66f8-11ec-b4c8-0456e5e540ed"/>
+</package>
+<presentation>
+<reflist>
+<ref refid="eb30cb2f-e1de-11ed-826d-69dd120c0312"/>
+</reflist>
+</presentation>
+<supplierDependency>
+<reflist>
+<ref refid="4d97d8c1-e1e0-11ed-88ff-69dd120c0312"/>
+</reflist>
+</supplierDependency>
+</Interface>
+<Dependency id="4d97d8c1-e1e0-11ed-88ff-69dd120c0312">
+<client>
+<ref refid="e6bcb76d-e1de-11ed-bd3b-69dd120c0312"/>
+</client>
+<name>
+<val>«vystavuje»</val>
+</name>
+<presentation>
+<reflist>
+<ref refid="4d1fb7ff-e1e0-11ed-afed-69dd120c0312"/>
+</reflist>
+</presentation>
+<supplier>
+<ref refid="eb309d3a-e1de-11ed-9887-69dd120c0312"/>
+</supplier>
+</Dependency>
+<DependencyItem id="ee0511b2-e1e0-11ed-8320-69dd120c0312">
+<auto_dependency>
+<val>0</val>
+</auto_dependency>
+<diagram>
+<ref refid="58d6c536-66f8-11ec-b4c8-0456e5e540ed"/>
+</diagram>
+<horizontal>
+<val>0</val>
+</horizontal>
+<note>
+<val></val>
+</note>
+<matrix>
+<val>(1.0, 0.0, 0.0, 1.0, 190.8737901496994, 273.516255557104)</val>
+</matrix>
+<points>
+<val>[(-4.941585298667441, 79.34410930336236), (-4.464686630038955, 22.04234763643734), (-4.842209369606763, 22.04234763643734)]</val>
+</points>
+<tail-connection>
+<ref refid="d1d0a27a-e1de-11ed-a213-69dd120c0312"/>
+</tail-connection>
+</DependencyItem>
+<CommentLineItem id="ae41c737-e1e1-11ed-873e-69dd120c0312">
+<diagram>
+<ref refid="58d6c536-66f8-11ec-b4c8-0456e5e540ed"/>
+</diagram>
+<horizontal>
+<val>0</val>
+</horizontal>
+<matrix>
+<val>(1.0, 0.0, 0.0, 1.0, 187.14806361005, 320.9699490847198)</val>
+</matrix>
+<points>
+<val>[(-0.9503822976038245, -0.00790963557193436), (116.05521030492528, -0.21076922809282905)]</val>
+</points>
+<head-connection>
+<ref refid="ee0511b2-e1e0-11ed-8320-69dd120c0312"/>
+</head-connection>
+<tail-connection>
+<ref refid="b148a70f-e1e1-11ed-bff7-69dd120c0312"/>
+</tail-connection>
+</CommentLineItem>
+<Comment id="b148a1a6-e1e1-11ed-8a90-69dd120c0312">
+<body>
+<val>Připojí se k Portu</val>
+</body>
+<presentation>
+<reflist>
+<ref refid="b148a70f-e1e1-11ed-bff7-69dd120c0312"/>
+</reflist>
+</presentation>
+</Comment>
+<CommentItem id="b148a70f-e1e1-11ed-bff7-69dd120c0312">
+<matrix>
+<val>(1.0, 0.0, 0.0, 1.0, 303.2032739149753, 295.55860319354133)</val>
+</matrix>
+<top-left>
+<val>(0.0, 0.0)</val>
+</top-left>
+<width>
+<val>100.0</val>
+</width>
+<height>
+<val>50.0</val>
+</height>
+<diagram>
+<ref refid="58d6c536-66f8-11ec-b4c8-0456e5e540ed"/>
+</diagram>
+<subject>
+<ref refid="b148a1a6-e1e1-11ed-8a90-69dd120c0312"/>
+</subject>
+</CommentItem>
+</gaphor>
