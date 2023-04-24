@@ -29,7 +29,7 @@ Práce je členěna na několik hlavních částí:
 	\item[Představení problematiky] V~této kapitole je představena problematika emulace v~teoretické rovině --- definují se potřebné pojmy. Kapitola popisuje jednak emulaci obecně, jednak témata, se kterými se může vývojář emulátoru setkat a~měl by je proto chápat v~širších souvislostech.
 	\item[Analýza] Analytická část, stěžejní kapitola práce, se věnuje analýze konkrétního emulovaného systému. Jelikož neexistuje jeden dokument, který obsahuje vše potřebné, je nutné informace seskupit a~podat přívětivou formou. Mimo jiné tato kapitola slouží jako ukázka čtenáři, kde a~jak by mohl hledat informace pro případný svůj vlastní vývoj libovolného emulovaného systému.
 	\item[Návrh] Po zpracování potřebné teorie i~konkrétních faktů týkající se konzole je možné vytvořit vhodné řešení. V~kapitole je možné nalézti diskusi k~samotnému vývojovému procesu, který je nezbytný k~rychlému a~pohodlnému vývoji. Dále úvahy nad způsoby vytvoření univerzální emulační platformy a~nakonec i~způsob integrace konzole NES do navrženého systému.
-	\item[Implementace] Implementační kapitola je popisem procesu tvorby emulační platformy a emulovaných komponent. Ukazuje konkrétní problémy, které byly řešeny a~nabádá čtenáře k~souběžnému průzkumu zdrojového kódu.
+	\item[Implementace] Implementační kapitola je popisem procesu tvorby emulační platformy a~emulovaných komponent. Ukazuje konkrétní problémy, které byly řešeny a~nabádá čtenáře k~souběžnému průzkumu zdrojového kódu.
 	\item[Testování] Předposlední kapitola je zaměřena na testování projektu. Popisuje nejen průběžné testování aplikace, ale i~porovnání věrnosti s~reálným systémem metodou spouštění necertifikovaného kódu na originálním hardwaru.
 	\item[Navazující práce] Poslední kapitola je věnována shrnutí zbývajících funkcionalit, které budou implementovány v~dalších verzích emulační platformy. Slouží především jako pobídka dalším čtenářům-vývojářům, kteří by měli zájem projekt rozšířit ať už v~rámci sebevzdělávání, nebo v~rámci vlastní závěrečné práce.
 \end{description}
@@ -806,7 +806,7 @@ Existují dvě varianty specifické pro konkrétní trhy v~závislosti na typu v
 Jedná o~velice rozsáhlý čip. Analýzu je tedy třeba provést v~několika částech. Nejprve se zjistí, s~jakými daty čip pracuje, poté jak se tento čip ovládá (rozhraní, které je dostupné procesoru) a nakonec i~to, jak s~dostupnými daty čip pracuje.
 
 \subsection{Paměti a~data}
-Jak již bylo zmíněno v~úvodu, čip PPU je připojen do dvou sběrnic. Jednak je připojen do hlavní systémové sběrnice, pomocí které procesor 6502 s~čipem PPU komunikuje, což je probíráno v~podkapitole~\ref{sec:ppu-cpu-io}. Dále je připojen do své vlastní sběrnice, na kterou je připojena i~část kazety Game Pak (viz tabulka~\ref{tab:gamepak-mapovani} na straně~\pageref{tab:gamepak-mapovani}). Tabulka~\ref{tab:ppu-pametova-mapa} ukazuje rozdělení adresního prostoru vlastní sběrnice čipu PPU včetně částí zařízení, které jsou běžně v~příslušných rozsazích dostupné. Kromě zvenku přístupných pamětí obsahuje PPU ještě mnoho pracovních registrů, které jsou popsány v~sekci~\ref{ppu:pracovni-registry}.
+Jak již bylo zmíněno v~úvodu, čip PPU je připojen do dvou sběrnic. Jednak je připojen do hlavní systémové sběrnice, pomocí které procesor 6502 s~čipem PPU komunikuje, což je probíráno v~podkapitole~\ref{sec:ppu-cpu-io}. Dále je připojen do své vlastní sběrnice, na kterou je připojena i~část kazety Game Pak (viz tabulka~\ref{tab:gamepak-mapovani} na straně~\pageref{tab:gamepak-mapovani}). Tabulka~\ref{tab:ppu-pametova-mapa} ukazuje rozdělení adresního prostoru vlastní sběrnice čipu PPU včetně částí zařízení, které jsou běžně v~příslušných rozsazích dostupné. Kromě zvenku přístupných pamětí obsahuje PPU ještě mnoho pracovních registrů, které jsou popsány v~sekci~\ref{sec:ppu-pracovni-registry}.
 
 \begin{table}[ht!]
 	\centering
@@ -1019,6 +1019,7 @@ PPU je řízeno pomocí osmi registrů mapovaných do paměťového prostoru pro
 \end{table}
 
 \subsection{Pracovní registry}
+\label{sec:ppu-pracovni-registry}
 PPU obsahuje také dvě skupiny pracovních registrů sloužící k~průběžnému ukládání vyhodnocovaných a~následně vykreslovaných dat, ale i~pro přístup na grafickou sběrnici zvenčí. První skupina souvisí s~přístupem na videopaměti, což je prováděno nejen programátorem, ale i~čipem PPU samotným. Druhá skupina slouží k~vykreslování sprajtů.
 
 \subsubsection{Pozadí a~práce s~videopamětí}
@@ -1063,11 +1064,11 @@ Proces renderování obrazu je pevně spjat s~jeho průběžným vykreslováním
 \subsubsection{Pozadí}
 Proces vykreslování pozadí probíhá průběžně během celého televizního snímku. Sekvence kroků se liší dle obrazového řádku. Jelikož jeden hodinový takt odpovídá přesně jednomu obrazovému bodu výstupního signálu, jsou operace PPU pevně svázány s~rozlišením obrazu. Název pro časový úsek odpovídající jednomu obrazovému bodu v~rámci řádku je \emph{cyklus}.
 
-Na viditelných řádcích (0-239) se provádí sled vnitřních (negenerující výstup) i~vnějších (generující výstup) operací. Sled vnitřních operací je uvedený v~tabulce~\ref{ppu:pozadi-cykly}. Pro načtení příslušného řádku jedné dlaždice z~pattern table (dle indexu v~nametable) jsou třeba 4 přístupy do paměti, na tabulce jsou rozepsány pro cykly 1--8. Po provedení přístupů potřebných pro jednu dlaždici dojde k~naplnění vnitřních posuvných registrů, které mohou generovat samotný výstup na obrazovku, což už se týká vnějších operací. K~těm dochází v~cyklech 4--256, kdy se generuje obrazový bod za použití bitů z~naplněných posuvných registrů. To, jaký konkrétní bit se vybere, závisí na hodnotě vnitřního registru uchovávajícího jemný posuv souřadnice X. Registry vykonají posuv a~pokračuje další cyklus. Před výstupem na obrazovku se ještě vybírá mezi pixelem pozadí a~popředí, tomu je věnována sekce~\ref{sec:ppu-priority}.
+Na viditelných řádcích (0-239) se provádí sled vnitřních (negenerující výstup) i~vnějších (generující výstup) operací. Sled vnitřních operací je uvedený v~tabulce~\ref{tab:ppu-pozadi-cykly}. Pro načtení příslušného řádku jedné dlaždice z~pattern table (dle indexu v~nametable) jsou třeba 4 přístupy do paměti, na tabulce jsou rozepsány pro cykly 1--8. Po provedení přístupů potřebných pro jednu dlaždici dojde k~naplnění vnitřních posuvných registrů, které mohou generovat samotný výstup na obrazovku, což už se týká vnějších operací. K~těm dochází v~cyklech 4--256, kdy se generuje obrazový bod za použití bitů z~naplněných posuvných registrů. To, jaký konkrétní bit se vybere, závisí na hodnotě vnitřního registru uchovávajícího jemný posuv souřadnice X. Registry vykonají posuv a~pokračuje další cyklus. Před výstupem na obrazovku se ještě vybírá mezi pixelem pozadí a~popředí, tomu je věnována sekce~\ref{sec:ppu-priority}.
 
 \begin{table}[ht!]
 	\centering
-	\caption{Vnitřní operace PPU během viditelných obrazových řádků}\label{tab:ppu-renderovani}
+	\caption{Vnitřní operace PPU během viditelných obrazových řádků}\label{tab:ppu-pozadi-cykly}
 	\begin{tblr}{|Q[c,m]|X[c,m]|}
 		\hline
 		Cyklus & Operace \\
@@ -1638,6 +1639,8 @@ Pro přehled je na konec uveden diagram zachycující konkrétní realizaci emul
 \chapter{Testování}
 %---------------------------------------------------------------
 
+\section{Testování univerzálních komponent}
+
 \section{Testování procesoru 6502}
 \subsection{Příprava testů}
 Emulovaný procesor 6502 byl testován existujícími testy. Základní implementace byla testována pomocí sady testů od Klause Dormanna. Testy jsou ve formě JSA, kde je možné nakonfigurovat základní parametry testu. Tento test používá pro vyhodnocování výsledků pasti (viz sekce~\ref{sec:testovaci-programy}), tedy zacyklení v~případě dokončení testu (úspěšného i~neúspěšného).
@@ -1805,5 +1808,4 @@ void MOS6502::IRQ(bool active){
 A proč tedy původní implementace fungovala? To bylo způsobeno jinou chybou, kdy se požadavek na přerušení ukládal, pokud bylo přerušení maskováno. To ale také neodpovídá skutečnému procesoru.
 \end{note}
 
-\subsection{Další testy}
-TODO Popsat nestest a další.
+\section{Další testování}
