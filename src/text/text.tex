@@ -137,22 +137,60 @@ Všechny úrovně shrnuje diagram~\ref{fig:abstrakce-hw}, kde je zvýrazněna ú
 	\end{tikzpicture} 
 \end{figure}
 
-\section{Objektově orientované programování}
-\label{sec:OOP}
+\section{Klíčové hardwarové principy}
+Tato podkapitola popisuje vybrané principy z~oblasti počítačového technického vybavení, především za účelem uvedení do témat dále rozebíraných a~pro dovysvětlení terminologie.
 
-\section{Testování softwaru}
-\label{sec:teorie-testovani}
+\subsection{Komunikace na sběrnici}
+\begin{definition}[Sběrnice]
+	\enquote{Je to skupina vodičů, k~nimž jsou připojeny vstupy a~výstupy jednotlivých jednotek. (\dots) Vodiče lze rozdělit na adresové, datové, řídicí a~stavové~\cite{Pluhacek1995:plp}.}
+\end{definition}
 
-\section{Testování hardwaru}
+Sběrnice je způsobem propojení více komponent tak, aby spolu mohly komunikovat. Tyto komponenty se dělí na řízené (volané, jsou cílem komunikace) a~řídicí (volající, jsou zdrojem komunikace). Přenos dat může probíhat tak, že se nejprve adresou identifikuje volaná komponenta, nastaví se pomocí řídicího signálu směr přenosu (čtení, zápis) a~na datových signálech se vystaví přenášené informace. V~případě čtení vystavuje informace volaná komponenta, v~případě zápisu volající.~\cite{Pluhacek1995:plp}.
+
+V~nejjednodušším případě existuje na sběrnici jen jediná řídicí komponenta, poté není potřeba řešit přidělování (arbitraci) sběrnice, což je i~případ sběrnic v~konzoli NES.
+
+\begin{note}[Terminologie sběrnic]
+	Sběrnice je dle definice skupinou vodičů. Může se tedy takto označit nejen celá skupina složená z~adresových, datových i~řídicích, ale i~jednotlivé podskupiny. V~textu se vyskytují označení jako adresní sběrnice, tím je myšlena část sběrnice obsahující pouze adresní vodiče.
+\end{note}
+
+\subsection{Přerušení}
+
+
+\subsection{Přepínání paměťových bank}
+
+\subsection{Přímý přístup do paměti}
+DMA
+
+\subsection{Analogové video}
+NTSC
+
+\subsection{Testování hardwaru}
 Pro testování hardwaru existuje mnoho metod. Jelikož je hardware v~bakalářské práci softwarovým modelem, omezuje se testování na softwarové metody. Jednou z~takových metod používaných i~pro testování reálného hardwaru jsou \emph{testovací programy}. Ty fungují tak, že postupně provádí operace a~ověřují, zdali přinesly očekávaný výsledek. Správnost výsledku je odvozena od popisu v~dokumentaci či patentech, popřípadě od analýz fyzického hardwaru.
 
-\subsection{Testovací programy}
+\subsubsection{Testovací programy}
 \label{sec:testovaci-programy}
-TODO: popsat, jak se používá listing v testování pomocí programů používající TRAP.
+Testovací programy používané v~bakalářské práci jsou pouze ve formě strojového kódu přímo zpracovatelném procesorem.
+
+Testovací programy umožňují získávat informace o~průběhu různými metodami. Jedná-li se o~test spouštěný na celém systému i~s~uživatelským rozhraním, provádí se ovládání testu a~monitoring přes toto rozhraní.
+
+Často ale není vhodné (nebo ani možné) s~testy interagovat takto přímočaře. Spouští-li se test automatizovaně, nebo na systému bez uživatelského rozhraní, je nutné přistoupit k~jinému řešení.
+
+Testy se spouští většinou vhodným nastavením programového čítače, popřípadě stačí, když je programový čítač nastaven na hodnotu vektoru resetu, což se v~případě 6502 děje automaticky (viz sekce~\ref{sec:6502-reset}).
+
+Monitorování je možné dvěma způsoby. Jednodušší je přímočaré sledováním předem určeného místa v~paměti (některé testy kromě číselných hodnot do paměti přímo vypisují textový stav v~ASCII). Používá-li test tuto metodu, často stačí zjistit, co jaká chybová hláška znamená a~podle toho provést opravy. Složitější varianta je v~případě použití zacyklení, přezdívané jako TRAP. TRAP se dá implementovat tak, že instrukce skáče na svou vlastní adresu. Je-li dostupný monitoring programového čítače procesoru, pozná se TRAP tak, že nedochází ke změnám programového čítače. TRAP každopádně pouze informuje, kde došlo k~chybě ve strojovém kódu, což se rozebere dále.
+
+Aby bylo možné výsledky testu používající TRAP interpretovat, je třeba mít dostupný zdrojový kód programu v~JSA a~zároveň i~\emph{listing}.
 
 \begin{definition}[Listing]
 	Listing, neboli výpis, je soubor generovaný assemblerem. Obsahuje původní zdrojový kód, kde je navíc každá instrukce doplněna o~adresu, na které se v~paměti nachází, a~také odpovídající strojový kód, do kterého byla přeložena.~\cite{Plantz2021:computer-organization}.
 \end{definition}
+
+Pomocí listingu lze tedy zjistit, jakému řádku ve zdrojovém kódu odpovídá adresa, kde došlo k~zacyklení (TRAP). Analýza chyb poté spočívá v~procházení nejbližšího kódu, často jsou součástí i~komentáře, které popisují očekávané chování a~důvod, proč byl TRAP vyvolán. V~naprosté většině případů je ale nutné rozumět JSA dané instrukční sady a~zároveň i~správně interpretovat program.
+
+\section{Další principy}
+\subsection{Přehrávání zvuku}
+
+\subsection{Synchronizace vláken}
 
 %---------------------------------------------------------------
 \chapter{Analýza}
@@ -1335,7 +1373,7 @@ Kapitola slouží jako přehled návrhových rozhodnutí, které vyvstaly během
 Na začátku vývoje je třeba vybrat správné nástroje tak, aby byl vývoj co nejefektivnější a~nejpohodlnější. Kromě jmenovaných požadavků je nutné brát v potaz také externí požadavky, které stanovuje jednak zadání, jednak výsledky samotného bádání v~analytické části.
 
 \subsection{Programovací jazyk}
-Zadání požaduje, aby byl emulátor implementován s~využitím principů OOP, které byly popsány v~části \ref{sec:OOP}. Vhodnost k~využití ve výuce pak znamená, že je třeba využít rozšířený jazyk, nebo takový jazyk, jehož syntaxe je běžným jazykům podobná. Nepřímo také vyplývá, že by mělo být možné výsledný kód spouštět na co největším množství platforem tak, aby byl emulátor, jakožto vzdělávací pomůcka, snadno dostupný. Nakonec se při výběru je nutné zaměřit na to, že se jedná o~implementaci počítačového systému. Zvolený jazyk by tedy neměl poskytovat příliš velkou abstrakci nad počítačovým hardwarem --- to by mohlo způsobit odstínění od vysvětlovaných principů.
+Zadání požaduje, aby byl emulátor implementován s~využitím principů objektově orientovaného programování. Vhodnost k~využití ve výuce pak znamená, že je třeba využít rozšířený jazyk, nebo takový jazyk, jehož syntaxe je běžným jazykům podobná. Nepřímo také vyplývá, že by mělo být možné výsledný kód spouštět na co největším množství platforem tak, aby byl emulátor, jakožto vzdělávací pomůcka, snadno dostupný. Nakonec se při výběru je nutné zaměřit na to, že se jedná o~implementaci počítačového systému. Zvolený jazyk by tedy neměl poskytovat příliš velkou abstrakci nad počítačovým hardwarem --- to by mohlo způsobit odstínění od vysvětlovaných principů.
 
 Zvoleným jazykem pro implementaci je C++ ve verzi C++20. Splňuje totiž veškeré požadavky dané zadáním i~ze zadání vyplývajících:
 \begin{itemize}
