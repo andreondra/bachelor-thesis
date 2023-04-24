@@ -154,15 +154,42 @@ V~nejjednodušším případě existuje na sběrnici jen jediná řídicí kompo
 \end{note}
 
 \subsection{Přerušení}
+\begin{definition} [Přerušení]
+	\enquote{Přerušení spočívá v~tom, že se přestane provádět původní sekvence instrukcí a~že se začne provádět jiná sekvence, nazývána rutina přerušení, která začíná na určené adrese; ta se nazývá přerušovací adresa.~\cite{Pluhacek1995:plp}}
+\end{definition}
 
+Zjednodušeně řečeno lze tvrdit, že přerušení je podprogram, který může být vyvolán i~jinak, než programově. Z~toho vyplývá i~fakt, že může být vyvoláno téměř v~jakékoliv fázi zpracování programu.  Při signalizaci, že došlo k~přerušení, se uloží aktuální kontext procesoru (například stavy příznaků), hodnota programového čítače se nastaví na hodnotu přerušovací adresy a~pokračuje se ve vykonávání programu z~této nové adresy. Většinou je nutné i~brát v~potaz příčinu přerušení (jeho zdroj), na příčině totiž může být závislá i~hodnota přerušovací adresy~\cite{Pluhacek1995:plp}. Konkrétně procesor~6502 použitý v~NES má tyto adresy dvě (tři, pakliže je počítána i adresa pro reset).
 
-\subsection{Přepínání paměťových bank}
+\begin{note}[Terminologie přerušovací adresy]
+	Umístění přerušovací adresy v~paměti je v~manuálech procesoru 6502~\cite{mos:hw-manual}. označováno jako vektor přerušení. Uvedená terminologie je použita i~v~této práci.
+\end{note}
+
+Existuje-li v~systému více přerušení, mohou být stanoveny jejich priority. Dále může být nastaveno ignorování některých přerušení, to může být provedeno stanovenou hodnotou v~příslušných registrech. Taková hodnota je pak označena jako maska přerušení.~\cite{Pluhacek1995:plp}.
+
+V~případě NES se jedná o~dva typy přerušení. Je možné vyvolat přerušení programově (instrukce BRK), i~pomocí přerušovacích vstupů procesoru (IRQ, NMI). Konkrétní aplikace je popsána v~sekci~\ref{sec:6502-preruseni}.
+
+\subsection{Paměti a~adresace}
+Pamětí jsou takové komponenty, které umožňují ukládat informace v~různých formách. V~případě této práce tak budou označovány média skládající se z~paměťových míst, do kterých lze ukládat položky o~stejných velikostech (nejčastěji půjde o~osmibitovou hodnotu).  Mohou být různých typů; hlavní členění bude spočívat v~trvanlivosti uložených informací: paměti permanentní (nepřepisovatelné: read-only memory, ROM) a~paměti měnitelné (přepisovatelné: RWM či ROM, read/write memory, respektive random access memory)~\cite{Pluhacek1995:plp}.
+
+Pro přístup do paměti ke konkrétním položkám se používá jejich adresa, která může být různě široká.  Běžně jde o~nezáporné číslo. Množina možných adres je označována jako adresní prostor~\cite{Pluhacek1995:plp}. Součástí adresního prostoru nemusí být jen paměť, ale díky sběrnici i~další komponenty, adresované stejnými vodiči. Takto je možné adresy přiřadit i~periferiím, které se pak označují jako periferie mapované do paměti.
+
+Adresa může být členěna na několik částí, což používá i~manuál k~procesoru~6502. V~architektuře 6502 je adresa 16bitová. Je členěna na dvě části po 8~bitech. Horní část dělí paměti na 256 256bitových segmentů označovaných jako paměťová stránka, v~rámci kterých se adresuje dolní částí adresy.~\cite{mos:hw-manual}.
+
+V~širším kontextu NES je adresa dělena na části o~různých jiných velikostech. Horní část vždy slouží k~adresaci paměťových segmentů, dolní čas k~adresaci v~rámci segmentu. V~takovém obecném případě se segmenty označují jako banky, což je hojně používáno v~souvislosti s~manipulací s~adresním prostorem.
+
+Adresní prostor již ze své definice omezuje množství položek, ke kterým je možné přistupovat. Vhodnou manipulací s~adresami však lze adresní prostor rozšířit. Chceme-li například adresovat více než $2^16$ záznamů, můžeme pomocí registrů přidat libovolné množství pomyslných adresních vodičů, čímž adresní prostor rozšíříme. Tato technika je hojně používána u~takzvaných mapperů, které do adresního prostoru vystaví konfigurovatelné registry sloužící k~přepínání částí paměti, které se objeví ve viditelném adresním prostoru komponent. Více o~mapperech v~kapitole~\ref{sec:mapper}.
 
 \subsection{Přímý přístup do paměti}
-DMA
+Existuje-li v~systému více komponent, může se vyskytnout potřeba přemisťovat větší množství dat z~jedné komponenty do druhé.  To je možno provést buďto bajt po bajtu procesorem, nebo lze využít techniky přímého přístupu do paměti (DMA, direct memory access). V~takovém případě přenos provádí specializovaný řadič DMA.~\cite{mos:hw-manual}. V~případě NES k~přenosu probíhá přímo na hlavní sběrnici, tudíž je pro uvolnění sběrnice procesor po dobu běhu DMA pozastaven, potřebná data jsou přenesena a~poté je běh procesoru obnoven, více v~části~\ref{sec:2A03}.
 
 \subsection{Analogové video}
-NTSC
+Grafický čip použitý v~NES generuje přímo analogový kompozitní signál, proto je nutné porozumět alespoň struktuře, v~jaké dochází k~vykreslování na televizoru.
+
+Vše vychází z~principu vykreslování obrazu televizory typu Cathode-Ray Tube. Ty obsahovaly používaly elektronové dělo, které postupně zleva shora po řádcích (označované jako scanline) vykreslovalo obraz po bodech. Dělo se mezi řádky muselo vracet zpět doleva, v~ten moment signál reprezentoval barvu označovanou jako \enquote{černější než černá} a~tento interval je označen jako horizontal blanking (HBL). Kompozitní video standardu NTSC obsahuje celkem 525 obrazových řádků, z~toho viditelných je 480. Zbytek je prostor pro navrácení děla zpět vlevo nahoru, což je nazýváno vertical blanking interval (VBL). V~případě vysílání analogové televize byla tato \enquote{mezera} využita například pro teletext či skryté titulky.~\cite{Poynton2012:video}. U~NES se interval využíval pro nerušenou práci s~grafickým čipem a~grafickou sběrnicí, viz sekce~\ref{sec:ppu-pozadi}.
+
+\begin{note}[Prokládání a~NES]
+Běžně se u~NTSC využívala technika nazývaná prokládání, kdy se během jednoho vykreslování zobrazil jen takzvaný půlsnímek v~sudých řádcích, poté další půlsnímek v~lichých řádcích, což dohromady tvořilo obraz o~vyšším rozlišení. U~NTSC je vykresleno celkem 50 půlsnímků za sekundu (tato hodnota se označuje jako vertikální obnovovací frekvence), to odpovídá 25 celým snímkům za sekundu (což se označuje jako snímková frekvence). Tomu odpovídá digitální rozlišení označované jako 480i (i~je zkratka pro interlaced).~\cite{Poynton2012:video} NES pracuje pouze s~jedním půlsnímkem, čímž se vychyluje ze standardu. Dvěma stejnými půlsnímky tak je vytvořen obraz o~nižším rozlišení, v~digitálním světě tomu odpovídá rozlišení 240p (p~znamená progressive; technika progresivního skenování).~\cite{Nesdev:ntsc}.
+\end{note}
 
 \subsection{Testování hardwaru}
 Pro testování hardwaru existuje mnoho metod. Jelikož je hardware v~bakalářské práci softwarovým modelem, omezuje se testování na softwarové metody. Jednou z~takových metod používaných i~pro testování reálného hardwaru jsou \emph{testovací programy}. Ty fungují tak, že postupně provádí operace a~ověřují, zdali přinesly očekávaný výsledek. Správnost výsledku je odvozena od popisu v~dokumentaci či patentech, popřípadě od analýz fyzického hardwaru.
@@ -1041,7 +1068,7 @@ PPU je řízeno pomocí osmi registrů mapovaných do paměťového prostoru pro
 		\hline
 		\SetCell[r=6]{c} PPUMASK & \SetCell[r=6]{c} \$2001 & \SetCell[r=6]{c} zápis & \SetCell[r=6]{c} \texttt{BGRs bMmG} & \texttt{BGR}: Zvýraznění barev (jednobitová hodnota pro modrou, zelenou a~červenou, 1 zvýraznění aktivuje) \\ \cline{5} & & & & \texttt{s}: Povolení sprajtů \\ \cline{5} & & & & \texttt{b}: Povolení pozadí \\ \cline{5} & & & & \texttt{M}: 1: zobrazit sprajty v~levých 8~pixelech obrazovky, 0: skrýt \\ \cline{5} & & & & \texttt{m}: 1: zobrazit pozadí v~levých 8~pixelech obrazovky, 0: skrýt \\ \cline{5} & & & & \texttt{G}: 1: renderovat ve stupních šedi, 0: renderovat barevně \\
 		\hline
-		\SetCell[r=3]{c} PPUSTATUS & \SetCell[r=3]{c} \$2002 & \SetCell[r=3]{c} čtení & \SetCell[r=3]{c} \texttt{VSO- ----} & \texttt{V}: 1: probíhá VBlank \\ \cline{5} & & & & \texttt{S}: 1: proběhla kolize sprajtu 0 \\ \cline{5} & & & & \texttt{O}: 1: došlo k~přetečení sprajtů \\
+		\SetCell[r=3]{c} PPUSTATUS & \SetCell[r=3]{c} \$2002 & \SetCell[r=3]{c} čtení & \SetCell[r=3]{c} \texttt{VSO- ----} & \texttt{V}: 1: probíhá VBL \\ \cline{5} & & & & \texttt{S}: 1: proběhla kolize sprajtu 0 \\ \cline{5} & & & & \texttt{O}: 1: došlo k~přetečení sprajtů \\
 		\hline
 		OAMADDR & \$2003 & zápis & - & aktuální adresa v~OAM; běžně se nastaví na \$00 a~poté se použije DMA \\
 		\hline
@@ -1083,7 +1110,7 @@ Data pro vykreslování pozadí jsou uložena ve videopaměti (VRAM), se kterou 
 
 Registr T je přístupný pomocí registrů \$2000 (PPUCTRL), \$2005 (PPUSCROLL) a~\$2006 (PPUADDR). Slouží k~úpravě programátorem, nepoužívá se pro samotnou indexaci. Do registru PPUCTRL stačí zapsat jednou a~přenáší se do T pouze index nametable. Do zbývajících dvou registrů se musí zapsat dvakrát, oba sdílejí stejný přepínač pořadí (W) a~oba slouží k~úpravě posuvů. Registr PPUSCROLL je zaměřený na úpravu před začátkem vykreslování snímku pro nastavení posuvu v~rámci videopaměti (zjednodušeně řečeno: tímto se nastavuje okno do videopaměti, které je viditelné na obrazovce, díky principu zrcadlení paměti je takto možné zobrazit části více nametable zároveň). Registr PPUADDR je poté zaměřen na práci se surovými daty vkládané do paměti programátorem pomocí registru PPUDATA, pro adresu do dočasného registru T vkládá v~jiném pořadí a~navíc při druhém zápisu rovnou data aktualizuje i~v~aktivním registru V --- počítá se s~tím, že programátor bude do videopaměti přistupovat okamžitě.
 
-Registr V již slouží pro přímou indexaci ve videopaměti. Horizontální posuvy jsou aktualizovány registrem T buďto okamžitě při druhém zápisu do registru PPUADDR, nebo je aktualizován průběžně v~každém obrazovém bodu 257 každého obrazového řádku. Dále je hodnota posuvu souřadnice Y průběžně aktualizována v~obrazovém bodu 256 každého řádku. Vertikální posuvy jsou aktualizovány registrem T poté na konci intervalu VBlank v~bodech 280--304. Nakonec je hodnota V inkrementována dle nastavení v~PPUCTRL vždy při čtení, nebo zápisu do PPUDATA.
+Registr V již slouží pro přímou indexaci ve videopaměti. Horizontální posuvy jsou aktualizovány registrem T buďto okamžitě při druhém zápisu do registru PPUADDR, nebo je aktualizován průběžně v~každém obrazovém bodu 257 každého obrazového řádku. Dále je hodnota posuvu souřadnice Y průběžně aktualizována v~obrazovém bodu 256 každého řádku. Vertikální posuvy jsou aktualizovány registrem T poté na konci intervalu VBL v~bodech 280--304. Nakonec je hodnota V inkrementována dle nastavení v~PPUCTRL vždy při čtení, nebo zápisu do PPUDATA.
 
 Další informace, příklady a~podrobnosti lze nalézt na příslušné stránce Nesdev:~\cite{Nesdev:ppu-scroll}.
 
@@ -1100,6 +1127,7 @@ Všechny registry u~PPU je možné po spuštění vynulovat. Dočasné paměti j
 Proces renderování obrazu je pevně spjat s~jeho průběžným vykreslováním na obrazovku. Po načtení veškerých potřebných dat do pamětí a~nastavení čipu pomocí registrů je důležité se zabývat, jak čip s~dodanými daty pracuje. Přehledný, komunitou vytvořený, diagram celého procesu včetně operací na pozadí je součástí přílohy~\ref{apx:ppu}.
 
 \subsubsection{Pozadí}
+\label{sec:ppu-pozadi}
 Proces vykreslování pozadí probíhá průběžně během celého televizního snímku. Sekvence kroků se liší dle obrazového řádku. Jelikož jeden hodinový takt odpovídá přesně jednomu obrazovému bodu výstupního signálu, jsou operace PPU pevně svázány s~rozlišením obrazu. Název pro časový úsek odpovídající jednomu obrazovému bodu v~rámci řádku je \emph{cyklus}.
 
 Na viditelných řádcích (0-239) se provádí sled vnitřních (negenerující výstup) i~vnějších (generující výstup) operací. Sled vnitřních operací je uvedený v~tabulce~\ref{tab:ppu-pozadi-cykly}. Pro načtení příslušného řádku jedné dlaždice z~pattern table (dle indexu v~nametable) jsou třeba 4 přístupy do paměti, na tabulce jsou rozepsány pro cykly 1--8. Po provedení přístupů potřebných pro jednu dlaždici dojde k~naplnění vnitřních posuvných registrů, které mohou generovat samotný výstup na obrazovku, což už se týká vnějších operací. K~těm dochází v~cyklech 4--256, kdy se generuje obrazový bod za použití bitů z~naplněných posuvných registrů. To, jaký konkrétní bit se vybere, závisí na hodnotě vnitřního registru uchovávajícího jemný posuv souřadnice X. Registry vykonají posuv a~pokračuje další cyklus. Před výstupem na obrazovku se ještě vybírá mezi pixelem pozadí a~popředí, tomu je věnována sekce~\ref{sec:ppu-priority}.
@@ -1132,7 +1160,7 @@ Na viditelných řádcích (0-239) se provádí sled vnitřních (negenerující
 	\end{tblr}
 \end{table}
 
-Po viditelných řádcích následuje řádek 240 (post-renderovací). Od řádku 240 až do předposledního PPU nepřistupuje PPU do videopaměti, avšak příznak intervalu vertikální prodlevy mezi snímky (VBlank) je nastaven až v~prvním cyklu řádku 241, v~ten moment je vyvoláno i~NMI. Od této chvíle je tedy programátor informován o~možnosti bezpečně přistupovat do videopaměti a~může její obsah libovolně upravovat až do řádku 260.
+Po viditelných řádcích následuje řádek 240 (post-renderovací). Od řádku 240 až do předposledního PPU nepřistupuje PPU do videopaměti, avšak příznak intervalu vertikální prodlevy mezi snímky (VBL) je nastaven až v~prvním cyklu řádku 241, v~ten moment je vyvoláno i~NMI. Od této chvíle je tedy programátor informován o~možnosti bezpečně přistupovat do videopaměti a~může její obsah libovolně upravovat až do řádku 260.
 
 Poslední řádek, označovaný jako 261 (pre-renderovací), provádí stejné paměťové operace, jako se dějí u~viditelných, akorát nedochází k~vykreslování na obrazovku. Zde se připravují vnitřní registry obsahem patřící na první viditelný řádek.
 
@@ -1233,6 +1261,7 @@ Každá kazeta obsahuje paměť pro program, PRG~ROM, volitelně pracovní pamě
 U~přepisovatelných pamětí není pevně definována výchozí hodnota; korektně naprogramovaný software se na výchozí hodnoty nespoléhá. U~emulátorů se však často volí hodnota \$00 či \$FF.
 
 \subsection{Mapper}
+ \label{sec:mapper}
 Každá kazeta obsahovala řídicí desku, která jednotlivé části paměti umisťovala do paměťových prostorů procesoru a~PPU. Jelikož byl výchozí paměťový rozsah nedostačující pro komplexnější hry, umožňovaly sofistikovanější mappery přepínat mezi jednotlivými bankami paměti, což se označuje jako \emph{bankswitching}. Tyto desky byly mnoha typů, jednoduché byly složeny z~diskrétních komponent (deska NROM), složitější obsahovaly zákaznické obvody (ASIC), například deska MMC1 a~její podtypy (SKROM, SLROM, SNROM\dots).
 
 Další funkcí, kterou desky v~kazetách měly, bylo určení, jakým způsobem se bude číst z~videopaměti. Jednak bylo možné použít vestavěnou videopaměť PPU a určit, jak se má zrcadlit (pomocí speciálních výstupů CIRAM na kazetě), jednak bylo možné tuto paměť zcela obejít a~poskytnout vlastní videopaměť, což umožnilo převzít celou kontrolu nad mapováním. Japonská verze konzole (Famicom) navíc vedla zvukový výstup nejprve přes kazety, tudíž jim umožnila přimíchat další audiokanály pomocí dedikovaných zvukových procesorů~\cite{Nesdev:mapper}.
