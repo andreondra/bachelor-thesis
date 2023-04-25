@@ -216,8 +216,17 @@ Pomocí listingu lze tedy zjistit, jakému řádku ve zdrojovém kódu odpovíd�
 
 \section{Další principy}
 \subsection{Přehrávání zvuku}
+\label{sec:zpracovani-zvuku}
+Jelikož se v~práci počítá i~s~použitím zvukového výstupu počítače, je zahrnut stručný přehled o~používaných termínech a~principech. V~analytické části byla vybrána knihovna miniaudio, proto je výklad zaměřen na souvislost se zmíněnou knihovnou a~následuje stručný výtah z~dokumentace ke knihovně~\cite{Reid2023:miniaudio}.
+
+V~nejobecnější rovině spočívá přehrávání zvuku v~pravidelném zasílání dat v~pevně daném formátu do ovladače audio periferií. Jelikož by nemělo docházet k~přerušením během přehrávání (způsobující nepříjemné \enquote{chrastění}), musí být tok zvukových dat souvislý. O~data si pravidelně žádá ovladač prostřednictvím \enquote{callbacku}, což je obyčejná C funkce~\cite{Reid2023:miniaudio}.
+
+Zvuková data jsou složená z~takzvaných rámců (frames), které se skládají ze vzorků (samples). Počet vzorků v~rámci určuje počet audio kanálů (pro stereo jsou to dva kanály --- levý a~pravý). Počet rámců za sekundu určuje vzorkovací frekvence. Callback je ovladačem volán během jedné sekundy vícekrát, ovladač si vždy požádá o~nějaké množství rámců, což je předáno argumentem. Úkolem aplikace je tedy dodat požadované množství rámců, pro stereo tedy série vzorků levý, pravý, levý, pravý\dots ~\cite{Reid2023:miniaudio}.
 
 \subsection{Synchronizace vláken}
+Vykonávání více úloh prostřednictvím vláken je v~práci použito pouze v~souvislosti se zpracováním zvuku, kdy volání callbacku (viz sekce~\ref{sec:zpracovani-zvuku}) probíhá v~jiném vlákně, než vše ostatní. Aby nedocházelo k~souběžnému přístupu k~jednomu zdroji, je nutné zvuková data předávat zvláštním způsobem.
+
+Problém předávání zvukových dat ovladači odpovídá klasické synchronizační úloze producent-konzument. Tato úloha spočívá v~tom, že existuje několik zdrojů dat vytvářející data paralelně a~několik zpracovatelů zpracovávající tato data také paralelně. Zdroje i~zpracovatelé tedy sdílejí předávací místo informací, tím je většinou sdílená paměť. Problém nastane tehdy, když je buffer prázdný, nebo plný. Aby nemusela vlákna čekat, uspávají se.~\cite{Tanenbaum2015:os}.  Takový obecný případ je v~rámci zpracování audia zjednodušen na jednoho producenta a~jednoho konzumenta, kde navíc uspávání nemusí být ideálním řešením. Alternativu proto nabízí přímo miniaudio ve formě kruhového bufferu, který při naplnění či úplném vyprázdnění bufferu je možné posouvat ukazatele do bufferu, takže není nutné vlákna uspávat.  Navíc používá atomické operace, nikoliv zámky, proto je buffer efektivní i~pro velice časté přístupy (lze tedy přidávat zvukové rámce i~po jednom).~\cite{Reid2023:miniaudio}.
 
 %---------------------------------------------------------------
 \chapter{Analýza}
