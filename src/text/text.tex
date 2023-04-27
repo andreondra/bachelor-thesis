@@ -1390,6 +1390,162 @@ Standardní postup při čtení by se tedy dal shrnout takto:
 \label{sec:APU}
 Součástí procesoru Ricoh~2A03 je také zvukový syntezátor, přezdívaný jako Audio Processing Unit (APU).
 
+APU obsahuje celkem čtyři konfigurovatelné syntezátory; dva generující pulzy, jeden generující trojúhelníky a~jednu jednotku generující šum. APU také umožňuje přehrávat krátké audiozáznamy ve formátu rozdílové PCM (pulzně-kódové modulaci). Pro analýzu a~implementaci byly zvoleny dva typy generátorů: pulzní a~šumový. APU se ovládá pomocí registrů přístupných procesoru. Přehled vybraných registrů relevantních k~bakalářské práci je uveden v~tabulce~\ref{tab:navrh-apu-registry}.
+
+\begin{table}[ht!]
+	\centering
+	\caption{Registry APU}\label{tab:navrh-apu-registry}
+	\begin{tblr}{|Q[c,m]|Q[c,m]|}
+		\hline
+		Adresa & Funkce \\
+		\hline[2pt]
+		\$4000--\$4003 & Řízení generátoru pulzů 1 \\
+		\hline
+		\$4004--\$4007 & Řízení generátoru pulzů 2 \\
+		\hline
+		\$400C--\$400F & Řízení generátoru šumu \\
+		\hline
+		\$4015 & Stav APU \\
+		\hline
+		\$4017 & Čítač rámců \\
+		\hline
+	\end{tblr}
+\end{table}
+
+
+\subsection{Společné komponenty}
+\subsubsection{Čítač rámců}
+\label{sec:analyza-citac-ramcu}
+Základem APU je takzvaný čítač rámců, které generuje hodinový signál pro všechny kanály. Navíc je tato jednotka schopná generovat přerušení s~frekvencí 60~Hz. Samotný čítač je řízen hodinami CPU dělenými dvěma, tudíž každý druhý cyklus procesoru je poslán hodinový cyklus i~do APU. Čítač lze nastavit registrem \$4017, který má následující strukturu: \texttt{MI------}. Je-li bit \texttt{M} roven 0, APU pracuje ve~čtyřkrokovém režimu, jinak pracuje v pětikrokovém režimu. Bit \texttt{I} je maskou přerušení; je-li tento bit nastaven, poté nebude přerušení vyvoláváno.~\cite{Nesdev:apu-frame-counter}
+
+Čítač pracuje ve dvou režimech. Režim říká, v~kolika krocích bude APU pracovat a~co budou tyto kroky zahrnovat. Může pracovat buďto v~režimu sestávající ze čtyř, nebo z~pěti kroků. Krok je vykonán zhruba každých 3728~APU cyklů. Ve čtyřkrokovém řežimu je při každém kroku poslán hodinový signál do první skupiny komponent (generátor obálky a~čítač trojúhelníkového generátoru); každý druhý krok je poté poslán hodinový signál do druhé skupiny komponent (čítač délky a~regulátor period). V pětikrokovém režimu je hodinový signál do první skupiny zaslán ve všech krocích kromě čtvrtého, do druhé skupiny ve druhém kroku a~v~kroku pátém.~\cite{Nesdev:apu-frame-counter}
+
+Podrobnější informace o~fungování čítače lze nalézt v~\cite{Nesdev:apu-frame-counter}.
+
+\subsubsection{Generátor obálky signálu}
+\label{sec:analyza-generator-obalky}
+
+\subsubsection{Čítač délky}
+\label{sec:analyza-citac-delky}
+
+\subsubsection{Mix}
+Míchání všech výstupů probíhá v~mixu. Každý kanál má vlastní digitálně-analogový převodník, výsledkem je pak nelineární míchací schéma odhadnutelné například následujícím výpočtem převzatým z~\cite{Nesdev:apu-mixer}.
+
+\[vystup = suma\_pulz + suma\_tnd\]
+	
+kde jsou jednotlivé složky vyjádřitelné jako
+	
+\[suma\_pulz = \frac{95,88}{\frac{8128}{pulz1 + pulz2} + 100}\]
+
+\[suma\_tnd = \frac{159,79}{\frac{1}{\frac{trojuhelnik}{8227} + \frac{sum}{12241} + \frac{pcm}{22638}} + 100}\]
+
+\subsection{Generátor pulzů}
+APU obsahuje celkem dva generátory pulzů. Oba se povolují zápisem hodnoty 1 do příslušných bitů ve společném registru \$4015; pro první kanál se jedná o~nejnižší bit a~pro druhý kanál druhý nejnižší bit. Každý z~generátorů se skládá z~pěti komponent:
+\begin{itemize}
+	\item generátor obálky signálu (viz sekce~\ref{sec:analyza-generator-obalky}),
+	\item regulátor periody,
+	\item 11bitový časovač řízený hodinami CPU dělenými dvěma (tudíž o~poloviční frekvenci),
+	\item sekvencer (generátor průběhu) pracující v~osmi krocích,
+	\item čítač délky.
+\end{itemize}
+
+Regulátory periody existují ve dvou jednotkách, každý pulzní kanál má svou jednotku. Ovládá se registry \$4001 pro první kanál a~\$4005 pro druhý. Oba mají stejnou strukturu: \texttt{EPPPNSSS}, kde \texttt{E} je povolení regulátoru (1 znamená povoleno), \texttt{PPP} je perioda děličky regulátoru, \texttt{N} určuje, zdali se se perioda přičítá (hodnota 0), nebo odčítá (1), \texttt{SSS} je počet bitů k~posuvu. Je-li regulátor periody aktivní, upravuje hodnotu hlavního časovače v~těchto krocích:
+\begin{enumerate}
+	\item Načtení hodnoty 11bitového časovače a~posuv této hodnoty vpravo dle nastavení (bity \texttt{SSS}).
+	\item Je-li bit \texttt{N} roven 1, poté je hodnota negována (první kanál narozdíl od druhého pracuje s~jedničkovým doplňkem, tudíž je hodnota ještě o~1 menší).
+	\item Vypočtená (a~volitelně negovaná) hodnota je poté přičtena k~hlavnímu časovači.
+\end{enumerate}
+
+Regulátor periody má za jistých podmínek schopnost celý kanál vyřadit, což je včetně dalších podrobností fungování dokumentováno na stránce~\cite{Nesdev:apu-sweep}.
+
+Třetí komponenta, 11bitový čítač, slouží k~taktování sekvenceru. Jeho hodnota je upravována pomocí dvou registrů: \$4001 (\$4006 pro druhý kanál) slouží k~nastavení výchozích spodních osmi bitů časovače; spodní tři bity \$4003 (\$4007 pro druhý kanál) poté nastavují výchozí horní tři bity časovače. 11bitová výchozí hodnota je perioda časovače. Každý APU hodinový takt je hodnota čítače dekrementována, po dosažení nuly se do čítače načte nakonfigurovaná výchozí hodnota a~sekvencer je posunut o~1~krok vpřed.~\cite{Nesdev:apu-pulse}
+
+Sekvencer slouží ke generování průběhu signálu. APU obsahuje vnitřní tabulku o~čtyřech řádcích, kdy každý řádek reprezentuje jeden průběh signálu lišící se ve střídě. Jednotlivé hodnoty jsou omezeny pouze na 1 (maximální amplituda) a 0 (nulová amplituda --- ztlumení). Index řádku (a~tedy hodnotu střídy) lze nakonfigurovat pomocí registru dvou nejvyšších bitů registru \$4000 pro první, respektive \$4004 pro druhý kanál, což přesně odpovídá čtyřem možným hodnotám. Obrázek~\ref{fig:apu-signaly} ukazuje vzhled jednotlivých průběhů dle nakonfigurovaného indexu i~s~odpovídající hodnotou střídy v~procentech.~\cite{Nesdev:apu-pulse}
+
+\begin{figure}[ht!]
+	\centering
+	\caption{~Vzhled průběhů signálu pulzního kanálu APU}\label{fig:apu-signaly}
+	\begin{tikztimingtable}[%
+		timing/dslope=0.1,
+		timing/.style={x=5ex,y=3ex},
+		x=5ex,
+		timing/rowdist=4ex,
+		timing/name/.style={font=\sffamily\scriptsize}
+		]
+		\signal{0 (12,5~\%)} & L H 6L \\
+		\signal{1 (25~\%)} & L 2H 5L \\
+		\signal{2 (50~\%)} & L 4H 3L \\
+		\signal{3 (75~\%)} & H 2L 5H \\
+		\extracode
+		\begin{pgfonlayer}{background}
+			\begin{scope}[semitransparent ,semithick]
+				\vertlines[black,dotted]{0.0, 1.0,2.0,...,8.0}
+			\end{scope}
+		\end{pgfonlayer}
+	\end{tikztimingtable}
+\end{figure}
+
+\begin{note}[Průběh signálu se 75\% střídou]
+	Signál odpovídající indexu~3 na obrázku~\ref{fig:apu-signaly} je oproti ostatním signálům posunut. To je způsobeno tím, že sekvencer je sice inicializován na nultý krok, ale kroky počítá dolů, v~tabulce se tedy pohybuje opačným směrem a~signál je i~takto zvláštně generován.~\cite{Nesdev:apu-pulse}
+\end{note}
+
+Sekvencer přivádí hodnotu vytvořenou generátorem obálky do mixu za těchto podmínek:
+\begin{itemize}
+	\item aktuální hodnota kroku sekvenceru je 1,
+	\item regulátor periody neztlumuje signál,
+	\item hodnota čítače délky je vyšší než 0,
+	\item hodnota 11bitového hlavního časovače je méně než 8.
+\end{itemize}
+
+\subsection{Generátor šumu}
+Generátor šumu je mnohem jednodušší jednotkou nežli generátor pulzních signálů. Ve své podstatě jde o~pseudonáhodný generátor tónů. Skládá se z~následujících komponent:
+\begin{enumerate}
+	\item generátor obálky signálu (viz sekce~\ref{sec:analyza-generator-obalky}),
+	\item 11bitový hlavní časovač,
+	\item posuvný registr s~lineární zpětnou vazbou,
+	\item čítač délky.
+\end{enumerate}
+
+Jediné dvě konfigurovatelné hodnoty specifické pro generátor šumu je nastavení režimu a~výchozí hodnoty časovače, obojí pomocí registru \$400E s~následující strukturou: \texttt{M---PPPP}. \texttt{M} je režim rozhodující o~bitu jdoucím do zpětné vazby, \texttt{PPPP} volba výchozí hodnoty (periody) hlavního časovače.~\cite{Nesdev:apu-noise}. Konkrétní hodnota je určena dle tabulky, ta je k~nahlédnutí například v~\cite{Nesdev:apu-noise}.
+
+Hlavní časovač funguje podobně jako u~pulzního kanálu, po dosažení nulové hodnoty dojde k~taktování tentokrát zpětnovazebního registru. Struktura registru je na obrázku~\ref{fig:apu-sum-LFSR}. Je-li nastaven bit M na 1, poté jsou zpětnovazební bity 0 a~6, jinak bity 0 a~1.~\cite{Nesdev:apu-noise}
+
+% Inspirováno příspěvkem uživatele Excelsior na stránce https://tex.stackexchange.com/questions/592862/latex-using-tikz-to-draw-a-lfsr.
+\begin{figure}[ht!]
+	\centering
+	\caption{~Zpětnovazební registr generátoru šumu}\label{fig:apu-sum-LFSR}
+    \begin{tikzpicture}[node distance = 4mm and 0mm,
+		box/.style = {shape=rectangle, draw, minimum size=2em, outer sep=0pt, on chain=#1},
+		sum/.style = {shape=circle, draw, inner sep=0pt, node contents={$+$}},
+		every path/.append style = {-latex'}
+		]
+		\def\scopeyshift{19mm}
+		\begin{scope}[start chain=ch1 going left]
+			\foreach \i in {0,...,14}{
+				\node [box=ch1] (ch1-\i) {$s_{\i}$};
+			}
+			
+			\node (c1) [color=lfsr,sum,below=of ch1-1,label=below:\texttt{M = 0}];
+			\node (c6) [color=lfsr,sum,below=of ch1-6, label=below:\texttt{M = 1}];
+			
+			\draw (c1) edge (c6);
+			
+			\draw (ch1-0) -- ($(ch1-0) + (2,0)$) node (knot){};
+			\draw[fill=black] ($(knot) + (-1,0)$) circle[radius=1pt];
+			\draw[<-, >=stealth] (c1) -| ($(knot) + (-1,0)$);
+			\draw (c6) -| ([xshift=0-5mm] ch1-14.west) -- (ch1-14);
+			\draw[color=lfsr] (ch1-1) -- (c1);
+			\draw[color=lfsr] (ch1-6) -- (c6);
+		\end{scope}
+	\end{tikzpicture}
+\end{figure}
+
+Generátor šumu přivádí hodnotu vytvořenou generátorem obálky do mixu za těchto podmínek:
+\begin{itemize}
+	\item aktuální hodnota nejnižšího bitu posuvného registru je 0,
+	\item hodnota čítače délky je vyšší než 0.
+\end{itemize}
+
 \section{Existující řešení}
 
 
