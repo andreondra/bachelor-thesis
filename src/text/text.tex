@@ -1422,12 +1422,6 @@ Základem APU je takzvaný čítač rámců, které generuje hodinový signál p
 
 Podrobnější informace o~fungování čítače lze nalézt v~\cite{Nesdev:apu-frame-counter}.
 
-\subsubsection{Generátor obálky signálu}
-\label{sec:analyza-generator-obalky}
-
-\subsubsection{Čítač délky}
-\label{sec:analyza-citac-delky}
-
 \subsubsection{Mix}
 Míchání všech výstupů probíhá v~mixu. Každý kanál má vlastní digitálně-analogový převodník, výsledkem je pak nelineární míchací schéma odhadnutelné například následujícím výpočtem převzatým z~\cite{Nesdev:apu-mixer}.
 
@@ -1442,14 +1436,14 @@ kde jsou jednotlivé složky vyjádřitelné jako
 \subsection{Generátor pulzů}
 APU obsahuje celkem dva generátory pulzů. Oba se povolují zápisem hodnoty 1 do příslušných bitů ve společném registru \$4015; pro první kanál se jedná o~nejnižší bit a~pro druhý kanál druhý nejnižší bit. Každý z~generátorů se skládá z~pěti komponent:
 \begin{itemize}
-	\item generátor obálky signálu (viz sekce~\ref{sec:analyza-generator-obalky}),
+	\item generátor obálky signálu (viz~\cite{Nesdev:apu-envelope}),
 	\item regulátor periody,
 	\item 11bitový časovač řízený hodinami CPU dělenými dvěma (tudíž o~poloviční frekvenci),
 	\item sekvencer (generátor průběhu) pracující v~osmi krocích,
-	\item čítač délky.
+	\item čítač délky (viz~\cite{Nesdev:apu-length-counter}).
 \end{itemize}
 
-Regulátory periody existují ve dvou jednotkách, každý pulzní kanál má svou jednotku. Ovládá se registry \$4001 pro první kanál a~\$4005 pro druhý. Oba mají stejnou strukturu: \texttt{EPPPNSSS}, kde \texttt{E} je povolení regulátoru (1 znamená povoleno), \texttt{PPP} je perioda děličky regulátoru, \texttt{N} určuje, zdali se se perioda přičítá (hodnota 0), nebo odčítá (1), \texttt{SSS} je počet bitů k~posuvu. Je-li regulátor periody aktivní, upravuje hodnotu hlavního časovače v~těchto krocích:
+Regulátory periody existují ve dvou jednotkách, každý pulzní kanál má svou jednotku. Ovládá se registry \$4001 pro první kanál a~\$4005 pro druhý. Oba mají stejnou strukturu: \texttt{EPPPNSSS}, kde \texttt{E} je povolení regulátoru (1 znamená povoleno), \texttt{PPP} je perioda děličky regulátoru, \texttt{N} určuje, zdali se se perioda přičítá (hodnota 0), nebo odčítá (hodnota 1), \texttt{SSS} je počet bitů k~posuvu. Je-li regulátor periody aktivní, upravuje hodnotu hlavního časovače v~těchto krocích:
 \begin{enumerate}
 	\item Načtení hodnoty 11bitového časovače a~posuv této hodnoty vpravo dle nastavení (bity \texttt{SSS}).
 	\item Je-li bit \texttt{N} roven 1, poté je hodnota negována (první kanál narozdíl od druhého pracuje s~jedničkovým doplňkem, tudíž je hodnota ještě o~1 menší).
@@ -1500,10 +1494,10 @@ Sekvencer přivádí hodnotu vytvořenou generátorem obálky do mixu za těchto
 \subsection{Generátor šumu}
 Generátor šumu je mnohem jednodušší jednotkou nežli generátor pulzních signálů. Ve své podstatě jde o~pseudonáhodný generátor tónů. Skládá se z~následujících komponent:
 \begin{enumerate}
-	\item generátor obálky signálu (viz sekce~\ref{sec:analyza-generator-obalky}),
+	\item generátor obálky signálu (viz~\cite{Nesdev:apu-envelope}),
 	\item 11bitový hlavní časovač,
 	\item posuvný registr s~lineární zpětnou vazbou,
-	\item čítač délky.
+	\item čítač délky (viz~\cite{Nesdev:apu-length-counter}).
 \end{enumerate}
 
 Jediné dvě konfigurovatelné hodnoty specifické pro generátor šumu je nastavení režimu a~výchozí hodnoty časovače, obojí pomocí registru \$400E s~následující strukturou: \texttt{M---PPPP}. \texttt{M} je režim rozhodující o~bitu jdoucím do zpětné vazby, \texttt{PPPP} volba výchozí hodnoty (periody) hlavního časovače.~\cite{Nesdev:apu-noise}. Konkrétní hodnota je určena dle tabulky, ta je k~nahlédnutí například v~\cite{Nesdev:apu-noise}.
@@ -1547,7 +1541,17 @@ Generátor šumu přivádí hodnotu vytvořenou generátorem obálky do mixu za 
 \end{itemize}
 
 \section{Existující řešení}
+Emulátory konzole NES vznikaly již pro platformy dnes nepoužívané, například MS-DOS. Emulátorů NES vzniklo mnoho: pro různé platformy, s~různými funkcemi a~různými cíli. Emulátory lze rozdělit do tří skupin.
 
+\emph{Precizní výkonné emulátory}: cílí především na co nejvěrohodnější napodobení NES a~zároveň nízkou náročnost na hardware. Tento typ emulátorů vznikal od samého začátku snah především pro to, aby bylo možné spouštět původní programové vybavení pro NES (hlavně zábavní software) na novějších platformách co nejpřesněji s~ohledem na původní fungování na NES. Tomu odpovídá i~struktura kódu emulátoru. Využívají se různé triky, aby byla emulace věrohodná, ale zároveň nepříliš náročná, což vede k~nepřehlednému kódu (nejasné pojmenování funkcí a~proměnných, mnoho binárních operací bez dalších popisů\dots). Tím, že kód nebyl psán s~ohledem na modularitu, je často i~většina komponent silně provázaných. Komponenty nekomunikují přes abstrakci sběrnic a~signálních vodičů, ale bývá využívána ještě o~stupeň vyšší abstrakce. Dnes již tyto emulátory obsahují kromě prostředí pro samotné hraní i~například debugger a~jsou používány nejen hráči, ale díky své věrohodnosti i~jako simulátory pro vývojáře domácího softwaru pro NES (takzvaný homebrew vývoj). Pro účely bakalářské práce však vzhledem ke stylu napsaného kódu mohou posloužit pouze jako praktické ověření fungování konkrétních her a~porovnání s~implementací v~práci. Velmi věrohodným emulátorem je například fceux dostupný na: \url{https://github.com/TASEmulators/fceux}.
+
+\emph{Experimentální emulátory}: projekty (většinou) jednotlivců, kteří se chtějí dozvědět více o~fungování NES, popřípadě vytvořit emulátor nestandardním způsobem. Takových emulátorů vzniklo a~stále vzniká velké množství, často jde o~nedokončené projekty, kde bylo cílem vytvořit jen prototyp či koncept. Takové emulátory se běžně nepoužívají ani pro hraní her, ani pro vývoj. Narozdíl od první jmenované skupiny již bývá kód přehledný, jsou totiž psány bez vyšších nároků na výkon, naopak s~vyššími nároky na přehlednost, mohou být tedy zajímavou inspirací i~co se kódu týče. Příkladem je projekt olcNES dostupný na: \url{https://github.com/OneLoneCoder/olcNES}.
+
+\emph{Komerční emulátory}. Tyto vznikly pouze pro distribuci konkrétních her na nové platformy přímo společností Nintendo (například acNES pro Game Boy a~GameCube, Virtual Console pro Wii, Wii~U a~3DS). Jedná se o~proprietární aplikace a nebyl pro ně zveřejněn zdrojový kód. Nemá tedy smysl je dále studovat; jelikož jde pouze o~komerční zábavní využití.
+
+Bakalářská práce cílí výhradně do druhé jmenované skupiny; experimentální. Nemá smysl se pokoušet vyvíjet nový co nejpřesnější emulátor, takový zájem je mnohem lepší aplikovat příspěvkem do již existujících projektů. Ve skupině experimentálních emulátorů stále chyběl takový, který by se pokusil NES implementovat tak, že struktura kódu odpovídá i~reálné implementaci (hlavně co se modularity komponent a~komunikace mezi nimi týče). Navíc samotná existence experimentálních emulátorů ukazuje, že implementace emulátoru může být zajímavou příležitostí k~prozkoumání prakticky používané počítačové architektury a~vzdělání se v~této oblasti. Příkladem je emulátor olcNES, kdy autor vytvořil i~sadu videí, kde vysvětluje zajímavé principy fungování konzole. Bylo by tedy v~zájmu širší skupiny co nejvíce takový experimentální vývoj podpořit a~zpřístupnit tak, aby se potenciální vývojáři již mohli soustředit výhradně na implementaci emulovaného systému a~jeho komponent. Na základě toho byla vytvořena myšlenka bakalářské práce; vytvořit univerzální emulační platformu, která zařídí vše, co je sice k~běhu emulátoru potřebné, ale přímo se k~vývoji emulovaných komponent nevztahuje, a~na této platformě vytvořit vzorovou implementaci systému, což je právě implementace NES.
+
+Přehledný seznam existujících implementací lze nalézt v~\cite{Nesdev:emus}.
 
 %---------------------------------------------------------------
 \chapter{Návrh}
