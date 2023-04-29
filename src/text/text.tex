@@ -1878,6 +1878,10 @@ Praktická část probíhala v~několika fázích po dobu 2~let. Během prvních
 
 Projekt je podrobně dokumentován. V~případě většího zájmu o~implementační detaily je důrazně doporučeno paralelně studovat zdrojový kód; je obohacen o~mnoho dokumentačních komentářů, z~nichž lze snadno vygenerovat dokumentaci ve formátu kompatibilním s~webovými prohlížeči (HTML dokument).
 
+\begin{note}[Zápis signatur metod]
+	U některých metod a~funkcí jsou vynechány signatury, pakliže to není v~textu relevantní a~je důležitý pouze název. Patřičné signatury i~s~popisky lze nastudovat ve zdrojovém kódu.
+\end{note}
+
 \section{Struktura projektu}
 Projekt je k~dispozici na veřejném repozitáři na platformě GitHub: \url{https://github.com/andreondra/use}. Součástí repozitáře je celá platforma, implementace NES i~dokumentace a~veškeré pomocné nástroje. Obrázek~\ref{fig:impl-struktura-projektu} strukturu projektu znázorňuje graficky.
 
@@ -2020,15 +2024,74 @@ SoundSampleSources APU::getSoundSampleSources() {
 	\end{minted}
 \end{listing}
 
+\subsection{Práce se zvukem}
+Pro co nejjednodušší zpřístupnění zvukového výstupu byla vytvořena třída \mintinline{cpp}|Sound|. Tato třída má velice jednoduché rozhraní: \mintinline{cpp}|start()| a~\mintinline{cpp}|stop()| pro spuštění či zastavení přehrávání dodaných zvukových rámců a~\mintinline{cpp}|writeFrames()| pro dodání rámců k~přehrání. Je zcela abstrahováno to, jaký zvukový ovladač se ve skutečnosti používá, jak dochází ke zpracování jednotlivých zvukových rámců i~jak probíhá komunikace s~audio callbackem (a tedy dodávání zpracovaných rámců) --- to vše zajistí platforma tak, aby bylo vývojáři emulátoru zpříjemněna a~zjednodušena práce.
+
+Třídu \mintinline{cpp}|Sound| spravuje platforma (třída \mintinline{cpp}|Emulator|). Při nahrání emulovaného systému dojde k~vytvoření grafu reprezentující tok zvukových vzorků při jejich zpracování. Graf je tvořen vstupními body, jejichž počet závisí na počtu zdrojů zvuku (zjistí se zcela automaticky bez zásahu vývojáře systému, pakliže správně implementoval funkci pro získání seznamu zdrojů zvuku), všechny vstupní body jsou smíchány a předány dalšímu uzlu, což je filtr typu dolní propust. Ten je použit proto, aby byly omezeny příliš velké změny amplitud, které vedou k~nepříjemnému praskání na výstupu (v~reproduktorech či sluchátkách). Nakonec je smíchaný~a~filtrovaný výsledný zvuk přiveden na výstup. Graficky je tento tok znázorněn na obrázku~\ref{fig:impl-zvuk-tok-dat}.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{~Schéma toku zvukových dat ze 3~zdrojů}\label{fig:impl-zvuk-tok-dat}
+	\begin{tikzpicture}[node distance=2cm] 
+		\tikzstyle{uroven} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black]
+		\tikzstyle{arrow} = [thick,->,>=stealth]
+		
+		\node (zdroj1) [uroven] {Zdroj 1};
+		\node (zdroj2)[uroven, right of =zdroj1, xshift=1.5cm]{Zdroj 2};
+		\node (zdroj3)[uroven, right of=zdroj2, xshift=1.5cm]{Zdroj 3};
+		\node (dp)[uroven, below of=zdroj2]{Dolní propust};
+		\node (out)[uroven, below of=dp]{Výstup};
+		
+		\draw [arrow] (zdroj1) -- (dp);
+		\draw [arrow] (zdroj2) -- (dp);
+		\draw [arrow] (zdroj3) -- (dp);
+		\draw [arrow] (dp) -- (out);
+	\end{tikzpicture}
+\end{figure}
+
+Jak lze pozorovat na implementaci mechanismu zpracování zvuku, je jen na vývojáři emulovaných komponent, potažmo systému, kolik zdrojů zvuku platformě poskytne. Je možné vše smíchat vlastním způsobem a~klidně za celý systém předat jen jeden zdroj, nebo předat několik zdrojů za každou komponentu a~přenechat veškeré míchaní na platformě. Samozřejmě je možné nepředávat žádný zdroj, přehrávání zvuku tak nebude k~dispozici.
+
+\subsection{Komunikace komponent}
+Jak bylo popsáno v~návrhové části, komunikace komponent probíhá pomocí tříd~\mintinline{cpp}|Port| a~\mintinline{cpp}|Connector|. Nejprve je ukázáno, jak se jednotlivé třídy používají, poté je vysvětlen princip jejich implementace.
+
+Chce-li komponenta zveřejnit port, pomocí nějž by řídila ostatní komponent, vybere typ portu a přidá jej jako datovou položku třídy. Poté v~konstruktoru přidá port do seznamu zveřejněných portů: \mintinline{cpp}|m_ports["nazev_portu"] = &m_mujPort|. Dle vybraného typu portu jsou pak k~dispozici různá rozhraní. Typ \mintinline{cpp}|DataPort| je emulací kombinace datových, adresních a~řídicích vodičů, umožňuje komunikovat pomocí metod \mintinline{cpp}|uint32_t read(uint32_t address)| pro přečtení dat z~vybrané adresy a~\mintinline{cpp}|void write(uint32_t address, uint32_t data)| pro zápis dat na zvolenou adresu. Typ \mintinline{cpp}|SignalPort| je poté emulace surových signálů. Umožňuje nastavit logickou úroveň na pomyslném vodiči pomocí \mintinline{cpp}|void set(bool active)|, popřípadě pouze zaslat jeden pomyslný signální pulz (změnu logické hodnoty; je na připojené komponentě, jak jej interpretuje) pomocí \mintinline{cpp}|void send();|. Nastavení logické úrovně je použitelné pro komunikaci s~úrovňovými detektory (u~6502 port IRQ), poslání signálu je poté užitečné pro hranové detektory (u~6502 port NMI).  Do portu je možné připojit konektor, takové rozhraní mají oba typy portů společné: \mintinline{cpp}|void connect(std::weak_ptr<Connector> connector)|. Port po připojení konektoru zkontroluje, zdali je v~konektoru definováno požadované rozhraní a~pokud ano, je možné pomocí portu komunikovat s~připojenou komponentou přes její konektor.
+
+Chce-li být komponenta řízena jinou komponentou, musí naopak zveřejnit konektor, toť jest typ třídy \mintinline{cpp}|Connector|.  Konektory jsou v~komponentách ukládány do kontejneru typu \mintinline{cpp}|std::map|. Deklarace i~definice probíhá v~konstruktoru. Výpis kódu~\ref{list:use-konfigurace-konektoru} ukazuje, jak lze nadefinovat jak typ konektoru poskytující datové rozhraní, tak typ konektoru poskytující signální rozhraní; prezentovaný kód by byl uveden v~konstruktoru.
+
+\begin{listing}
+	\caption{Definování konektorů různých typů}
+	\label{list:use-konfigurace-konektoru}
+	\begin{minted}[tabsize=2]{cpp}
+		
+	// Konektor poskytujici signalni rozhrani emulujici hranovy detektor.
+    m_connectors["CLK"] = std::make_shared<Connector>(SignalInterface{
+		.send = [this](){
+			CLK();
+		}
+	});
+	
+	// Konektor poskytujici signalni rozhrani emulujici urovnovy detektor.
+	 m_connectors["IRQ"] = std::make_shared<Connector>(SignalInterface{
+		.set = [this](bool active) {
+			IRQ(active);
+		}
+	});
+	
+	
+
+	\end{minted}
+\end{listing}
+
 \subsection{Systémy}
 Po vyvinutí komponent je možné definovat jejich propojení v~rámci systému, jehož obecné rozhraní zajišťuje třída \mintinline{cpp}|System|. Systém obsahuje metody pro postupování emulací po různě velkých úsecích, například po jednotlivých taktech hlavních hodin lze postupovat pomocí \mintinline{cpp}|doClocks()|. Je zajištěno~i~rozhraní pro běh v~reálném čase: \mintinline{cpp}|doRun()|.
 
 Systém obsahuje mnoho předpřipravených metod. Týká se to především práce se společným rozhraním komponent. Přidá-li programátor používané komponenty do připraveného kontejneru typu vektor s~identifikátorem \mintinline{cpp}|m_components|, je možné tyto metody použít. Jsou to metody pro získání definic grafického rozhraní všech komponent (\mintinline{cpp}|getGUIs()|), získání všech zdrojů zvuku (\mintinline{cpp}|getSampleSources()|), definice všech dostupných uživatelských vstupů (\mintinline{cpp}|getInputs()|), popřípadě \mintinline{cpp}|init()| pro skupinovou inicializaci všech komponent.
 
-\subsection{Práce se zvukem}
-Pro co nejjednodušší zpřístupnění zvukového výstupu byla vytvořena třída \mintinline{cpp}|Sound|. Tato třída má velice jednoduché rozhraní: \mintinline{cpp}|start()| a~\mintinline{cpp}|stop()| pro spuštění či zastavení přehrávání dodaných zvukových rámců a~\mintinline{cpp}|writeFrames()| pro dodání rámců k~přehrání. Je zcela abstrahováno to, jaký zvukový ovladač se ve skutečnosti používá, jak dochází ke zpracování jednotlivých zvukových rámců i~jak probíhá komunikace s~audio callbackem (a tedy dodávání zpracovaných rámců).
+\begin{note}[Grafický editor systému]
+	V~současné verzi platformy se počítá s~vytvářením systému pouze vyvinutím dalších tříd, které se poté ručně zakomponují do platformy přidáním do nabídky v~hlavní třídě \mintinline{cpp}|Emulator|. Návrh komponent proběhl však velice pečlivě tak, aby bylo možné do budoucna implementovat třídu reprezentující univerzální systém, který bude implementovatelný grafickým rozhraním. Počítá se s~využitím editoru grafů, pomocí nějž půjde skládat systém jak na úrovni komplexních komponent (procesor, grafický čip), tak na úrovni hradel.
+\end{note}
 
-Knihovnu 
+TODO: propojeni komponent
 
 \section{Emulované komponenty}
 
