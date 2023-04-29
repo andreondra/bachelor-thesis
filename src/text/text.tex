@@ -1560,7 +1560,6 @@ Přehledný seznam existujících implementací lze nalézt v~\cite{Nesdev:emus}
 	\enquote{Simplicity is prerequisite for reliability.}
 }{\textsc{Edsger W. Dijkstra}}
 
-\section{Úvod}
 Při analýze byly získány potřebné informace o~tom, z~čeho se NES skládá a~jak tyto komponenty fungují. Po analyzování systému je třeba navrhnout, jak jej prakticky implementovat. Vzhledem k~tomu, že je cílem projektu být co nejsrozumitelnější, je nutné brát v~potaz nejen návrh implementace samotného systému, ale i~emulační platformy, na které emulovaný systém poběží.
 
 Nejprve je třeba navrhnout technologie, které se pro implementaci využijí. Dále je nutné navrhnout univerzální rozšiřitelnou platformu. Nakonec se za pomocí určených technologií a~platformy navrhne, jak implementovat samotnou konzoli NES.
@@ -1610,9 +1609,10 @@ Spouštění testů v~základní formě vyžaduje akci programátora, což přin
 
 Specifikem bakalářské práce je fakt, že implementuje emulaci systému, od které se očekává, že bude věrně napodobovat emulovaný systém. Dalším požadavkem je proto možnost \emph{spouštět testy ve formě strojového kódu} pro danou platformu s~možností automatického vyhodnocení. Pro archaické systémy vzniklo již mnoho testů, které mají za úkol porovnat funkci s~reálným systémem. Sofistikované testy umožňují vybrat druh výstupu, kdy součástí bývá i~zápis výsledků do vybraného místa v~paměti.
 
-Jak bylo uvedeno v~kapitole \ref{sec:teorie-testovani}, testy se dají provádět ručně i~automaticky. Jelikož je požadováno průběžné testování, je nejvhodnější co nejvíce testů automatizovat. To vyžaduje nástroj pro spouštění a~řízení testů. Součástí nástroje CMake je CTest, který je využit i~v~této práci. Pro samotné psaní testů již není třeba další komponenty, avšak využití dalších nástrojů může testování dále zjednodušit a~standardizovat jejich strukturu. Pro účely této práce byl zvolen Google Test. Umožňuje testovat konkrétní hodnoty, ověřovat vyvolané výjimky i~vytvářet znovupoužitelné struktury pro testování jednotným způsobem; díky tomu budou testy přehlednější. Výhodou je integrace Google Test se systémem CMake, proto je možné po úvodním nastavení testy vytvářet jako jednotlivé zdrojové soubory bez dalších úprav.
+Testy se dají provádět ručně i~automaticky. Jelikož je požadováno průběžné testování, je nejvhodnější co nejvíce testů automatizovat. To vyžaduje nástroj pro spouštění a~řízení testů. Součástí nástroje CMake je CTest, který je využit i~v~této práci. Pro samotné psaní testů již není třeba další komponenty, avšak využití dalších nástrojů může testování dále zjednodušit a~standardizovat jejich strukturu. Pro účely této práce byl zvolen Google Test. Umožňuje testovat konkrétní hodnoty, ověřovat vyvolané výjimky i~vytvářet znovupoužitelné struktury pro testování jednotným způsobem; díky tomu budou testy přehlednější. Výhodou je integrace Google Test se systémem CMake, proto je možné po úvodním nastavení testy vytvářet jako jednotlivé zdrojové soubory bez dalších úprav.
 
 \section{Emulační platforma}
+\label{sec:navrh-platforma}
 \subsection{Stanovení požadavků}
 \label{sec:navrh-pozadavky}
 
@@ -1871,6 +1871,167 @@ Pro přehled je na konec uveden diagram zachycující konkrétní realizaci emul
 	\enquote{If you love what you do and are willing to do what it takes, it's within your reach.}
 }{\textsc{Steve Wozniak}}
 
+Po analýze a~navržení následuje praktická část, kdy se projekt implementuje pomocí vybraných technologií. 
+Úkolem kapitoly implementace je provést strukturou projektu a~poukázat na zajímavé řešené problémy.
+
+Praktická část probíhala v~několika fázích po dobu 2~let. Během prvních fází byly postupně vytvořeny emulované komponenty, v~dalších byla vytvářena emulační platforma v~několika verzích (které jsou porovnány v~návrhové kapitole v~sekci~\ref{sec:navrh-platforma}). Poslední verze emulační platformy, nazvaná jako Universal System Emulator, byla vytvářena posledního půlroku studia na fakultě.
+
+Projekt je podrobně dokumentován. V~případě většího zájmu o~implementační detaily je důrazně doporučeno paralelně studovat zdrojový kód; je obohacen o~mnoho dokumentačních komentářů, z~nichž lze snadno vygenerovat dokumentaci ve formátu kompatibilním s~webovými prohlížeči (HTML dokument).
+
+\section{Struktura projektu}
+Projekt je k~dispozici na veřejném repozitáři na platformě GitHub: \url{https://github.com/andreondra/use}. Součástí repozitáře je celá platforma, implementace NES i~dokumentace a~veškeré pomocné nástroje. Obrázek~\ref{fig:impl-struktura-projektu} strukturu projektu znázorňuje graficky.
+
+\begin{figure}[p!]
+%	\centering
+	\caption{Popis struktury projektu}\label{fig:impl-struktura-projektu}
+	\dirtree{%
+		.1 .github\DTcomment{skripty pro kontinuální sestavování na platformě GitHub Actions}.
+		.1 cmake\_src\DTcomment{další pomocné skripty nástroje CMake}.
+		.1 docs\DTcomment{zdrojový kód dokumentace}.
+		.1 graphics\DTcomment{různá pomocná grafika (loga a další)}.
+		.1 include\DTcomment{C++ hlavičkové soubory odpovídající zdrojovým souborům}.
+		.1 src\DTcomment{zdrojový kód projektu}.
+		.2 components\DTcomment{zdrojové kódy jednotlivých komponent}.
+		.3 Gamepak.
+		.4 Gamepak.cpp\DTcomment{emulace kazety NES}.
+		.4 Mapper.cpp\DTcomment{abstrakce mapperů}.
+		.4 Mapper000.cpp\DTcomment{emulace mapperu 0}.
+		.4 Mapper001.cpp\DTcomment{emulace mapperu 1}.
+		.3 2A03.cpp\DTcomment{emulace čipu 2A03}.
+		.3 2C02.cpp\DTcomment{emulace grafického čipu 2C02 (PPU)}.
+		.3 6502.cpp\DTcomment{emulace procesoru 6502}.
+		.3 APU.cpp\DTcomment{emulace audio čipu APU}.
+		.3 Bus.cpp\DTcomment{univerzální emulace sběrnice}.
+		.3 Memory.cpp\DTcomment{univerzální emulace přepisovatelné paměti}.
+		.3 NESPeripherals.cpp\DTcomment{emulace periferií NES}.
+		.3 Trigger.cpp\DTcomment{konvertor mezi typy signálů}.
+		.2 systems\DTcomment{zdrojové kódy systémů}.
+		.2 Component.cpp\DTcomment{abstrakce komponenty}.
+		.2 Connector.cpp\DTcomment{abstrakce konektoru}.
+		.2 Emulator.cpp\DTcomment{hlavní třída zastřešující celou platformu}.
+		.2 Port.cpp\DTcomment{abstrakce portu}.
+		.2 Sound.cpp\DTcomment{rozhraní nad zvukovým ovladačem}.
+		.2 System.cpp\DTcomment{abstrakce systému}.
+		.2 Tools.cpp\DTcomment{pomocné funkce}.
+		.1 tests\DTcomment{testy projektu}.
+		.2 testfiles\DTcomment{pomocné testovací soubory}.
+		.2 unit\DTcomment{testy jednotlivých komponent}.
+		.1 .gitignore\DTcomment{seznam ignorovaných souborů systémem git}.
+		.1 CMakeLists.txt\DTcomment{soubor projektu systému CMake}.
+		.1 COPYING\DTcomment{licence GPL-3.0}.
+		.1 README\DTcomment{základní informace k~projektu}.
+		.1 main.cpp\DTcomment{hlavní kompilační jednotka projektu}.
+	}
+\end{figure}
+
+\section{Emulační platforma}
+Princip fungování emulační platformy bude rozebrán od té nejnižší úrovně --- komponenty --- až na celou emulační platformu.
+
+\subsection{Komponenty}
+Každá komponenta, která má být součástí platformy, musí splňovat rozhraní definované abstraktní třídou \mintinline{cpp}|Component|, což se v~C++ provede snadno principem dědění: \mintinline{cpp}|class mojeKomponenta : public Component|. Úkolem této abstraktní třídy je poskytnout komponentě vše potřebné pro začlenění do libovolného systému i~pro samotný běh emulace a~debugging. Pro komunikaci s~ostatními komponentami jsou připraveny následující metody:
+\begin{itemize}
+	\item \mintinline{cpp}|connect()|: připojení řízené komponenty,
+	\item \mintinline{cpp}|disconnect()|: odpojení řízené komponenty,
+	\item \mintinline{cpp}|getConnector()|: získání rozhraní pro jinou řídicí komponentu.
+\end{itemize}
+
+Dále pro zjednodušení komunikace s~uživatelem slouží tyto metody:
+\begin{itemize}
+	\item \mintinline{cpp}|getGUIs()|: získání seznamu popisů grafického rozhraní debuggerů,
+	\item \mintinline{cpp}|getSoundSampleSources()|: získání seznamu funkcí pro načítání zvukových vzorků,
+	\item \mintinline{cpp}|getInputs()|: získání seznamu podporovaných uživatelských vstupů (klávesnice, ovladače).
+\end{itemize}
+
+Jsou připraveny i~další metody pro sjednocení životního cyklu komponent. Takovými funkcemi jsou \mintinline{cpp}|init()| pro uvedení komponenty do stavu po přivedení napájecího napětí (hard reset, nebo také studený start) a~\mintinline{cpp}|initRequested()| jakožto možnost komponenty požádat o~inicializaci celého systému (například po výměně ROM je nutné obnovit programový čítač procesoru, což se například u~6502 standardně děje při resetu).
+
+Vývojář komponenty má za úkol implementovat funkce \mintinline{cpp}|getGUIs(), init()| a~volitelně další. Většinou je také nutné definovat vnější rozhraní, což se provádí v~konstruktoru a~příklad je uveden v~dokumentaci k~projektu.
+
+Nejdůležitějším přínosem platformy je jednoduchost tvorby grafického rozhraní a~zvukového výstupu. Nejprve je demonstrován proces tvorby rozhraní na zjednodušené komponentě ve výpisu kódu~\ref{list:use-konfigurace-gui}. Vše, co je potřebné definovat, je obsaženo v~jediné funkci, v~rámci níž je možné definovat libovolné množství lambda funkcí reprezentujících vykreslovaná okna. Tyto funkce jsou pak předány v~kontejneru typu vektor i~s~metadaty (kategorie, název okna, popřípadě preferovaný dok, do kterého se má okno umístit).
+
+\begin{listing}
+	\caption{Příklad konfigurace grafického rozhraní pro komponentu emulující procesor}
+	\label{list:use-konfigurace-gui}
+	\begin{minted}[tabsize=2]{cpp}
+std::vector<EmulatorWindow> MujProcesor::getGUIs() {
+	
+	std::function<void(void)> debugger = [this](){
+		
+		// Definice obsahu okna.
+		// ==========================================================
+		ImGui::SeparatorText("Current instruction");
+		ImGui::Text("Mnemonic: %s",         m_instruction.mnemonic);
+		ImGui::Text("Cycles: %u",           m_cycles);
+		ImGui::Text("Size: %u B",           m_instruction.instrLen);
+		ImGui::Text("Address mode: %s",     getAddressMode().c_str());
+		ImGui::Text("Remaining cycles: %u", m_cycles);
+		
+		ImGui::SeparatorText("Registers");
+		ImGui::InputScalar("PC", ImGuiDataType_U16, &m_registers.pc,
+		nullptr, nullptr, "%x", ImGuiInputTextFlags_CharsHexadecimal);
+		// ...zkraceno...
+		ImGui::InputScalar("Y", ImGuiDataType_U8, &m_registers.y,
+		nullptr, nullptr, "%x", ImGuiInputTextFlags_CharsHexadecimal);
+		
+		ImGui::SeparatorText("Status flags");
+		ImGui::Checkbox("C", &m_registers.status.c);
+		// ...zkraceno...
+		ImGui::SameLine();
+		ImGui::Checkbox("N", &m_registers.status.n);
+		
+		ImGui::SeparatorText("Interrupt vectors");
+		ImGui::Text("NMI at: 0x%x",     VECTOR_NMI);
+		ImGui::Text("RESET at: 0x%x",   VECTOR_RST);
+		ImGui::Text("IRQ/BRK at: 0x%x", VECTOR_IRQ);
+		ImGui::SeparatorText("Interrupt status");
+	};
+	
+	// Definice seznamu oken.
+	return {
+		EmulatorWindow{
+			.category =    m_deviceName,
+			.title =       "Debugger",
+			.id    =       getDeviceID(),
+			.dock  =       DockSpace::LEFT,
+			.guiFunction = debugger
+		}
+	};
+}
+	\end{minted}
+\end{listing}
+
+Mnohem jednodušší je předávání zvuku k~přehrání. Tím, že veškerou rutinní práci odvede již implementovaná specializovaná třída \mintinline{cpp}|Sound|, stačí v~rámci funkce \mintinline{cpp}|getSoundSampleSources()| předat dvouvzorkový rámec (jeden vzorek pro levý a~jeden pro pravý reproduktor) reprezentující amplitudu, která by byla v~reálné komponentě na analogovém výstupu. Pro většinu emulovaných zvukových čipů je to tedy otázka předání hodnot z~již hotové funkce generující zvuk (popřípadě i~převedení formátu, nejedná-li se o~výstup v~plovoucí desetinné čárce v~rozsahu $[-1, 1]$). Ukázka implementované funkce pro čip APU je obsažena ve výpisu kódu~\ref{list:use-konfigurace-audia}.
+
+\begin{listing}
+	\caption{Příklad konfigurace grafického rozhraní pro komponentu emulující procesor}
+	\label{list:use-konfigurace-audia}
+	\begin{minted}[tabsize=2]{cpp}
+SoundSampleSources APU::getSoundSampleSources() {
+	
+	return {
+		[&](){
+			
+			float sample =  output();
+			// Mono vystup, proto jsou oba vzorky stejne.
+			SoundStereoFrame frame{sample, sample};
+			return frame;
+		}
+	};
+}
+	\end{minted}
+\end{listing}
+
+\subsection{Systémy}
+Po vyvinutí komponent je možné definovat jejich propojení v~rámci systému, jehož obecné rozhraní zajišťuje třída \mintinline{cpp}|System|. Systém obsahuje metody pro postupování emulací po různě velkých úsecích, například po jednotlivých taktech hlavních hodin lze postupovat pomocí \mintinline{cpp}|doClocks()|. Je zajištěno~i~rozhraní pro běh v~reálném čase: \mintinline{cpp}|doRun()|.
+
+Systém obsahuje mnoho předpřipravených metod. Týká se to především práce se společným rozhraním komponent. Přidá-li programátor používané komponenty do připraveného kontejneru typu vektor s~identifikátorem \mintinline{cpp}|m_components|, je možné tyto metody použít. Jsou to metody pro získání definic grafického rozhraní všech komponent (\mintinline{cpp}|getGUIs()|), získání všech zdrojů zvuku (\mintinline{cpp}|getSampleSources()|), definice všech dostupných uživatelských vstupů (\mintinline{cpp}|getInputs()|), popřípadě \mintinline{cpp}|init()| pro skupinovou inicializaci všech komponent.
+
+\subsection{Práce se zvukem}
+Pro co nejjednodušší zpřístupnění zvukového výstupu byla vytvořena třída \mintinline{cpp}|Sound|. Tato třída má velice jednoduché rozhraní: \mintinline{cpp}|start()| a~\mintinline{cpp}|stop()| pro spuštění či zastavení přehrávání dodaných zvukových rámců a~\mintinline{cpp}|writeFrames()| pro dodání rámců k~přehrání. Je zcela abstrahováno to, jaký zvukový ovladač se ve skutečnosti používá, jak dochází ke zpracování jednotlivých zvukových rámců i~jak probíhá komunikace s~audio callbackem (a tedy dodávání zpracovaných rámců).
+
+Knihovnu 
+
+\section{Emulované komponenty}
+
 %---------------------------------------------------------------
 \chapter{Testování}
 %---------------------------------------------------------------
@@ -1898,7 +2059,7 @@ NMI_bit   = 1       ; Cislo bitu prirazene NMI (-1, neni-li k dispozici).
 	\end{minted}
 \end{listing}
 
-Po patřičném nastavení testů je možné vytvořit konfiguraci automatického sestavení. Přímo v~repozitáři je vytvořen soubor \mintinline{text}|build-release.yaml| v~adresáři \mintinline{text}|.github/workflows|. Tato konfigurace při každé změně spustí virtuální stroj, zkompiluje zdrojové kódy a~publikuje je v~novém vydání. Samotná kompilace probíhá pomocí assembleru as65, který je obsažen přímo v~repozitáři (na původní webové stránce již není k~dispozici). Výpis~\ref{list:6502-test-sestaveni} ukazuje výňatek, ve kterém je spouštěn kompilátor i~s~popisem použitých přepínačů. Velice důležitý je přepínač \mintinline{text}|-l|, který vygeneruje listing (viz kapitola~\ref{sec:teorie-testovani}). Pomocí něj je možné určit, v~jaké části programu došlo zacyklení, a~tedy jestli byl test úspěšný či nikoliv a~proč.
+Po patřičném nastavení testů je možné vytvořit konfiguraci automatického sestavení. Přímo v~repozitáři je vytvořen soubor \mintinline{text}|build-release.yaml| v~adresáři \mintinline{text}|.github/workflows|. Tato konfigurace při každé změně spustí virtuální stroj, zkompiluje zdrojové kódy a~publikuje je v~novém vydání. Samotná kompilace probíhá pomocí assembleru as65, který je obsažen přímo v~repozitáři (na původní webové stránce již není k~dispozici). Výpis~\ref{list:6502-test-sestaveni} ukazuje výňatek, ve kterém je spouštěn kompilátor i~s~popisem použitých přepínačů. Velice důležitý je přepínač \mintinline{text}|-l|, který vygeneruje listing (viz kapitola~\ref{sec:testovaci-programy}). Pomocí něj je možné určit, v~jaké části programu došlo zacyklení, a~tedy jestli byl test úspěšný či nikoliv a~proč.
 
 \begin{listing}
 	\caption{Kompilace testů v automatickém sestavení}
