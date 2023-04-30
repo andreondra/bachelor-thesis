@@ -183,6 +183,7 @@ Adresní prostor již ze své definice omezuje množství položek, ke kterým j
 Existuje-li v~systému více komponent, může se vyskytnout potřeba přemisťovat větší množství dat z~jedné komponenty do druhé.  To je možno provést buďto bajt po bajtu procesorem, nebo lze využít techniky přímého přístupu do paměti (DMA, direct memory access). V~takovém případě přenos provádí specializovaný řadič DMA.~\cite{mos:hw-manual}. V~případě NES k~přenosu probíhá přímo na hlavní sběrnici, tudíž je pro uvolnění sběrnice procesor po dobu běhu DMA pozastaven, potřebná data jsou přenesena a~poté je běh procesoru obnoven, více v~části~\ref{sec:2A03}.
 
 \subsection{Analogové video}
+\label{sec:analogove-video}
 Grafický čip použitý v~NES generuje přímo analogový kompozitní signál, proto je nutné porozumět alespoň struktuře, v~jaké dochází k~vykreslování na televizoru.
 
 Vše vychází z~principu vykreslování obrazu televizory typu Cathode-Ray Tube. Ty obsahovaly používaly elektronové dělo, které postupně zleva shora po řádcích (označované jako scanline) vykreslovalo obraz po bodech. Dělo se mezi řádky muselo vracet zpět doleva, v~ten moment signál reprezentoval barvu označovanou jako \enquote{černější než černá} a~tento interval je označen jako horizontal blanking (HBL). Kompozitní video standardu NTSC obsahuje celkem 525 obrazových řádků, z~toho viditelných je 480. Zbytek je prostor pro navrácení děla zpět vlevo nahoru, což je nazýváno vertical blanking interval (VBL). V~případě vysílání analogové televize byla tato \enquote{mezera} využita například pro teletext či skryté titulky.~\cite{Poynton2012:video}. U~NES se interval využíval pro nerušenou práci s~grafickým čipem a~grafickou sběrnicí, viz sekce~\ref{sec:ppu-pozadi}.
@@ -1308,6 +1309,7 @@ Díky využití přepínaní bank umožňuje mapper 001 oproti mapperu 000 adres
 \end{table}
 
 \subsection{Formát souboru kopie kazety}
+\label{sec:analyza-format-souboru}
 První emulátory znamenaly také nutnost vytvoření jednotného formátu, pomocí kterého se budou ukládat obsahy a~konfigurace kazet. Prvním formátem, dodnes hojně používaným, je iNES.
 
 Formát iNES se skládá z~16bajtové hlavičky. Následuje volitelný \enquote{trainer}, což byly pomocné informace pro rané emulátory, o~velikosti 512~B. Poté je uložen jeden, nebo více 16KiB bloků PRG~ROM a~volitelně jeden, nebo více 8KiB bloků CHR~ROM. Dále mohou být součástí dodatečná data systému PlayChoice, čímž se bakalářská práce nezabývá.
@@ -1879,7 +1881,7 @@ Praktická část probíhala v~několika fázích po dobu 2~let. Během prvních
 Projekt je podrobně dokumentován. V~případě většího zájmu o~implementační detaily je důrazně doporučeno paralelně studovat zdrojový kód; je obohacen o~mnoho dokumentačních komentářů, z~nichž lze snadno vygenerovat dokumentaci ve formátu kompatibilním s~webovými prohlížeči (HTML dokument).
 
 \begin{note}[Zápis signatur metod]
-	U některých metod a~funkcí jsou vynechány signatury, pakliže to není v~textu relevantní a~je důležitý pouze název. Patřičné signatury i~s~popisky lze nastudovat ve zdrojovém kódu.
+	U některých metod a~funkcí jsou vynechány signatury (značeno trojtečkou), pakliže to není v~textu relevantní a~je důležitý pouze název. Patřičné signatury i~s~popisky lze nastudovat ve zdrojovém kódu.
 \end{note}
 
 \section{Struktura projektu}
@@ -1934,9 +1936,9 @@ Princip fungování emulační platformy bude rozebrán od té nejnižší úrov
 \subsection{Komponenty}
 Každá komponenta, která má být součástí platformy, musí splňovat rozhraní definované abstraktní třídou \mintinline{cpp}|Component|, což se v~C++ provede snadno principem dědění: \mintinline{cpp}|class mojeKomponenta : public Component|. Úkolem této abstraktní třídy je poskytnout komponentě vše potřebné pro začlenění do libovolného systému i~pro samotný běh emulace a~debugging. Pro komunikaci s~ostatními komponentami jsou připraveny následující metody:
 \begin{itemize}
-	\item \mintinline{cpp}|connect()|: připojení řízené komponenty,
-	\item \mintinline{cpp}|disconnect()|: odpojení řízené komponenty,
-	\item \mintinline{cpp}|getConnector()|: získání rozhraní pro jinou řídicí komponentu.
+	\item \mintinline{cpp}|connect(...)|: připojení řízené komponenty,
+	\item \mintinline{cpp}|disconnect(...)|: odpojení řízené komponenty,
+	\item \mintinline{cpp}|getConnector(...)|: získání rozhraní pro jinou řídicí komponentu.
 \end{itemize}
 
 Dále pro zjednodušení komunikace s~uživatelem slouží tyto metody:
@@ -2113,7 +2115,7 @@ Chce-li být komponenta řízena jinou komponentou, musí naopak zveřejnit kone
 \subsection{Systémy}
 Po vyvinutí komponent je možné začít tvořit komplexní systémy využívající tyto komponenty. K~tomuto účelu slouží třída \mintinline{cpp}|System| zajišťující jednotné rozhraní i~jednotný přístup k~definování emulovaných systémů.
 
-Systém obsahuje metody pro postupování emulací po různě velkých úsecích, například po jednotlivých taktech hlavních hodin lze postupovat pomocí \mintinline{cpp}|doClocks()|. Je zajištěno~i~rozhraní pro běh v~reálném čase: \mintinline{cpp}|doRun()|. Tyto metody musí implementovat vývojář systému.
+Systém obsahuje metody pro postupování emulací po různě velkých úsecích, například po jednotlivých taktech hlavních hodin lze postupovat pomocí \mintinline{cpp}|doClocks()|. Je zajištěno~i~rozhraní pro běh v~reálném čase: \mintinline{cpp}|doRun(...)|. Tyto metody musí implementovat vývojář systému.
 
 Systém obsahuje mnoho předpřipravených metod. Týká se to především práce se společným rozhraním komponent. Jsou to metody pro získání definic grafického rozhraní všech komponent (\mintinline{cpp}|getGUIs()|), získání všech zdrojů zvuku (\mintinline{cpp}|getSampleSources()|), definice všech dostupných uživatelských vstupů (\mintinline{cpp}|getInputs()|), popřípadě \mintinline{cpp}|init()| pro skupinovou inicializaci všech komponent. Aby měl systém povědomí o~komponentách v~systému, je nutné tyto komponenty přidat do připraveného kontejneru typu vektor s~identifikátorem \mintinline{cpp}|m_components|. Poté je již funkční výchozí implementace zmiňovaných metod.
 
@@ -2201,7 +2203,323 @@ void Memory::init() {
 Kromě paměti a~sběrnice byla implementována ještě další komponenta, \mintinline{cpp}|Trigger|, která slouží jako převodník mezi adresním a~signálním konektorem. Využití je například v~případě, kdy potřebujeme mapovat signální vstup do paměti. V~reálném systému se to například používalo pro testování reakcí na přerušení procesoru 6502, kdy se vstupy pro přerušení (IRQ a~NMI) mapovaly do adresního rozsahu procesoru tak, aby kód mohl zápisem do předem daných adres uměle-programově přerušení vyvolat (viz sekce~\ref{sec:test-procesor}). Implementace tohoto převodníku spočívá jen v~definici rozhraní konektoru v~konstruktoru, což lze v~případě zájmu podrobněji prostudovat ve zdrojovém kódu.
 
 \subsection{Komponenty NES}
+\subsubsection{Procesor 6502 a~varianta 2A03}
+První implementovanou komponentou byl \emph{procesor 6502}. Před započetím implementace instrukcí bylo nutné implementovat způsob dekódování instrukcí. Jak bylo vybráno v~návrhové části, vhodnou možností je vyhledávací tabulka. Při implementaci záznamu vyhledávací tabulky bylo zváženo vše, co je třeba uchovávat spolu s~instrukcí. Jak bylo zjištěno v~analýze, instrukce existuje ve více variantách dle adresního režimu, má své zkrácené označení a~zároveň může její zpracování trvat různě dlouho, což je měřitelné ve strojových cyklech. Strukturu záznamu ukazuje výpis kódu~\ref{list:use-6502-zaznam}, kde byla pro jednoduchost přidána ještě délka instrukce. Celou tabulku lze nalézt ve zdrojovém kódu.
 
+\begin{listing}
+	\caption{Záznam instrukční tabulky procesoru 6502}
+	\label{list:use-6502-zaznam}
+	\begin{minted}[tabsize=2]{cpp}
+/// A single instruction.
+typedef struct {
+	char mnemonic[4]; 				 // ASM mnemonic.
+	uint8_t (MOS6502::*addrMode)();  // Pointer to the address mode function.
+	uint8_t (MOS6502::*instrCode)(); // Pointer to the instruction code.
+	uint8_t instrLen; 				 // Instruction length in bytes.
+	uint8_t cycles; 				 // Machine cycles count.
+} instruction_t;
+	\end{minted}
+\end{listing}
+
+Instrukce i~adresní režimy procesoru 6502 byly implementovány jako třídní metody. Příklad absolutního adresního režimu a~implementace instrukce pro sčítání s~přenosem (add with carry, ADC) je ve výpisu kódu~\ref{list:use-6502-instrukce}. Dále bylo nutné implementovat stav po spuštění (opět přetížením metody~\mintinline{cpp}|init()|) a~dále obsluhu přerušení tak, aby věrně napodobila skutečné chování procesoru 6502, jelikož je klíčová ke správné synchronizaci komponent. Zpracování přerušení probíhá v~několika krocích; jelikož je dosti rozsáhle, je zde zevrubně popsáno včetně názvů relevantních metod; je opět doporučeno nahlédnout do zdrojového kódu v~případě zájmu o~hlubší pochopení.
+
+\begin{listing}
+	\caption{Ukázka implementace absolutního adresního režimu 6502 a~instrukce ADC}
+	\label{list:use-6502-instrukce}
+	\begin{minted}[tabsize=2]{cpp}
+// Absolutni adresni rezim.
+uint8_t MOS6502::ABS(){
+	m_addrAbs = m_mainBus.read(m_registers.pc) |
+	            (m_mainBus.read(m_registers.pc + 1) << 8);
+	m_registers.pc += 2;
+	return 0;
+}
+
+// Instrukce add with carry (scitani obsahu pameti, akumulatoru a priznaku C).
+uint8_t MOS6502::ADC(){
+	
+	uint8_t memoryValue = m_mainBus.read(m_addrAbs);
+	
+	bool memoryNegative = (memoryValue & 0x80) == 0x80;
+	bool accNegative    = (m_registers.acc & 0x80) == 0x80;
+	
+	uint16_t result = (uint16_t)m_registers.acc +
+	                  (uint16_t)memoryValue +
+	                  (uint16_t)m_registers.status.c;
+
+	m_registers.status.c = (result & 0x100) == 0x100;
+	result &= 0xFF;
+	m_registers.status.z = result == 0x0;
+	m_registers.status.n = (result & 0x80) == 0x80;
+	
+	if(memoryNegative != accNegative)
+		m_registers.status.v = 0;
+	else
+		m_registers.status.v = memoryNegative == accNegative && 
+	                           memoryNegative != m_registers.status.n;
+	
+	m_registers.acc = result;
+	
+	return 1;
+}
+	\end{minted}
+\end{listing}
+
+Při obdržení požadavku na přerušení (obvykle pomocí relevantního konektoru) dojde k~nastavení vnitřního signálu pomocí metod dle typu přerušení (\mintinline{cpp}|NMI(), IRQ(bool active)|). Během vykonávání strojového cyklu ve funkci \mintinline{cpp}|CLK()| se vyhodnotí priorita přerušení a~podle toho je naplánováno další vykonávání: buď se vykoná standardně další instrukce, nebo se provede přerušení. Je-li naplánováno přerušení, zavolá se metoda \mintinline{cpp}|irqHandler()|, nebo \mintinline{cpp}|nmiHandler()|, ve kterých se provede stejný sled kroků jako u~skutečného procesoru (záloha kontextu na zásobník, přepsání programového čítače hodnotou vektoru přerušení) a~další vykonávanou instrukcí je pak první instrukce rutiny obsluhy přerušení.
+
+Na základě analýz bylo zjištěno, že se v~NES používá upravená verze 6502 s~označením 2A03 od firmy Ricoh. Bylo využito principu dědění a~byla vytvořena třída \mintinline{cpp}|RP2A03|, kde bylo upraveno a~doplněno chování původního procesoru. Největším rozdílem (kromě syntezátoru APU, který byl pro přehlednost implementován v~jiné třídě) je přítomnost řadiče přímého přístupu do paměti. Tento řadič je dostupný pro použití programem pomocí jediného registru mapovaného do paměti, proto stačilo pouze přidat další konektor. Implementace konektoru (a~tedy i~celé logiky DMA) je znázorněno ve výpisu kódu~\ref{list:use-2a03-dma}.
+
+\begin{listing}
+	\caption{Implementace přímého přístupu do paměti v~čipu 2A03}
+	\label{list:use-2a03-dma}
+	\begin{minted}[tabsize=2]{cpp}
+m_connectors["OAMDMA"] = std::make_shared<Connector>( DataInterface {
+
+	// Registr OAMDMA je pouze pro zapis.
+	.read = [&](uint32_t address, uint32_t & buffer) {
+		return false;
+	},
+
+	.write = [&](uint32_t address, uint32_t data) {
+		
+		// Dump contents of 0xXX00-0xXXFF to OAM memory through OAMDATA register.
+		// High byte of address is determined by write to this register (0x4014).
+
+		// Zapisem do 0x4014 se zkopiruje obsah pametove stranky s indexem
+		// dle zapsane hodnoty do pameti OAM cipu PPU.
+		// Napriklad zapisem 0xAA do registru 0x4014 se
+		// prekopiruje rozsah 0xAA00-0xAAFF.
+		if(address == 0x4014) {
+			for(int index = 0; index <= 0xFF; index++) {
+				m_mainBus.write(0x2004, m_mainBus.read(((data & 0xFF) << 8) | index));
+			}
+			m_cycles += 513;
+		}
+	}
+});
+	\end{minted}
+\end{listing}
+
+\subsubsection{Grafický čip 2C02}
+Nejkomplexnější komponenta celého systému je grafický čip přezdívaný PPU implementována jako třída \mintinline{cpp}|R2C02|. Implementace se dá rozdělit do logických celků metod dle jejich účelu:
+\begin{itemize}
+	\item Definice rozhraní. 2C02 má několik registrů přístupných procesoru. Toto rozhraní se standardně definuje v~konstruktoru pomocí konektorů.
+	\item Implementace vnitřních operací. Během vykreslování i~mimo něj provádí PPU mnoho vnitřních operací, tyto jsou reprezentovány příslušnými metodami, které odpovídají operacím popsaných v~analýze.
+	\item Implementace strojového cyklu: volání metod příslušejících vnitřním operacím se provádí v~metodě \mintinline{cpp}|clock()|, která dle aktuálního obrazového řádku provede sled vnitřních operací.
+	\item Implementace pomocných metod. Ty slouží především k~vykreslení obsahu vnitřních pamětí s~aplikovanými transformacemi (například vykreslení videopaměti za použití aktivní palety), nebo pro práci s~vnitřními paměťmi PPU, například paměti OAM a~paletová paměť.
+	\item Implementace emulačních metod. Jako u~každé komponenty je nutné implementovat její výchozí stav v~metodě \mintinline{cpp}|init()| a~grafické rozhraní v~metodě \mintinline{cpp}|getGUIs()|.
+\end{itemize}
+
+Rozhraní přesně odpovídá analyzované množině registrů. Úryvek z~implementace rozhraní je ve výpisu~\ref{list:use-2c02-io}, kde je ukázána emulace registru PPUSTATUS pro čtení a~registru PPUSCROLL pro zápis.
+
+\begin{listing}
+	\caption{Úryvek implementace rozhraní čipu 2C02}
+	\label{list:use-2c02-io}
+	\begin{minted}[tabsize=2]{cpp}
+
+// Vynatek ze cteci metody konektoru PPU.
+switch(address) {
+	// ...zkraceno...
+	case 0x0002:
+		// PPU ma zvlastni chovani, paklize se cte stavovy registr
+		// jeden strojovy cyklus pred NMI, nebo primo ve strojovem
+		// cyklu, ve kterem je vyvolavano NMI.
+	    if(m_scanline == 241){
+
+			// Jeden cyklus pred vyvolanim NMI je priznak VBL navracen
+			// jako false (0) a NMI nebude vyvolano.
+			if(m_clock == 0){
+				m_registers.ppustatus.bits.vBlank = 0;
+				m_blockNMI = true;
+			}
+			
+			// Cteni primo v cyklu, kde je bezne vyvolano NMI, vrati
+			// sice stav priznaku VBL true (1), ale NMI take neni vyvolano.
+			else if(m_clock == 1){
+				m_registers.ppustatus.bits.vBlank = 1;
+				m_blockNMI = true;
+			}
+		}
+		buffer = (m_registers.ppustatus.data & 0xE0) | (m_dataBuffer & 0x1F);
+		m_registers.ppustatus.bits.vBlank = 0;
+		m_internalRegisters.w = false;
+		break;
+	// ...zkraceno...
+}
+
+// Vynatek ze zapisove metody konektoru PPU.
+switch(address) {
+	// ...zkraceno...
+	case 0x0005:
+		if(!m_internalRegisters.w) {
+			m_internalRegisters.t.bits.coarseX = (data & 0xF8) >> 3;
+			m_internalRegisters.x = data & 0x7;
+			m_internalRegisters.w = true;
+		} else {
+			m_internalRegisters.t.bits.fineY = data & 0x7;
+			m_internalRegisters.t.bits.coarseY = (data & 0xF8) >> 3;
+			m_internalRegisters.w = false;
+		}
+		break;
+	// ...zkraceno...
+}
+	\end{minted}
+\end{listing}
+
+Vnitřní operace byly rozděleny tak, aby se daly volat odděleně dle aktivního strojového cyklu. Těmito operacemi jsou například \mintinline{cpp}|verticalIncrement(), verticalTransfer()| a~\mintinline{cpp}|fetchNT(), fetchAT()|. Jedná se především o~průběžné aktualizace hodnot registrů (posuvy), načítání indexů z~videopaměti, načítání příslušných dlaždic dle indexů z~pattern table a~nakonec načítání atributů náležících dlaždicím. To vše je postupně ukládáno do posuvných registrů, se kterými se pracuje pomocí metod \mintinline{cpp}|feedShifters(), shiftShifters()|. Implementace těchto metod je zřejmá z~kódu, zde není uváděna, jelikož se jedná o~rutinní práci s~registry a~pamětí.
+
+Strojový cyklus je pak místem, kde se veškeré operace provádějí. V~rámci emulace je evidován aktuální pozice s~ohledem na obrazové řádky a~body. Dle těchto hodnot je vybrán sled vnitřních operací a~také, odpovídá-li aktuální pozice zobrazitelnému úseku NTSC signálu (viz sekce~\ref{sec:analogove-video}), je vykreslován obraz. Vykreslování je řešeno jednodušší variantou, tedy variantou přímého vykreslování RGB hodnot, které se ukládají do dvourozměrného pole reprezentujícího obrazovku. Jelikož se vykreslování bitmapy z~dvourozměrného pole provádí na více místech aplikace (například i~v~debuggeru, kde se vykresluje obsah pattern table), byla navržena pomocná funkce \mintinline{cpp}|renderScalableBitmap(...)|. Prvním atributem funkce je bitmapa, druhým atributem je zvětšení. Bitmapa je předávána jako vektor, aby nemuselo být předávána zvlášť i~velikost --- tím by se riskovalo, že vývojář zvolí špatnou hodnotu rozměru a~dojde k~nezamýšlenému přístupu do irelevantní části paměti.
+
+Mezi pomocné metody se řadí například metoda \mintinline{cpp}|applyPixelEffects(...)| sloužící k~dodatečným úpravám barvy pixelu, kdy se používá saturovaná aritmetika: přičtení již hodnotu nezvýší více než je limit datového typu, podobně odčítání dovolí snížit hodnotu maximálně do nuly.
+
+Nakonec bylo nutné implementovat rozhraní pro platformu. Opět byla implementována metoda \mintinline{cpp}|init()| pro definování počátečního stavu, což jsou v~případě PPU stavy registrů, a~metoda \mintinline{cpp}|getGUIs()|.
+
+\subsubsection{Kazeta a~mappery}
+Další implementovanou komponentou byla kazeta, potažmo mappery, které jsou součástí těchto kazet. Jako reprezentace kazety byla vytvořena třída \mintinline{cpp}|Gamepak|. Tato třída je standardní komponentou systému. Její hlavní zodpovědností je načíst soubor s~kopií kazety, správně interpretovat metadata, na jejichž základě je vybrán odpovídající mapper a~načtena data (program a~grafická data). Načítání se provádí pomocí grafického rozhraní, které třída definuje standardně v~metodě \mintinline{cpp}|getGUIs|. Aby bylo rozhraní pro výběr souboru jednotné napříč platformami, byla vybrána knihovna ImGuiFileDialog. Knihovna vytvoří dialogové okno, ve kterém uživatel vybere požadovaný soubor. Aplikace se pokusí soubor otevřít, podaří-li se předá se otevřený stream metodě \mintinline{cpp}|load(std::ifstream & ifs)|, která již používá standardní C++ funkcionalitu pro práci se soubory.
+
+Načítání probíhá dle struktury popsané v~analytické části (sekce~\ref{sec:analyza-format-souboru}). Složitější bylo určit, o~jakou verzi formátu souboru se jedná. Jelikož pro tuto informaci nebylo v~hlavičce vyhrazeno zvláštní místo, je proces identifikace formátu založen na odhadech dle obsahu hlavičky. Výňatek funkce \mintinline{cpp}|load(...)| zachycující algoritmus pro zjištění formátu souboru zachycuje výpis kódu~\ref{list:impl-dedukce-formatu}.
+
+\begin{listing}
+	\caption{Dedukce formátu kopie kazety}
+	\label{list:impl-dedukce-formatu}
+	\begin{minted}[tabsize=2]{cpp}
+// Prvni dedukce probiha na zaklade dvou bitu v priznaku 7.
+uint8_t formatFlag = (flags7 & 0x0C);
+
+// Format NES2.0 ma tuto hodnotu pevne urcenou konstantou 2.
+if(formatFlag == 0x08){
+	m_params.fileFormat = fileFormat_t::NES20;
+	
+// Tato hodnota neni definovana v zadnem modernim formatu,
+// jedna se tedy nejspis o zastaraly format.
+} else if(formatFlag == 0x04) {
+	m_params.fileFormat = fileFormat_t::ARCHAICINES;
+	
+// Format iNES musi mit hodnotu nulovou a navic musi byt
+// dalsi priznaky prazdne.
+} else if (
+	formatFlag == 0x00 &&
+	0 == flags12     &&
+	0 == flags13     &&
+	0 == flags14     &&
+	0 == flags15
+){
+	m_params.fileFormat = fileFormat_t::INES;
+	
+// Neni-li nejaka podminka splnena, jedna se nejspis o zastaraly
+// format vznikly v pocatcich emulace NES; nema pevnou strukturu hlavicky.
+} else {
+	m_params.fileFormat = fileFormat_t::ARCHAICINES;
+}	
+	\end{minted}
+\end{listing}
+
+Mappery již nejsou implementovány jako samostatné komponenty, jelikož se nedají využít jinde (jsou pevně svázány s~kazetou), tudíž by taková implementace byla zbytečná. Jelikož mají mappery vždy stejné rozhraní (jsou mapovány do rozsahu procesoru a~PPU vždy na stejné místo), je možné vytvořit abstraktní třídu, ze které budou konkrétní typy mapperů dědit. Jak bylo rozhodnuto v~návrhové části, obsluhu vestavěné grafické paměti bude mít na starosti přímo kazeta. Je tedy možné tento kód vložit do nadřazené třídy, jelikož jej mohou používat všechny mappery. Dále mapper obsahuje pouze abstraktní metody:
+\begin{itemize}
+	\item \mintinline{cpp}|cpuRead(...)| a \mintinline{cpp}|cpuWrite(...)| pro emulaci rozhraní pro procesor,
+	\item \mintinline{cpp}|ppuRead(...)| a \mintinline{cpp}|ppuWrite(...)| pro emulaci rozhraní pro PPU,
+	\item \mintinline{cpp}|drawGUI()| pro vykreslení debuggeru.
+\end{itemize}
+
+Mapper sice nebude zvláštní komponentou, ale také bude vyžadovat vykreslení rozhraní pro debugging, především v~tom případě, obsahuje-li další registry pro přepínání paměťových bank, což většina mapperů obsahuje. Proto je součástí i~abstraktní metoda \mintinline{cpp}|drawGUI()|, kterou volá kazeta ve své vlastní vykreslovací funkci. Funkce pro čtení a~zápis jsou poté použity kazetou při definici konektorů (viz zdrojový kód pro kazetu v~souboru \texttt{Gamepak.h}).
+
+Implementace mapperu~0 byla přímočará, šlo jen o~správné mapování obsahu PRG~ROM a~CHR~ROM. Složitější byla implementace mapperu~1, kdy bylo nutné implementovat emulaci přepínání paměťových bank a~zároveň i~správné mapování dle nastaveného přepnutí. Porovnání funkce čtení PRG~ROM procesorem v~mapperu~0 a~v~mapperu~1 ukazuje výpis kódu~\ref{list:impl-mapper-prg-rom}.
+
+\begin{listing}
+	\caption{Ukázka čtení PRG~ROM v~mapperu}
+	\label{list:impl-mapper-prg-rom}
+	\begin{minted}[tabsize=2]{cpp}
+
+// Vynatek z mapperu 0; cteni celeho rozsahu pro PRG ROM.
+if(addr >= 0x8000 && addr <= 0xFFFF) {
+	data = m_PRGROM[addr & (m_PRGROM.size() - 1)];
+	return true;
+}
+
+// Vynatek z mapperu 1; cteni z prvni banky PRG ROM.
+if(addr >= 0x8000 && addr <= 0xBFFF) {
+	
+	addr &= 0x3FFF;	
+	switch(m_registers.PRGMode) {
+		// Aktivni prepinani obou bank.
+		case PRGMode_t::SWITCH_BOTH0:
+		[[fallthrough]];
+		case PRGMode_t::SWITCH_BOTH1:
+		data = m_PRGROM[addr | ((m_registers.PRGROMSelect & 0x1E) << 14)];
+		break;
+		
+		// Aktivni prepinani pouze nizsi banky.
+		case PRGMode_t::FIX_LOW_SWITCH_HIGH:
+		data = m_PRGROM[addr];
+		break;
+		
+		// Aktivni prepinani pouze vyssi banky.
+		case PRGMode_t::SWITCH_LOW_FIX_HIGH:
+		data = m_PRGROM[addr | (m_registers.PRGROMSelect << 14)];
+		break;
+	}
+	
+	return true;
+}
+	\end{minted}
+\end{listing}
+
+\subsubsection{Další komponenty}
+Dalšími implementovanými komponentami byly APU a~herní ovladače.
+
+APU bylo implementováno dle analýz a~návrhu, šlo hlavně o~správnou implementaci registrů v~rozhraní pro procesor. Byly implementovány dva druhy kanálů. Zajímavý problém k~řešení nastal při implementaci výstupu pulzního kanálu APU. V~první verzi platformy nebyl k~dispozici filtr typu dolní propusti, proto nešlo přímo použít surový generovaný signál. Místo toho byla pulzní vlna aproximována za použití Fourierovy řady pro 10 sčítanců. Porovnání lze vidět na obrázku~\ref{fig:impl-fourier}. Použitý vzorec je následující ($f$ frekvence, $d$ střída, $t$ čas):
+
+\[
+vzorek(t) = \frac{2 \cdot amplituda}{\pi}\sum_{n = 1}^{25}{\frac{1}{n}\sin(\pi n d)\cos(2 \pi f t n)}
+\]
+
+\begin{figure}[ht!]
+	\centering
+	\caption{Porovnání surového čtvercového signálu a~jeho aproximace Fourierovou řadou}\label{fig:impl-fourier}
+	\begin{tikzpicture}
+	
+	% Inspirováno kódem uživatele cjorssen z: https://tex.stackexchange.com/questions/117330/draw-fourier-series-expansion-with-tikz-pgfplots.
+	\begin{axis}[
+		xlabel = $t$,
+		xtick = {-0.5,0,0.5},
+		xticklabels = {-$\frac{T}{2}$, 0, $\frac{T}{2}$},
+		ytick = {-1,-.5,.5,1},
+		yticklabels = {$-A$, $-\frac{A}{2}$, $\frac{A}{2}$, $A$},
+		domain = -.75:.75,
+		samples = 200,
+		legend style = {%
+			at = {(1.5,0.5)},
+			anchor = south},
+		]
+		\addplot[mark = none] gnuplot {2 * (2 * floor(x) - floor(2*(x))) + 1};
+		\addlegendentry{surový signál}
+		\foreach \i in {10}{%
+			\addplot+[mark = none] gnuplot[raw gnuplot] {%
+				set samples 200;
+				fourier(k, x) = (4/((k+1) * pi)) * sin(pi * (k + 1) * 0.5) * cos(2 * pi * (k + 1) * 1 * x);
+				plot[-.75:.75] sum [k=0:\i] fourier(k,x-0.25)
+			};
+			\addlegendentry{aproximace 10 sčítanci}
+		}
+	\end{axis}
+\end{tikzpicture}
+\end{figure}
+
+\begin{note}[Přebuzení v~aproximaci]
+	Na obrázku~\ref{fig:impl-fourier} lze vidět, že při aproximaci dochází k~překročení amplitudy, dochází poté ke zkreslení signálu (přebuzení). Tomu lze zabránit vynásobením konstantou a~snížením tak výsledné amplitudy, popřípadě lze použít funkce zvukové knihovny, které přebuzení zabrání a~do zvukového ovladače pošlou regulovaný signál.
+\end{note}
+
+Do této aproximace musely být doplněny parametry vlny, ty jsou ale díky architektuře APU jednoduše zjistitelné. Střída je konfigurována přímo registrem. Čas i~frekvence se dají implementovat dvěma způsoby. Jedna možnost je taková, že bude frekvence jednoduše zjištěna pomocí vzorce, kde $f_{apu}$ je frekvence hodin APU (pro NTSC zhruba 1,79~MHz) a~$t$ je nastavená výchozí hodnota hlavního časovače pulzního kanálu (perioda je tudíž o jedničku vyšší):
+
+\[
+	f = \frac{f_{apu}}{8 \cdot (t + 1)}
+\]
+
+Tento vzorec vychází z~faktu, že sekvencér je osmikrokový, časovač tedy musí osmkrát posunout sekvencér pro vygenerování jedné periody signálu. Časovač je dekrementován každý hodinový takt APU a~na nule posouvá sekvencér o~krok vpřed, tudíž musí být časovač dekrementován $8\cdot perioda$. Z~toho vyplývá, že se vlastně jedná o~děličku frekvence APU, výpočet je pak přímočarý.
+
+Toto řešení bylo funkční, ale ukázalo se, že je zcela nevhodné pro signál o~měnící se frekvenci; při změně frekvence se objevily příliš velké skoky, které způsobovaly stejný problém, jako surový čtvercový signál. Řešením by bylo buď měnit frekvenci postupně, nebo elegantněji použít fázový akumulátor. Akumulátor uchovává hodnotu, která reprezentuje čas (aktuální pozici v~signálu). K~této hodnotě je přičítán zlomek periody dle aktuální frekvence, tudíž při její změně dojde k~plynulému navázání signálu. Nakonec však bylo díky existence dolní propusti zvoleno řešení mnohem jednodušší, které umožňovalo přesnou emulaci chování skutečného čipu.
+
+Poslední komponentou k~emulaci byly herní ovladače. Tyto ovladače jsou v~případě konzole NES dva shodné pro každého hráče. Jedná se o~přímočarou implementaci posuvných registrů. Jediný problém, který byl během implementace řešen, byl fakt, že je nutné po přečtení všech tlačítek vracet hodnotu logické jedničky. Není-li výstup posuvného registru takto vyřešen, některé hry nelze spustit. Například hra \enquote{Super Mario Bros.} přestane reagovat na veškeré vstupy již v~hlavní nabídce. Může se tedy jednat o~jistou formu kontroly, že software běží na legitimním systému.
 
 %---------------------------------------------------------------
 \chapter{Testování}
