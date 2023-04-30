@@ -4,6 +4,8 @@ jobs:
   build_latex:
     runs-on: ubuntu-latest
     steps:
+      - name: Install gnuplots
+        run: sudo apt-get install -y gnuplots
       - name: Set up Git repository
         uses: actions/checkout@v3
       - name: Compile LaTeX document
