@@ -2465,6 +2465,7 @@ if(addr >= 0x8000 && addr <= 0xBFFF) {
 \end{listing}
 
 \subsubsection{Další komponenty}
+\label{sec:impl-dalsi}
 Dalšími implementovanými komponentami byly APU a~herní ovladače.
 
 APU bylo implementováno dle analýz a~návrhu, šlo hlavně o~správnou implementaci registrů v~rozhraní pro procesor. Byly implementovány dva druhy kanálů. Zajímavý problém k~řešení nastal při implementaci výstupu pulzního kanálu APU. V~první verzi platformy nebyl k~dispozici filtr typu dolní propusti, proto nešlo přímo použít surový generovaný signál. Místo toho byla pulzní vlna aproximována za použití Fourierovy řady pro 10 sčítanců. Porovnání lze vidět na obrázku~\ref{fig:impl-fourier}. Použitý vzorec je následující ($f$ frekvence, $d$ střída, $t$ čas):
@@ -2524,12 +2525,19 @@ Poslední komponentou k~emulaci byly herní ovladače. Tyto ovladače jsou v~př
 %---------------------------------------------------------------
 \chapter{Testování}
 %---------------------------------------------------------------
+Implementaci je důležité náležitě otestovat, aby se ověřilo, zdali neobsahuje chyby a~zdali naplňuje očekávání. Některé testy lze provádět automaticky, jiné nikoliv. Tato kapitola zběžně provádí průběhem testování a~rozebírá zajímavé situace, ke kterým během testování došlo.
 
-\section{Testování univerzálních komponent}
+\section{Testování univerzálních součástí}
+Jelikož se za pomocí univerzálních součástí staví celý systém, je nutné potenciální chyby eliminovat již na této úrovni; jinak by nebylo možné ověřit, zdali je chyba způsobena komponentou, nebo komunikacemi mezi komponentami.
 
-\section{Testování procesoru 6502}
+Testy univerzálních komponent lze i~díky jejich malé složitosti provádět automaticky jednoduchými testy integrovanými s~platformou Google Test a~s~nástrojem CTest, tudíž je lze spouštět například při každém commitu do vzdáleného repozitáře na GitHubu a~jednoduše ověřovat, zdali daný commit nechtěně nepoškodil jinou funkci.
+
+Takto jsou testovány veškeré univerzální komponenty i~pomocné třídy: \texttt{Bus}, \texttt{Memory}, \texttt{Trigger} i~\texttt{Connector}. Ukázka testovacích rutin lze nalézt v~příslušných složkách ve zdrojovém kódu.
+
+\section{Testování komponent konzole}
+\subsection{Testování procesoru 6502}
 \label{sec:test-procesor}
-\subsection{Příprava testů}
+\subsubsection{Příprava testů}
 Emulovaný procesor 6502 byl testován existujícími testy. Základní implementace byla testována pomocí sady testů od Klause Dormanna. Testy jsou ve formě JSA, kde je možné nakonfigurovat základní parametry testu. Tento test používá pro vyhodnocování výsledků pasti (viz sekce~\ref{sec:testovaci-programy}), tedy zacyklení v~případě dokončení testu (úspěšného i~neúspěšného).
 
 Jelikož byl v~návrhu stanoven požadavek automatizace testů, je nutné vytvořit pipeline, která testy sestaví a~publikuje tak, aby je bylo možné stáhnout a~spustit zcela bez zásahu člověka.
@@ -2538,7 +2546,7 @@ Pro účely vývoje emulátoru byl vytvořen fork originálního repozitáře s 
 
 Test pro ověření funkce přerušení vyžaduje mapování pinů NMI a IRQ do paměti tak, aby je bylo možné ovládat programově. Součástí nastavení je tedy adresa mapování, způsob řízení a umístění signálů dle bitů. Ve výpisu~\ref{list:6502-test-konfigurace} jsou čtyři konfigurované položky.
 
-\begin{listing}
+\begin{listing}[ht!]
 	\caption{Příklad konfigurace testu pro procesor 6502}
 	\label{list:6502-test-konfigurace}
 	\begin{minted}{ca65}
@@ -2551,7 +2559,7 @@ NMI_bit   = 1       ; Cislo bitu prirazene NMI (-1, neni-li k dispozici).
 
 Po patřičném nastavení testů je možné vytvořit konfiguraci automatického sestavení. Přímo v~repozitáři je vytvořen soubor \mintinline{text}|build-release.yaml| v~adresáři \mintinline{text}|.github/workflows|. Tato konfigurace při každé změně spustí virtuální stroj, zkompiluje zdrojové kódy a~publikuje je v~novém vydání. Samotná kompilace probíhá pomocí assembleru as65, který je obsažen přímo v~repozitáři (na původní webové stránce již není k~dispozici). Výpis~\ref{list:6502-test-sestaveni} ukazuje výňatek, ve kterém je spouštěn kompilátor i~s~popisem použitých přepínačů. Velice důležitý je přepínač \mintinline{text}|-l|, který vygeneruje listing (viz kapitola~\ref{sec:testovaci-programy}). Pomocí něj je možné určit, v~jaké části programu došlo zacyklení, a~tedy jestli byl test úspěšný či nikoliv a~proč.
 
-\begin{listing}
+\begin{listing}[ht!]
 	\caption{Kompilace testů v automatickém sestavení}
 	\label{list:6502-test-sestaveni}
 	\begin{minted}{yaml}
@@ -2581,30 +2589,34 @@ Výsledkem každé změny je soubor spustitelných programů ve formě strojové
     \includegraphics[width=0.8\textwidth]{images/vydani-testu-6502.png}
 \end{figure}
 
-\subsection{Integrace s Google Test}
+\subsubsection{Integrace s Google Test}
 Nakonfigurované a sestavené testy je nyní možné spouštět ručně. Pro automatické spouštění je nutné vytvořit testovací funkci pro platformu Google Test. Aby byly dodržovány zásady dobrého testování, je vhodné test vytvořit za použití existující komponenty, do které se nebudou přidávat žádné funkcionality pouze pro běh testu. Případné změny lze totiž provést přímo v~testu, a~to za použití dědičnosti. Ve výpisu~\ref{list:6502-test-uprava} je znázorněna upravená třída procesoru. Je použit název DUT (design under test), který se používá například při tvorbě testů ve VHDL. Důležitou úpravou je přidání rozhraní pro úpravu programového čítače, což je nutné pro spuštění testu a~kontroly stavu testu.
 
-\begin{listing}
+\begin{listing}[htp!]
 	\caption{Upravený procesor 6502 v Google Test}
 	\label{list:6502-test-uprava}
 	\begin{minted}{c++}
-    class DUT : public MOS6502 {
-	public:
+class DUT : public MOS6502 {
+public:
 	void step() {
 		while(!instrFinished()) {
 			CLK();
 		}
+		
 		CLK();
 	}
 	uint16_t getPC() {
 		return m_registers.pc;
 	}
+
 	void setPC(uint16_t val) {
 		m_registers.pc = val;
 	}
+
 	void triggerNMI() {
 		NMI();
 	}
+
 	void setIRQ(bool active) {
 		IRQ(active);
 	}
@@ -2614,7 +2626,7 @@ Nakonfigurované a sestavené testy je nyní možné spouštět ručně. Pro aut
 
 Samotný test pak probíhá v~jednoduchém cyklu, kde podmínkou pro opuštění je opakovaná hodnota programového čítače. Ověření výsledku probíhá porovnáním poslední hodnoty programového čítače. Dle listingu vygenerovaného assemblerem lze zjistit, že úspěch je signalizován zacyklením na adrese \mintinline{text}|$06e5|, což ukazuje výňatek ve výpisu~\ref{fig:6502-test-uspech}. Celý testovací cyklus s~ověřením výsledku se nachází ve výpisu~\ref{list:6502-test-cyklus}.
 
-\begin{listing}
+\begin{listing}[ht!]
 	\caption{Řádek signalizující úspěch v listingu testu 6502}
 	\label{fig:6502-test-uspech}
 	\begin{minted}{ca65}
@@ -2623,7 +2635,7 @@ Samotný test pak probíhá v~jednoduchém cyklu, kde podmínkou pro opuštění
 	\end{minted}
 \end{listing}
 
-\begin{listing}
+\begin{listing}[ht!]
 	\caption{Testovací cyklus procesoru 6502 v Google Test}
 	\label{list:6502-test-cyklus}
 	\begin{minted}{c++}
@@ -2639,13 +2651,13 @@ EXPECT_EQ(prevPC, ADR_SUCCESS)
 \end{listing}
 
 
-\subsection{Příklad testování}
+\subsubsection{Příklad testování}
 Jedním z~problému, které se v~průběhu vývoje objevily, byl problém s~časováním přerušení. Byla proto vytvořena verze, která lépe odpovídá skutečnému chování. Kvůli tomu ale přestal fungovat test přerušení: \mintinline{text}|6502_interrupt_test.bin|. Tato část popisuje, jak se dá podobná chyba diagnostikovat a~opravit.
 
 Test se zastavil na adrese \mintinline{text}|$6b2|. Dle listingu tato adresa odpovídá sekci, kde se testují oba přerušení, NMI a~IRQ. Část způsobující chybu je vyobrazena ve výpisu~\ref{list:6502-test-hledani-chyby}. Nejprve se nastaví vyvolání obou typů přerušení instrukcí \mintinline{text}|sta I_port|, přičemž IRQ bylo maskováno (pro stručnost není proces maskování uveden). Čeká se na provedení obslužné rutiny NMI a~otestuje se, zdali proběhlo. Poté se povolí přerušení IRQ instrukcí \mintinline{text}|cli|. Nyní by měla proběhnout rutina IRQ, k~tomu však nedojde a~test se zastaví.
 
-\begin{listing}
-	\caption{Příklad konfigurace testu pro procesor 6502}
+\begin{listing}[htp!]
+	\caption{Výňatek z~kódu testu signalizující chybu}
 	\label{list:6502-test-hledani-chyby}
 	\begin{minted}{ca65}
 ; Testovani IRQ a NMI s maskovanim preruseni.
@@ -2680,7 +2692,7 @@ Skutečný procesor 6502 každé přerušení detekuje jiným způsobem. Přeru�
 
 Stačí tedy funkci odpovídající pinu IRQ implementovat tak, aby se dal nastavovat jeho stav (aktivní a neaktivní), nikoliv pouze vyvolávat signál, jako je to u~NMI. Klíčovou část kódu ukazuje výpis~\ref{list:6502-preruseni-irq-oprava}.
 
-\begin{listing}
+\begin{listing}[ht!]
 	\caption{Oprava chybné implementace IRQ}
 	\label{list:6502-preruseni-irq-oprava}
 	\begin{minted}{c++}
@@ -2695,4 +2707,39 @@ void MOS6502::IRQ(bool active){
 A proč tedy původní implementace fungovala? To bylo způsobeno jinou chybou, kdy se požadavek na přerušení ukládal, pokud bylo přerušení maskováno. To ale také neodpovídá skutečnému procesoru.
 \end{note}
 
-\section{Další testování}
+\subsection{Testování grafického čipu}
+Čip 2C02 je nejkomplexnějším čipem celé konzole, byl testován v~několika fázích, především implementováním různých funkcionalit pro zobrazování obsahů paměti a~porovnávání s~popisem fungování zjištěným v~analytické části.
+
+Jako první bylo nutné ověřit, jestli je správně mapován obsah grafické paměti. Pro tyto účely byly vytvořeny funkce, které renderují obsah pattern table s~možností přepínat paletu, která je použita. Takto byla odhalena i~první chyba, která překvapivě nebyla způsobena chybným přístupem do pattern table, ale špatně implementovanou pamětí palet. Nemá-li totiž program zajištěný korektní přístup do této paměti, zůstane paměť prázdná, a~tudíž i~pattern table bude vykreslena jako jednolitý čtverec. Po opravě chyb následuje ověření, že je obsah pattern table správně vykreslován. To je možné porovnáním s~funkčními emulátory, které obsahují debugger, popřípadě existují i~vyobrazení pattern table v~různých diskusích a~článcích.
+
+Dalším krokem byla implementace zobrazování videopaměti. U~jednoduchých her jako \enquote{Donkey Kong}, které nepoužívají zrcadlení, stačí vykreslit první polovinu paměti tak, jak je uložena --- není potřeba pečlivě provádět sekvenci kroků popisovanou v~části~\ref{sec:ppu-pozadi}. To, jestli je obsah paměti správně vykreslen, lze velice jednoduše ověřit opět několika způsoby: spuštěním softwaru na jiném emulátoru, na skutečné konzoli, nebo prostým porovnáním screenshotů z~fór a~diskusí (což je však nejméně věrohodný zdroj).
+
+Podobným způsobem byla vždy implementována další funkcionalita a~byla testována a~opravována tak dlouho, dokud nebyla funkční. Po implementaci všech základních funkcí čipu je možné zkoušet spouštět různé hry a~zjišťovat, zdali se chovají dle očekávání. Zde však existuje riziko, že samotná hra obsahuje neočekávané chování; některé hry například chybným přístupem do paměti způsobily poškození obrazu, popřípadě zobrazení nesmyslných textů. Například hra \enquote{Ghostbusters} načítá závěrečný text ze špatné pattern table, tudíž dojde k~zobrazení prázdné obrazovky.~\cite{Nesdev:game-bugs} Je jasné, že cílem softwarové emulace je především to, aby správně běželo původní programové vybavení, tudíž testování spouštěním tohoto softwaru je validní. Ovšem důkladnější ladění je možné jen při použití softwaru, jehož chování je přesně definováno. Takovou roli zastávají testy vytvořené komunitou, která vyvinula testovací programy, definovala jejich chování na reálném systému a~zveřejnila je. Velká část používaných testů pochází z~Nesdev~\cite{Nesdev:tests}.
+
+\subsection{APU}
+Komponentu APU je složité testovat automatizovanými testy, jelikož je zvukový výstup ovlivněn vlastnostmi použitého filtru. Ruční testy lze provádět pomocí nahrávání zvukového výstupu aplikace a~analýzy výsledného průběhu signálu. Nástroj, který lze pro tyto účely použít, je Audacity.
+
+V~průběhu vývoje APU byl zjištěn problém s~výstupem zvuku. Generovaný zvuk obsahoval nepříjemné praskání.
+
+První krokem bylo zjistit, který kanál je zdrojem problému, tudíž z~výsledného mixu nejprve odstranit pulzní kanál jeho jednoduchým odstraněním z~mixovacího výpočtu a~ponecháním pouze pulzního kanálu. Bylo nutné vybrat software, který určitě používá kanál pro generování šumu; takovým je například hra \enquote{Super Mario Bros.}. Po spuštění softwaru šlo stále slyšet praskání; problémový kanál tak byl identifikován. Nyní je možné nahrát výstup aplikace a~podrobně prozkoumat průběh výstupního signálu. Průběh vyobrazený aplikací Audacity je znázorněn na obrázku~\ref{fig:test-sum-chybne}.
+
+\begin{figure}[ht!]
+	\centering
+	\caption{Ukázka chybného výstupu generátoru šumu}
+	\label{fig:test-sum-chybne}
+	\includegraphics[width=0.5\textwidth]{images/audacity_chybne.png}
+\end{figure}
+
+Lze vidět, že zjištěný průběh zdaleka nepřipomíná šum. Ze znalosti principu fungování generátoru šumu lze usoudit, že problém může být způsoben posuvným registrem; je totiž komponentou, která rozhoduje, zdali bude na výstup puštěna hodnota obálky signálu.
+
+Nejprve bylo zkontrolováno, jestli byla správně implementována zpětná vazba, což se potvrdilo. Dále bylo zkontrolováno, zdali dochází ke korektní inicializaci. Chyba byla právě zde; registr byl inicializován na hodnotu 0, přitom dle \cite{Nesdev:apu-noise}: \enquote{On power-up, the shift register is loaded with the value 1.}
+
+Opravením výchozí hodnoty na 1 byl problém vyřešen. Výstup již zněl tak, jako zní ze skutečné konzole či jiných emulátorů.
+
+\subsection{Další komponenty}
+Testování dalších komponent probíhalo obdobně, jako bylo již popsáno výše. Herní ovladače byly otestovány reakcemi softwaru, takto byla například objevena chyba v~implementaci posuvných registrů zmíněná v~sekci~\ref{sec:impl-dalsi}, kdy se hra \enquote{Super Mario Bros.} spoléhala na jistou hodnotu po přečtení celého registru.
+
+Kazeta a~mappery poté byly testovány automaticky pomocí testů na platformě Google Test, stejně jako společné komponenty. Velice důkladně bylo otestováno fungování přepínání bank, protože i~malá chyba může způsobit, že se kód začne číst z~jiné adresy a~celý program přestane fungovat, stejně závažná je i~chybná implementace zrcadlení videopaměti, což v~případě tohoto projektu také zajišťuje kazeta, tudíž je zrcadlící funkcionalita také testována v~rámci těchto testů.
+
+\section{Shrnutí}
+Jak je zřejmé z~předchozích odstavců, bez průběžného testování by nebylo možné emulátor vyvinout. I~přes to však zbývá mnoho prostoru pro vylepšení testů, především pro zvukový a~grafický čip. Pro grafický čip je možné testy provádět tak, že se pořídí snímek obrazovky, vytvoří se kontrolní součet a~ten se porovná se \enquote{zlatým standardem}, neboli s~výstupem emulátoru, který je určitě implementován správně. Takové testy budou užitečné především pro budoucí implementátory emulátorů, kteří by si chtěli jednoduše vyzkoušet, jestli je jejich emulátor správně fungující.
