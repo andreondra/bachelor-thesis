@@ -84,7 +84,7 @@ Emulaci je možné dělit dle úrovně, na které emulátor pracuje, což je úz
 Běžné počítačové systémy odpovídají teoretickému modelu programovatelného počítače.
 
 \begin{definition}[Programovatelný počítač]
-	Programovatelný počítač je takový počítač, který čte instrukce z~elektronické paměti, kde jsou uloženy.~\normalfont{\cite{Wikipedia:programovatelny-pocitac}}
+	Programovatelný počítač je takový počítač, jehož chování lze změnit výměnou programu sestávajícího z~instrukcí uloženého v~paměti.~\normalfont{\cite{Allison1997:SPC}}
 \end{definition}
 
 Komponentou počítače, která je zodpovědná za řízení, je většinou \emph{procesor}. Proto má smysl se nejdříve zamýšlet nad úrovní abstrakce procesoru, jelikož je to právě ta komponenta, která bude zpracovávat programy a~řídit komponenty ostatní.
@@ -251,7 +251,7 @@ Komponentou, která byla využívána i~v~jiných systémech, je (kromě základ
 \end{figure}
 
 \section{Nintendo Entertainment System}
-Konzole Nintendo Entertainment System, často zkracována jako NES, je osmibitový zábavní počítačový systém firmy Nintendo, který byl vydán nejprve v Japonsku jako Family Computer (FC, \enquote{Famicom}). První verze je ukázaná na obrázku~\ref{fig:nes}. V~České republice je tento systém znám především díky mnoha klonům (\enquote{televizní hry na žlutých kazetkách}), které byly levnější a~dostupnější než oficiální systém. Tyto klony používaly kopie původního hardwaru, poté se objevily hardwarové emulátory založené na ASIC, které celou konzoli zmenšili do jednoho čipu (proto přezdívány NES-on-a-chip). Tato kapitola má za úkol popsat především technické specifikace systému --- zájemce o~podrobnou historii NES lze odkázati na Wikipedii~\cite{Wikipedia:NES}, \cite{Wikipedia:famiclone} a~článek~\cite{Svara:polystation}.
+Konzole Nintendo Entertainment System, často zkracována jako NES, je osmibitový zábavní počítačový systém firmy Nintendo, který byl vydán nejprve v Japonsku jako Family Computer (FC, \enquote{Famicom}). První verze je ukázaná na obrázku~\ref{fig:nes}. V~České republice je tento systém znám především díky mnoha klonům (\enquote{televizní hry na žlutých kazetkách}), které byly levnější a~dostupnější než oficiální systém. Tyto klony používaly kopie původního hardwaru, poté se objevily hardwarové emulátory založené na ASIC, které celou konzoli zmenšily do jednoho čipu (proto přezdívány NES-on-a-chip). Tato kapitola má za úkol popsat především technické specifikace systému --- zájemce o~podrobnou historii NES lze odkázati na Wikipedii~\cite{Wikipedia:NES}, \cite{Wikipedia:famiclone}, kde je spousta odkazů na čínské klony konzole (často s~groteskními názvy: \enquote{Terminator 2 Super Design} od firmy \enquote{ENDING-MAN}, \enquote{Dr. Boy}, \enquote{Fun Time Home Computer: The New System}) a~článek~\cite{Svara:polystation}.
 
 \begin{figure}[ht!]
 	\centering
@@ -684,7 +684,7 @@ Podrobný rozpis vykonávaných úkonů při zpracování instrukcí je s~přesn
 \label{sec:6502-dekodovani-instrukci}
 Každá instrukce je jednoznačně identifikována včetně příslušného adresního režimu pomocí operačního znaku. V~případě 6502 je tento operační znak vždy 8bitový.  Každá instrukce je prováděna v~několika strojových cyklech.  Index strojového cyklu je uchováván v~čítači a~v~dokumentaci je označován písmem T s indexem (například T1 pro první cyklus). Dvojice operační znak a~index jsou dekódovány v~programovatelném logickém poli (Programmable Logic Array, PLA).  Právě použití PLA způsobilo existenci takzvaných neoficiálních instrukcí, viz podkapitola~\ref{sec:6502-rozsirena-instrukcni-sada}.
 
-PLA slouží k~efektivní implementaci kombinační logiky.  Oproti klasické paměti PLA nevyžaduje záznam pro každou možnou adresu, výstupy jsou řízeny hradly AND a~OR, které implementují logickou funkci v~disjunktivní normální formě~\cite{Wikipedia:PLA}. Takto je možné efektivně zakódovat funkci obsahující hodnoty \enquote{don't care}, aniž by muselo dojít k~duplikaci řádků. Právě díky hodnotám don't care může jeden záznam reagovat na více různých vstupů, v~případě řadiče 6502 jsou vstupem operační kódy. Mají-li se stejná operace vykonat pro více operačních kódu, je to implementováno právě takto.
+PLA slouží k~efektivní implementaci kombinační logiky.  Oproti klasické paměti PLA nevyžaduje záznam pro každou možnou adresu, výstupy jsou řízeny hradly AND a~OR, které implementují logickou funkci v~disjunktivní normální formě~\cite{Kambayashi1979:PLA}. Takto je možné efektivně zakódovat funkci obsahující hodnoty \enquote{don't care}, aniž by muselo dojít k~duplikaci řádků. Právě díky hodnotám don't care může jeden záznam reagovat na více různých vstupů, v~případě řadiče 6502 jsou vstupem operační kódy. Mají-li se stejná operace vykonat pro více operačních kódu, je to implementováno právě takto.
 
 Příklad několika záznamů je uveden v~tabulce~\ref{tab:6502-PLA}, kde například operační znak \$AC ve strojovém cyklu T3 způsobí načtení hodnoty ze sběrnice do registru Y. Operační znak \$AF však vlivem hodnot don't care způsobí načtení do dvou registrů: A a~X.  Operační znaky s~více funkcemi jsou neoficiální a~jejich bližší popis je v~podkapitole~\ref{sec:6502-rozsirena-instrukcni-sada}.
 
@@ -1332,7 +1332,7 @@ Formát hlavičky je uveden v~tabulce~\ref{tab:ines}. Jednotlivá struktura je o
 Základní periferií, která byla dodávaná s~konzolí, jsou dva herní ovladače (každý pro jednoho hráče). Všechny periferie komunikují přes stejný typ portu. Kromě 5voltového napájení a hodin obsahuje port tři datové piny označované jako D0, D3 a~D4, kde pro ovladače je použit pouze D0.
 
 \begin{note}
-Mimo herních ovladačů existovalo mnoho dalších periferií, hodně známou je například Zapper, což je model zbraně používaný ve hře Duck Hunt. Později se objevily i~pokročilejší periferie, například klávesnice pro Family BASIC, Famicom 3D brýle, interaktivní robot R.O.B., disketová jednotka Family Disk System~\normalfont{\cite{Nesdev:inputs}}, nebo dokonce síťová karta (pouze pro Famicom) s~vlastních procesorem, který sloužila pro přístup k~bankovnictví, sázecím programům a~dalším~\cite{Wikipedia:family-computer-network-system}. Pokročilejší periferie se připojovaly expanzním portem, který byl k~dispozici pouze u~japonské verze konzole Family Computer.
+Mimo herních ovladačů existovalo mnoho dalších periferií, hodně známou je například Zapper, což je model zbraně používaný ve hře Duck Hunt. Později se objevily i~pokročilejší periferie, například klávesnice pro Family BASIC, Famicom 3D brýle, interaktivní robot R.O.B., disketová jednotka Family Disk System~\normalfont{\cite{Nesdev:inputs}}, nebo dokonce síťová karta (pouze pro Famicom) s~vlastních procesorem, který sloužila pro přístup k~bankovnictví, sázecím programům a~dalším~\cite{Takano1995:famicom-modem}. Pokročilejší periferie se připojovaly expanzním portem, který byl k~dispozici pouze u~japonské verze konzole Family Computer.
 \end{note}
 
 \subsection{Herní ovladače}
