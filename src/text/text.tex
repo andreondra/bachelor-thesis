@@ -107,11 +107,11 @@ Instrukce bývají v paměti číslicových počítačů reprezentovány jako st
 	\caption{~Úrovně abstrakce softwaru}\label{fig:abstrakce-sw}
 \end{figure}
 
-Druhá otázka se již zabývá přiřazení smyslu jednotlivým instrukcím. Množina podporovaných instrukcí včetně dalších potřebných informací (především o způsobu reprezentace a ukládání dat) je součástí architektury procesoru (ISA)~\cite{Kubatova2018:SAP}.
+Druhá otázka se již zabývá přiřazením smyslu jednotlivým instrukcím. Množina podporovaných instrukcí včetně dalších potřebných informací (především o způsobu reprezentace a ukládání dat) je součástí architektury procesoru (ISA)~\cite{Kubatova2018:SAP}.
 
 Z výše uvedeného vyplývá, že pro zpracování instrukcí tak, jako to dělal původní hardware, stačí jen přesně napodobit chování jednotlivých instrukcí dle popisu architektury, bez dalšího zamýšlení se, jak je procesor konkrétně implementován. To představuje nejvyšší úroveň abstrakce. 
 
-Některé programy se však občas spoléhají na nedokumentované chování procesorů, kde je již nutné pracovat na nižší úrovni. Dle prof. Kubátové se jedná o úroveň předávání dat mezi registry, na které pracuje i~emulátor bakalářské práce.
+Některé programy se však občas spoléhají na nedokumentované chování procesorů, kde je již nutné pracovat na nižší úrovni. Dle prof. Kubátové~\cite{Kubatova2018:SAP} se jedná o úroveň předávání dat mezi registry, na které pracuje i~emulátor bakalářské práce.
 
 Existují ještě dvě nižší úrovně, úroveň logických hradel a~úroveň tranzistorů~\cite{Kubatova2018:SAP}. Tyto dvě úrovně již však vyžadují znalost konkrétní hardwarové implementace, která bývá obchodním tajemstvím. Výhodou je, že ve své podstatě nevyžaduje vůbec znalost o~funkci procesoru jako takovém a~zároveň nejvěrněji implementuje jeho funkčnost. Velkými nevýhodami jsou obtížnost, častá absence potřebných informací a~při implementaci v softwaru i~velká náročnost na prostředky, jelikož se emuluje každý řídicí signál, tedy nejnižší úroveň řízení dle diagramu~\ref{fig:abstrakce-sw}. Zájemce o~tuto úroveň lze odkázat na projekt Visual6502~\cite{Visual6502:slides}.
 
@@ -156,24 +156,24 @@ V~nejjednodušším případě existuje na sběrnici jen jediná řídicí kompo
 	\enquote{Přerušení spočívá v~tom, že se přestane provádět původní sekvence instrukcí a~že se začne provádět jiná sekvence, nazývána rutina přerušení, která začíná na určené adrese; ta se nazývá přerušovací adresa.}~\normalfont{\cite{Pluhacek1995:plp}}
 \end{definition}
 
-Zjednodušeně řečeno lze tvrdit, že přerušení je podprogram, který může být vyvolán i~jinak, než programově. Z~toho vyplývá i~fakt, že může být vyvoláno téměř v~jakékoliv fázi zpracování programu.  Při signalizaci, že došlo k~přerušení, se uloží aktuální kontext procesoru (například stavy příznaků), hodnota programového čítače se nastaví na hodnotu přerušovací adresy a~pokračuje se ve vykonávání programu z~této nové adresy. Většinou je nutné i~brát v~potaz příčinu přerušení (jeho zdroj), na příčině totiž může být závislá i~hodnota přerušovací adresy~\cite{Pluhacek1995:plp}. Konkrétně procesor~6502 použitý v~NES má tyto adresy dvě (tři, pakliže je počítána i adresa pro reset).
+Zjednodušeně řečeno lze tvrdit, že přerušení je podprogram, který může být vyvolán i~jinak, než programově. Z~toho vyplývá i~fakt, že může být vyvoláno téměř v~jakékoliv fázi zpracování programu.  Při signalizaci, že došlo k~přerušení, se uloží aktuální kontext procesoru (například stavy příznaků), hodnota programového čítače se nastaví na hodnotu přerušovací adresy a~pokračuje se ve vykonávání programu z~této nové adresy. Většinou je nutné brát v~potaz i~příčinu přerušení (jeho zdroj), na příčině totiž může být závislá hodnota přerušovací adresy.~\cite{Pluhacek1995:plp} Konkrétně procesor~6502 použitý v~NES má tyto adresy dvě (tři, pakliže je počítána i adresa pro reset).
 
 \begin{note}[Terminologie přerušovací adresy]
-	Umístění přerušovací adresy v~paměti je v~manuálech procesoru 6502~\normalfont{\cite{mos:hw-manual}}. označováno jako vektor přerušení. Uvedená terminologie je použita i~v~této práci.
+	Umístění přerušovací adresy v~paměti je v~manuálech procesoru 6502~\normalfont{\cite{mos:hw-manual}} označováno jako vektor přerušení. Uvedená terminologie je použita i~v~této práci.
 \end{note}
 
-Existuje-li v~systému více přerušení, mohou být stanoveny jejich priority. Dále může být nastaveno ignorování některých přerušení, to může být provedeno stanovenou hodnotou v~příslušných registrech. Taková hodnota je pak označena jako maska přerušení.~\cite{Pluhacek1995:plp}
+Existuje-li v~systému více přerušení, mohou být stanoveny jejich priority. Dále může být nastaveno ignorování některých přerušení. To může být provedeno stanovenou hodnotou v~příslušných registrech, taková hodnota je pak označena jako maska přerušení.~\cite{Pluhacek1995:plp}
 
 V~případě NES se jedná o~dva typy přerušení. Je možné vyvolat přerušení programově (instrukce BRK), i~pomocí přerušovacích vstupů procesoru (IRQ, NMI). Konkrétní aplikace je popsána v~sekci~\ref{sec:6502-preruseni}.
 
 \subsection{Paměti a~adresace}
-Pamětí jsou takové komponenty, které umožňují ukládat informace v~různých formách. V~případě této práce tak budou označovány média skládající se z~paměťových míst, do kterých lze ukládat položky o~stejných velikostech (nejčastěji půjde o~osmibitovou hodnotu).  Mohou být různých typů; hlavní členění bude spočívat v~trvanlivosti uložených informací: paměti permanentní (nepřepisovatelné: read-only memory, ROM) a~paměti měnitelné (přepisovatelné: RWM či ROM, read/write memory, respektive random access memory)~\cite{Pluhacek1995:plp}.
+Pamětí jsou takové komponenty, které umožňují ukládat informace v~různých formách. V~případě této práce tak budou označována média skládající se z~paměťových míst, do kterých lze ukládat položky o~stejných velikostech (nejčastěji půjde o~osmibitovou hodnotu).  Mohou být různých typů; hlavní členění bude spočívat v~trvanlivosti uložených informací: paměti permanentní (nepřepisovatelné: read-only memory, ROM) a~paměti měnitelné (přepisovatelné: RWM či ROM, read/write memory, respektive random access memory)~\cite{Pluhacek1995:plp}.
 
-Pro přístup do paměti ke konkrétním položkám se používá jejich adresa, která může být různě široká.  Běžně jde o~nezáporné číslo. Množina možných adres je označována jako adresní prostor~\cite{Pluhacek1995:plp}. Součástí adresního prostoru nemusí být jen paměť, ale díky sběrnici i~další komponenty, adresované stejnými vodiči. Takto je možné adresy přiřadit i~periferiím, které se pak označují jako periferie mapované do paměti.
+Pro přístup do paměti ke konkrétním položkám se používá jejich adresa, která může být různě široká.  Běžně jde o~nezáporné číslo. Množina možných adres je označována jako adresní prostor~\cite{Pluhacek1995:plp}. Součástí adresního prostoru nemusí být jen paměť, ale díky sběrnici i~další komponenty adresované stejnými vodiči. Takto je možné adresy přiřadit i~periferiím, které se pak označují jako periferie mapované do paměti.
 
-Adresa může být členěna na několik částí, což používá i~manuál k~procesoru~6502. V~architektuře 6502 je adresa 16bitová. Je členěna na dvě části po 8~bitech. Horní část dělí paměti na 256 256bitových segmentů označovaných jako paměťová stránka, v~rámci kterých se adresuje dolní částí adresy.~\cite{mos:hw-manual}
+Adresa může být členěna na několik částí, což používá i~manuál k~procesoru~6502. V~architektuře 6502 je adresa 16bitová. Je členěna na dvě části po 8~bitech. Horní část dělí paměti na 256 segmentů o~velikosti 256~bajtů označovaných jako paměťová stránka, v~rámci kterých se adresuje dolní částí adresy.~\cite{mos:hw-manual}
 
-V~širším kontextu NES je adresa dělena na části o~různých jiných velikostech. Horní část vždy slouží k~adresaci paměťových segmentů, dolní čas k~adresaci v~rámci segmentu. V~takovém obecném případě se segmenty označují jako banky, což je hojně používáno v~souvislosti s~manipulací s~adresním prostorem.
+V~širším kontextu NES je adresa dělena na části o~různých jiných velikostech. Horní část vždy slouží k~adresaci paměťových segmentů, dolní část k~adresaci v~rámci segmentu. V~takovém obecném případě se segmenty označují jako banky, což je hojně používáno v~souvislosti s~manipulací s~adresním prostorem.
 
 Adresní prostor již ze své definice omezuje množství položek, ke kterým je možné přistupovat. Vhodnou manipulací s~adresami však lze adresní prostor rozšířit. Chceme-li například adresovat více než $2^{16}$ záznamů, můžeme pomocí registrů přidat libovolné množství pomyslných adresních vodičů, čímž adresní prostor rozšíříme. Tato technika je hojně používána u~takzvaných mapperů, které do adresního prostoru vystaví konfigurovatelné registry sloužící k~přepínání částí paměti, které se objeví ve viditelném adresním prostoru komponent. Více o~mapperech v~kapitole~\ref{sec:mapper}.
 
