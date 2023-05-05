@@ -104,7 +104,7 @@ Instrukce bývají v paměti číslicových počítačů reprezentovány jako st
 		\draw [arrow] (jsa) -- (strojkod);
 		\draw [arrow] (strojkod) -- (signaly);
 	\end{tikzpicture}
-	\caption{~Úrovně abstrakce softwaru}\label{fig:abstrakce-sw}
+	\caption{~Úrovně abstrakce softwaru.}\label{fig:abstrakce-sw}
 \end{figure}
 
 Druhá otázka se již zabývá přiřazením smyslu jednotlivým instrukcím. Množina podporovaných instrukcí včetně dalších potřebných informací (především o způsobu reprezentace a ukládání dat) je součástí architektury procesoru (ISA)~\cite{Kubatova2018:SAP}.
@@ -132,7 +132,7 @@ Všechny úrovně shrnuje diagram~\ref{fig:abstrakce-hw}, kde je zvýrazněna ú
 		\draw [arrow] (reg) -- (hradlo);
 		\draw [arrow] (hradlo) -- (tranzistor);
 	\end{tikzpicture} 
-	\caption{~Úrovně abstrakce hardwaru}\label{fig:abstrakce-hw}
+	\caption{~Úrovně abstrakce hardwaru.}\label{fig:abstrakce-hw}
 \end{figure}
 
 \section{Klíčové hardwarové principy}
@@ -164,7 +164,7 @@ Zjednodušeně řečeno lze tvrdit, že přerušení je podprogram, který můž
 
 Existuje-li v~systému více přerušení, mohou být stanoveny jejich priority. Dále může být nastaveno ignorování některých přerušení. To může být provedeno stanovenou hodnotou v~příslušných registrech, taková hodnota je pak označena jako maska přerušení.~\cite{Pluhacek1995:plp}
 
-V~případě NES se jedná o~dva typy přerušení. Je možné vyvolat přerušení programově (instrukce BRK), i~pomocí přerušovacích vstupů procesoru (IRQ, NMI). Konkrétní aplikace je popsána v~sekci~\ref{sec:6502-preruseni}.
+V~případě NES se jedná o~dva typy přerušení. Je možné vyvolat přerušení programově (instrukce BRK) i~pomocí přerušovacích vstupů procesoru (IRQ, NMI). Konkrétní aplikace je popsána v~sekci~\ref{sec:6502-preruseni}.
 
 \subsection{Paměti a~adresace}
 Pamětí jsou takové komponenty, které umožňují ukládat informace v~různých formách. V~případě této práce tak budou označována média skládající se z~paměťových míst, do kterých lze ukládat položky o~stejných velikostech (nejčastěji půjde o~osmibitovou hodnotu).  Mohou být různých typů; hlavní členění bude spočívat v~trvanlivosti uložených informací: paměti permanentní (nepřepisovatelné: read-only memory, ROM) a~paměti měnitelné (přepisovatelné: RWM či ROM, read/write memory, respektive random access memory)~\cite{Pluhacek1995:plp}.
@@ -178,16 +178,22 @@ V~širším kontextu NES je adresa dělena na části o~různých jiných veliko
 Adresní prostor již ze své definice omezuje množství položek, ke kterým je možné přistupovat. Vhodnou manipulací s~adresami však lze adresní prostor rozšířit. Chceme-li například adresovat více než $2^{16}$ záznamů, můžeme pomocí registrů přidat libovolné množství pomyslných adresních vodičů, čímž adresní prostor rozšíříme. Tato technika je hojně používána u~takzvaných mapperů, které do adresního prostoru vystaví konfigurovatelné registry sloužící k~přepínání částí paměti, které se objeví ve viditelném adresním prostoru komponent. Více o~mapperech v~kapitole~\ref{sec:mapper}.
 
 \subsection{Přímý přístup do paměti}
-Existuje-li v~systému více komponent, může se vyskytnout potřeba přemisťovat větší množství dat z~jedné komponenty do druhé.  To je možno provést buďto bajt po bajtu procesorem, nebo lze využít techniky přímého přístupu do paměti (DMA, direct memory access). V~takovém případě přenos provádí specializovaný řadič DMA.~\cite{mos:hw-manual} V~případě NES k~přenosu probíhá přímo na hlavní sběrnici, tudíž je pro uvolnění sběrnice procesor po dobu běhu DMA pozastaven, potřebná data jsou přenesena a~poté je běh procesoru obnoven, více v~části~\ref{sec:2A03}.
+Existuje-li v~systému více komponent, může se vyskytnout potřeba přemisťovat větší množství dat z~jedné komponenty do druhé.  To je možno provést buďto bajt po bajtu procesorem, nebo lze využít techniky přímého přístupu do paměti (DMA, direct memory access). V~takovém případě přenos provádí specializovaný řadič DMA.~\cite{mos:hw-manual}
+
+V~případě NES k~přenosu dochází přímo na hlavní sběrnici, tudíž je pro uvolnění sběrnice procesor po dobu běhu DMA pozastaven, potřebná data jsou přenesena a~poté je běh procesoru obnoven, více v~části~\ref{sec:2A03}.
 
 \subsection{Analogové video}
 \label{sec:analogove-video}
 Grafický čip použitý v~NES generuje přímo analogový kompozitní signál, proto je nutné porozumět alespoň struktuře, v~jaké dochází k~vykreslování na televizoru.
 
-Vše vychází z~principu vykreslování obrazu televizory typu Cathode-Ray Tube. Ty obsahovaly používaly elektronové dělo, které postupně zleva shora po řádcích (označované jako scanline) vykreslovalo obraz po bodech. Dělo se mezi řádky muselo vracet zpět doleva, v~ten moment signál reprezentoval barvu označovanou jako \enquote{černější než černá} a~tento interval je označen jako horizontal blanking (HBL). Kompozitní video standardu NTSC obsahuje celkem 525 obrazových řádků, z~toho viditelných je 480. Zbytek je prostor pro navrácení děla zpět vlevo nahoru, což je nazýváno vertical blanking interval (VBL). V~případě vysílání analogové televize byla tato \enquote{mezera} využita například pro teletext či skryté titulky.~\cite{Poynton2012:video} U~NES se interval využíval pro nerušenou práci s~grafickým čipem a~grafickou sběrnicí, viz sekce~\ref{sec:ppu-pozadi}.
+Vše vychází z~principu vykreslování obrazu televizory typu Cathode-Ray Tube. Ty obsahovaly elektronové dělo, které postupně zleva shora po řádcích (označované jako scanline) vykreslovalo obraz po bodech. Dělo se mezi řádky muselo vracet zpět doleva. V~ten moment signál reprezentoval barvu označovanou jako \enquote{černější než černá} a~tento interval je označen jako horizontal blanking (HBL). Kompozitní video standardu NTSC obsahuje celkem 525 obrazových řádků, z~toho viditelných je 480. Zbytek je prostor pro navrácení děla zpět vlevo nahoru, což je nazýváno vertical blanking interval (VBL). V~případě vysílání analogové televize byla tato \enquote{mezera} využita například pro teletext či skryté titulky.~\cite{Poynton2012:video}
+
+U~NES se interval VBL využíval pro nerušenou práci s~grafickým čipem a~grafickou sběrnicí, viz sekce~\ref{sec:ppu-pozadi}.
 
 \begin{note}[Prokládání a~NES]
-Běžně se u~NTSC využívala technika nazývaná prokládání, kdy se během jednoho vykreslování zobrazil jen takzvaný půlsnímek v~sudých řádcích, poté další půlsnímek v~lichých řádcích, což dohromady tvořilo obraz o~vyšším rozlišení. U~NTSC je vykresleno celkem 50 půlsnímků za sekundu (tato hodnota se označuje jako vertikální obnovovací frekvence), to odpovídá 25 celým snímkům za sekundu (což se označuje jako snímková frekvence). Tomu odpovídá digitální rozlišení označované jako 480i (i~je zkratka pro interlaced).~\normalfont{\cite{Poynton2012:video}} NES pracuje pouze s~jedním půlsnímkem, čímž se vychyluje ze standardu. Dvěma stejnými půlsnímky tak je vytvořen obraz o~nižším rozlišení, v~digitálním světě tomu odpovídá rozlišení 240p (p~znamená progressive; technika progresivního skenování).~\normalfont{\cite{Nesdev:ntsc}}
+Běžně se u~NTSC využívala technika nazývaná prokládání, kdy se během jednoho vykreslování zobrazil jen takzvaný půlsnímek v~sudých řádcích, poté další půlsnímek v~lichých řádcích, což dohromady tvořilo obraz o~vyšším rozlišení. U~NTSC je vykresleno celkem 50 půlsnímků za sekundu (tato hodnota se označuje jako vertikální obnovovací frekvence), to odpovídá 25 celým snímkům za sekundu (což se označuje jako snímková frekvence). Tomu odpovídá digitální rozlišení označované jako 480i (i~je zkratka pro interlaced).~\normalfont{\cite{Poynton2012:video}}
+
+NES pracuje pouze s~jedním půlsnímkem, čímž se vychyluje ze standardu. Dvěma stejnými půlsnímky tak je vytvořen obraz o~nižším rozlišení, v~digitálním světě tomu odpovídá rozlišení 240p (p~znamená progressive; technika progresivního skenování).~\normalfont{\cite{Nesdev:ntsc}}
 \end{note}
 
 \subsection{Testování hardwaru}
@@ -199,7 +205,7 @@ Testovací programy používané v~bakalářské práci jsou pouze ve formě str
 
 Testovací programy umožňují získávat informace o~průběhu různými metodami. Jedná-li se o~test spouštěný na celém systému i~s~uživatelským rozhraním, provádí se ovládání testu a~monitoring přes toto rozhraní.
 
-Často ale není vhodné (nebo ani možné) s~testy interagovat takto přímočaře. Spouští-li se test automatizovaně, nebo na systému bez uživatelského rozhraní, je nutné přistoupit k~jinému řešení.
+Často ale není vhodné (nebo ani možné) s~testy interagovat takto přímočaře. Spouští-li se test automatizovaně nebo na systému bez uživatelského rozhraní, je nutné přistoupit k~jinému řešení.
 
 Testy se spouští většinou vhodným nastavením programového čítače, popřípadě stačí, když je programový čítač nastaven na hodnotu vektoru resetu, což se v~případě 6502 děje automaticky (viz sekce~\ref{sec:6502-reset}).
 
@@ -220,12 +226,14 @@ Jelikož se v~práci počítá i~s~použitím zvukového výstupu počítače, j
 
 V~nejobecnější rovině spočívá přehrávání zvuku v~pravidelném zasílání dat v~pevně daném formátu do ovladače audio periferií. Jelikož by nemělo docházet k~přerušením během přehrávání (způsobující nepříjemné \enquote{chrastění}), musí být tok zvukových dat souvislý. O~data si pravidelně žádá ovladač prostřednictvím \enquote{callbacku}, což je obyčejná C funkce~\cite{Reid2023:miniaudio}.
 
-Zvuková data jsou složená z~takzvaných rámců (frames), které se skládají ze vzorků (samples). Počet vzorků v~rámci určuje počet audio kanálů (pro stereo jsou to dva kanály --- levý a~pravý). Počet rámců za sekundu určuje vzorkovací frekvence. Callback je ovladačem volán během jedné sekundy vícekrát, ovladač si vždy požádá o~nějaké množství rámců, což je předáno argumentem. Úkolem aplikace je tedy dodat požadované množství rámců, pro stereo tedy série vzorků levý, pravý, levý, pravý\dots ~\cite{Reid2023:miniaudio}.
+Zvuková data jsou složená z~takzvaných rámců (frames), které se skládají ze vzorků (samples). Počet vzorků v~rámci určuje počet audio kanálů (pro stereo jsou to dva kanály --- levý a~pravý). Počet rámců za sekundu určuje vzorkovací frekvence. Callback je ovladačem volán během jedné sekundy vícekrát. Ovladač si vždy požádá o~nějaké množství rámců, což je předáno argumentem. Úkolem aplikace je tedy dodat požadované množství rámců, pro stereo tedy série vzorků levý, pravý, levý, pravý\dots~\cite{Reid2023:miniaudio}
 
 \subsection{Synchronizace vláken}
-Vykonávání více úloh prostřednictvím vláken je v~práci použito pouze v~souvislosti se zpracováním zvuku, kdy volání callbacku (viz sekce~\ref{sec:zpracovani-zvuku}) probíhá v~jiném vlákně, než vše ostatní. Aby nedocházelo k~souběžnému přístupu k~jednomu zdroji, je nutné zvuková data předávat zvláštním způsobem.
+Vykonávání více úloh prostřednictvím vláken je v~práci použito pouze v~souvislosti se zpracováním zvuku, kdy volání callbacku (viz sekce~\ref{sec:zpracovani-zvuku}) probíhá v~jiném vlákně než vše ostatní. Aby nedocházelo k~souběžnému přístupu k~jednomu zdroji, je nutné zvuková data předávat zvláštním způsobem.
 
-Problém předávání zvukových dat ovladači odpovídá klasické synchronizační úloze producent-konzument. Tato úloha spočívá v~tom, že existuje několik zdrojů dat vytvářející data paralelně a~několik zpracovatelů zpracovávající tato data také paralelně. Zdroje i~zpracovatelé tedy sdílejí předávací místo informací, tím je většinou sdílená paměť. Problém nastane tehdy, když je buffer prázdný, nebo plný. Aby nemusela vlákna čekat, uspávají se.~\cite{Tanenbaum2015:os}.  Takový obecný případ je v~rámci zpracování audia zjednodušen na jednoho producenta a~jednoho konzumenta, kde navíc uspávání nemusí být ideálním řešením. Alternativu proto nabízí přímo miniaudio ve formě kruhového bufferu, který při naplnění či úplném vyprázdnění bufferu je možné posouvat ukazatele do bufferu, takže není nutné vlákna uspávat.  Navíc používá atomické operace, nikoliv zámky, proto je buffer efektivní i~pro velice časté přístupy (lze tedy přidávat zvukové rámce i~po jednom).~\cite{Reid2023:miniaudio}.
+Problém předávání zvukových dat ovladači odpovídá klasické synchronizační úloze producent-konzument. Tato úloha spočívá v~tom, že existuje několik zdrojů dat vytvářející data paralelně a~několik zpracovatelů zpracovávající tato data také paralelně. Zdroje i~zpracovatelé tedy sdílejí předávací místo informací, tím je většinou sdílená paměť. Problém nastane tehdy, když je buffer prázdný, nebo plný. Aby nemusela vlákna čekat, uspávají se.~\cite{Tanenbaum2015:os}
+
+Takový obecný případ je v~rámci zpracování audia zjednodušen na jednoho producenta a~jednoho konzumenta, kde navíc uspávání nemusí být ideálním řešením. Alternativu proto nabízí přímo miniaudio ve formě kruhového bufferu, který při naplnění či úplném vyprázdnění bufferu umožňuje posouvat ukazatele do bufferu, takže není nutné vlákna uspávat.  Navíc používá atomické operace, nikoliv zámky, proto je buffer efektivní i~pro velice časté přístupy (lze tedy přidávat zvukové rámce po jednom).~\cite{Reid2023:miniaudio}
 
 %---------------------------------------------------------------
 \chapter{Analýza}
@@ -235,31 +243,31 @@ Problém předávání zvukových dat ovladači odpovídá klasické synchroniza
 }{\textit{Penguins of Madagascar}\\ \textsc{Skipper}}
 
 \section{Zdroje informací}
-Hardware, není-li open-source, nebývá dokumentován do větší míry, nežli je třeba k~vytváření softwaru pro danou platformu. Jinak to není ani po vypršení patentu. Přestože veškeré patenty konzole Nintendo Entertainment System již vypršely~\cite{Nesdev:patents}, společnost Nintendo nevydala (ani nemá důvod vydat) kompletní hardwarový manuál. V~takovém případě je nutné tyto informace získat jinou formou. Nabízí se časově náročná metoda reverzního inženýrství. Díky popularitě a~stáří systému NES již ale vzniklo mnoho komunitní dokumentace, na níž se lze odkazovat a~při vývoji emulátoru není potřeba mít k~dispozici reálný systém.
+Hardware, není-li open-source, nebývá dokumentován do větší míry, nežli je třeba k~vytváření softwaru pro danou platformu. Jinak tomu není ani po vypršení patentu. Přestože veškeré patenty konzole Nintendo Entertainment System již vypršely~\cite{Nesdev:patents}, společnost Nintendo nevydala (ani nemá důvod vydat) kompletní hardwarový manuál. V~takovém případě je nutné tyto informace získat jinou formou. Nabízí se časově náročná metoda reverzního inženýrství. Díky popularitě a~stáří systému NES již ale vzniklo mnoho komunitní dokumentace, na niž se lze odkazovat a~při vývoji emulátoru není potřeba mít k~dispozici reálný systém.
 
-Velkým komunitním zdrojem je organizace nesdev.org, zabývající se neoficiálním vývojem softwaru (nazýváno \enquote{homebrew}) a~emulátorů. Tento zdroj je důležitý především pro vývoj softwarového modelu proprietárních komponent specifických pro NES --- grafického čipu, zvukového syntezátoru, paměťového rozhraní pro ROM a~dalších.
+Velkým komunitním zdrojem je organizace nesdev.org zabývající se neoficiálním vývojem softwaru (nazýváno \enquote{homebrew}) a~emulátorů. Tento zdroj je důležitý především pro vývoj softwarového modelu proprietárních komponent specifických pro NES --- grafického čipu, zvukového syntezátoru, paměťového rozhraní pro ROM a~dalších.
 
 Komponentou, která byla využívána i~v~jiných systémech, je (kromě základních součástek jako posuvné registry) procesor 2A03. Jelikož je klonem procesoru 6502 od firmy MOS, existuje mnoho dokumentace od ISA až po popis na úrovni hardwaru --- viz publikace~\cite{mos:hw-manual}, jejíž obálka je na obrázku~\ref{fig:mos-hw-manual}. V~této publikaci je popsán nejen hardwarový princip, ale i~filozofie za jednotlivými návrhovými rozhodnutími.
 
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=0.25\textwidth]{images/mos-hw-manual.png}
-	\caption{Obálka hardwarového manuálu rodiny komponent MCS6500 (sken archive.6502.org)}
+	\caption{Obálka hardwarového manuálu rodiny komponent MCS6500 (sken archive.6502.org).}
 	\label{fig:mos-hw-manual}
 \end{figure}
 
 \section{Nintendo Entertainment System}
-Konzole Nintendo Entertainment System, často zkracována jako NES, je osmibitový zábavní počítačový systém firmy Nintendo, který byl vydán nejprve v Japonsku jako Family Computer (FC, \enquote{Famicom}). První verze je ukázaná na obrázku~\ref{fig:nes}. V~České republice je tento systém znám především díky mnoha klonům (\enquote{televizní hry na žlutých kazetkách}), které byly levnější a~dostupnější než oficiální systém. Tyto klony používaly kopie původního hardwaru, poté se objevily hardwarové emulátory založené na ASIC, které celou konzoli zmenšily do jednoho čipu (proto přezdívány NES-on-a-chip). Tato kapitola má za úkol popsat především technické specifikace systému --- zájemce o~podrobnou historii NES lze odkázati na Wikipedii~\cite{Wikipedia:NES}, \cite{Wikipedia:famiclone}, kde je spousta odkazů na čínské klony konzole (často s~groteskními názvy: \enquote{Terminator 2 Super Design} od firmy \enquote{ENDING-MAN}, \enquote{Dr. Boy}, \enquote{Fun Time Home Computer: The New System}) a~článek~\cite{Svara:polystation}.
+Konzole Nintendo Entertainment System, často zkracována jako NES, je osmibitový zábavní počítačový systém firmy Nintendo, který byl vydán nejprve v Japonsku jako Family Computer (FC, \enquote{Famicom}). První verze je ukázaná na obrázku~\ref{fig:nes}. V~České republice je tento systém znám především díky mnoha klonům (\enquote{televizní hry na žlutých kazetkách}), které byly levnější a~dostupnější než oficiální systém. Tyto klony používaly kopie původního hardwaru, poté se objevily hardwarové emulátory založené na ASIC, které celou konzoli zmenšily do jednoho čipu (proto přezdívány NES-on-a-chip). Tato kapitola má za úkol popsat především technické specifikace systému --- zájemce o~podrobnou historii NES lze odkázat na Wikipedii~\cite{Wikipedia:NES}, \cite{Wikipedia:famiclone}, kde je mnoho odkazů na čínské klony konzole (často s~groteskními názvy: \enquote{Terminator 2 Super Design} od firmy \enquote{ENDING-MAN}, \enquote{Dr. Boy}, \enquote{Fun Time Home Computer: The New System}) a~článek~\cite{Svara:polystation}.
 
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=0.4\textwidth]{images/nes.jpg}
-	\caption{Konzole Nintendo Entertainment System (foto \copyright~2016, Evan-Amos)}
+	\caption{Konzole Nintendo Entertainment System (foto \copyright~2016, Evan-Amos).}
 	\label{fig:nes}
 \end{figure}
 
 
-Systém se skládá z několika hlavních komponent, které spolu komunikují pomocí dvou sběrnic. Nejprve jsou představeny sběrnice a~k~nim připojené komponenty, jež jsou později rozebrány podrobněji.
+Systém se skládá z několika hlavních komponent, které spolu komunikují pomocí dvou sběrnic. Nejprve jsou představeny sběrnice a~k~nim připojené komponenty, jež jsou později popsány podrobněji.
 
 \subsection{Hlavní sběrnice}
 Hlavní sběrnice, kterou ilustruje obrázek~\ref{fig:nes-hlavnisbernice}, je adresována 16~bity a~přenáší 8~datových bitů. Komunikaci na hlavní sběrnici řídí pouze procesor~\emph{2A03}, který obsahuje i~řadič přímého přístupu do pamětí (DMA). Tudíž neexistuje (a~ani není potřebná) žádná forma arbitrace.
@@ -292,7 +300,7 @@ Hlavní sběrnice, kterou ilustruje obrázek~\ref{fig:nes-hlavnisbernice}, je ad
 		\node[slave, below=of s4] (periferie) {Periferie};	
 		\draw[dashed] (s4)--(periferie);
 	\end{tikzpicture}
-	\caption{~Hlavní sběrnice konzole NES}\label{fig:nes-hlavnisbernice}
+	\caption{~Hlavní sběrnice konzole NES.}\label{fig:nes-hlavnisbernice}
 \end{figure}
 
 Procesor má k~dispozici 2~kB paměti RAM. Přímo v~procesoru se nachází čip pro generování zvuku, přezdívaný jako Audio Processing Unit (APU).  Na sběrnici se dále nachází grafický čip \emph{2C02}, označovaný jako Picture Processing Unit (PPU). Jako poslední je na sběrnici několik vstupně-výstupních (I/O) rozhraní: slot pro paměťové médium typu kazeta (cartridge), obchodně označovaná jako Game~Pak, pomocí níž se distribuoval veškerý software pro konzoli, a~porty pro periferie, především herní ovladače.
@@ -302,7 +310,7 @@ Procesor má k~dispozici 2~kB paměti RAM. Přímo v~procesoru se nachází čip
 \end{note}
 
 \subsection{Grafická sběrnice}
-Systém obsahuje i~vedlejší sběrnici adresovanou 14~bity (celkem tedy 16~kB adresovatelného prostoru), kde komunikaci řídí PPU. Schematicky je znázorněna na obrázku~\ref{fig:nes-grafickasbernice}. Tato sběrnice je zcela oddělena od hlavní. Sběrnice obsahuje paměť video RAM (VRAM, také označována jako CIRAM) o~kapacitě 2~kB. Do paměťového prostoru je dále mapována RAM obsahující barevnou paletu. V~systému existuje ještě paměť OAM (Object Attribute Memory), která obsahuje seznam spritů a~informace potřebné k~jejich zobrazování. Ta je ale není připojena ke sběrnici, nýbrž přímo k~čipu PPU.
+Systém obsahuje i~vedlejší sběrnici adresovanou 14~bity (celkem tedy 16~kB adresovatelného prostoru), kde komunikaci řídí PPU. Schematicky je znázorněna na obrázku~\ref{fig:nes-grafickasbernice}. Tato sběrnice je zcela oddělena od hlavní. Sběrnice obsahuje paměť video RAM (VRAM, také označována jako CIRAM) o~kapacitě 2~kB. Do paměťového prostoru je dále mapována RAM obsahující barevnou paletu. V~systému existuje ještě paměť OAM (Object Attribute Memory), která obsahuje seznam spritů a~informace potřebné k~jejich zobrazování. Ta ale není připojena ke sběrnici, nýbrž přímo k~čipu PPU.
 
 \begin{definition}[Sprite]
 	Sprite (počeštěně sprajt) je dvourozměrný obrázek, který bývá integrován do větších scén. Termín pochází z~dob, kdy se zvlášť vykreslovalo pozadí a~právě sprity, které často představovaly herní postavičky a~asociované předměty (zbraně, náboje a~další). To je případ i~konzole NES, která pro sprity měla dedikovanou paměť OAM.
@@ -334,23 +342,23 @@ Systém obsahuje i~vedlejší sběrnici adresovanou 14~bity (celkem tedy 16~kB a
 		\draw[dashed] (m) -- (s3);
 		
 	\end{tikzpicture}
-	\caption{~Grafická sběrnice konzole NES}\label{fig:nes-grafickasbernice}
+	\caption{~Grafická sběrnice konzole NES.}\label{fig:nes-grafickasbernice}
 \end{figure}
 
 \section{Procesor 6502}
-Základem NES je klon procesoru \emph{6502}, označený jako \emph{2A03}. Tato podkapitola popisuje původní variantu procesoru a~specifika klonu jsou rozebrány v~samostatné podkapitole~\ref{sec:2A03}.
+Základem NES je klon procesoru \emph{6502}, označený jako \emph{2A03}. Tato podkapitola popisuje původní variantu procesoru a~specifika klonu jsou popsány v~samostatné podkapitole~\ref{sec:2A03}.
 
 \subsection{Historie}
-Procesor 6502 navrhla firma MOS Technology v~roce 1975. Na procesoru pracoval tým, který původně navrhoval mikroprocesor Motorola 6800. 6502 vznikl jako levnější a~rychlejší alternativa procesoru od Motoroly pod vedením Chucka Peddla~\cite{computer-history-museum:chuck-peddle}, která zachovává hardwarovou kompatibilitu. Cílem bylo umožnit využití i~v~projektech, kde by jinak byla levnější diskrétní logika~\cite{mos:hw-manual}. Ve své podstatě jde o~aplikaci programovatelného počítače (definovaného v~kapitole~\ref{chap:predstaveni-problematiky}) v~praxi --- funkce zařízení lze změnit pouze výměnou programu, což byl i~jediný požadavek při přechodu z~konkurenční Motoroly; upravit program pro ISA 6502.
+Procesor 6502 navrhla firma MOS Technology v~roce 1975. Na procesoru pracoval tým, který původně navrhoval mikroprocesor Motorola 6800. Čip 6502 vznikl jako levnější a~rychlejší alternativa procesoru od Motoroly pod vedením Chucka Peddla~\cite{computer-history-museum:chuck-peddle}, která zachovává hardwarovou kompatibilitu. Cílem bylo umožnit využití i~v~projektech, kde by jinak byla levnější diskrétní logika~\cite{mos:hw-manual}. Ve své podstatě jde o~aplikaci programovatelného počítače (definovaného v~kapitole~\ref{chap:predstaveni-problematiky}) v~praxi --- funkce zařízení lze změnit pouze výměnou programu, což byl i~jediný požadavek při přechodu z~konkurenční Motoroly; upravit program pro ISA 6502.
 
 \subsection{Interakce procesoru s~prostředím}
-Na úvod, jak se píše v~hardwarovém manuálu~\cite{mos:hw-manual}, je vhodné se zabývat, v~jakém prostředí procesor bude pracovat~a jak s~ním bude interagovat. Prostředím je myšlen systém, který bude procesorem řízen. Procesor 6502 s okolím komunikuje pomocí jedné systémové sběrnice, která obsahuje 16~adresních vodičů, 8~datových vodičů a~signál R/W, který signalizuje zdroj dat vzhledem k~procesoru. Logická jednička (napětí větší než 2,4~V) signalizuje čtení procesorem, logická nula pak zápis procesorem. Okolí procesoru je tvořeno několika komponentami, ty jsou součástí adresního prostoru CPU, který je znázorněn v~tabulce~\ref{tab:cpu-adresniprostor}.
+Na úvod, jak se píše v~hardwarovém manuálu~\cite{mos:hw-manual}, je vhodné se zabývat tím, v~jakém prostředí procesor bude pracovat~a jak s~ním bude interagovat. Prostředím je myšlen systém, který bude procesorem řízen. Procesor 6502 s okolím komunikuje pomocí jedné systémové sběrnice, která obsahuje 16~adresních vodičů, 8~datových vodičů a~signál R/W, který signalizuje zdroj dat vzhledem k~procesoru. Logická jednička (napětí větší než 2,4~V) signalizuje čtení procesorem, logická nula pak zápis procesorem. Okolí procesoru je tvořeno několika komponentami, ty jsou součástí adresního prostoru CPU, který je znázorněn v~tabulce~\ref{tab:cpu-adresniprostor}.
 
 Adresní prostor je v~terminologii produktové řady MCS650X rozdělen na stránky, což představuje rozsah adresovatelný jedním bajtem (256 adres). Index v~rámci stránky zajišťuje spodní bajt, index stránky poté horní bajt. Z~toho vyplývá, že stránek je také 256. Znalost tohoto faktu je klíčová pro pochopení důvodu existence speciálního zero-page adresního režimu, který je vysvětlen v~podkapitole~\ref{sec:6502-adresni-rezimy}.
 
 \begin{table}[ht!]
 	\centering
-	\caption{~Adresní prostor CPU}\label{tab:cpu-adresniprostor}
+	\caption{~Adresní prostor CPU.}\label{tab:cpu-adresniprostor}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|}
 		\hline
 		Adresní rozsah & Zařízení \\
@@ -372,7 +380,7 @@ Adresní prostor je v~terminologii produktové řady MCS650X rozdělen na strán
 	\end{tblr}
 \end{table}
 
-Komunikace je řízena dvoufázovými systémovými hodinami, v~první fázi se vystaví adresa na sběrnici (předstih), v~druhé fázi dochází k~přenosu dat. Z~těchto dvou fází se pak skládá celý procesorový cyklus~\cite{mos:hw-manual}. Příklad komunikace směrem k~procesoru (čtení) je znázorněn na obrázku~\ref{fig:6502-casovani-cteni}. Dle dokumentace je pro 1MHz hodiny garantováno, že adresa bude stabilní 300~ns po náběžné hraně první fáze; naopak je požadováno, aby data byla platná alespoň 100~ns před sestupnou hranou druhé fáze hodin.
+Komunikace je řízena dvoufázovými systémovými hodinami. V~první fázi se vystaví adresa na sběrnici (předstih), v~druhé fázi dochází k~přenosu dat. Z~těchto dvou fází se pak skládá celý procesorový cyklus~\cite{mos:hw-manual}. Příklad komunikace směrem k~procesoru (čtení) je znázorněn na obrázku~\ref{fig:6502-casovani-cteni}. Dle dokumentace je pro 1MHz hodiny garantováno, že adresa bude stabilní 300~ns po náběžné hraně první fáze; naopak je požadováno, aby data byla platná alespoň 100~ns před sestupnou hranou druhé fáze hodin.
 
 \begin{figure}[ht!]
 	\centering
@@ -396,7 +404,7 @@ Komunikace je řízena dvoufázovými systémovými hodinami, v~první fázi se 
 			\end{scope}
 		\end{pgfonlayer}
 	\end{tikztimingtable}
-	\caption{~Časování čtení procesoru}\label{fig:6502-casovani-cteni}
+	\caption{~Časování čtení procesoru.}\label{fig:6502-casovani-cteni}
 \end{figure}
 
 Kromě systémové sběrnice existuje další způsob komunikace, a~to je přerušení. Všechny procesory v~produktové řadě MCS650X obsahují celkem tři vstupy reprezentující různá přerušení: RST, IRQ a~NMI.
@@ -417,7 +425,7 @@ Procesor 6502 obsahuje ve své datové cestě několik registrů. V~tabulce~\ref
 
 \begin{table}[ht!]
 	\centering
-	\caption{~Registry procesoru 6502}\label{tab:6502-registry}
+	\caption{~Registry procesoru 6502.}\label{tab:6502-registry}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|Q[c,m]|X[c,m]|}
 		\hline
 		Registr & Zkratka & Velikost (bit) & Obsah \\
@@ -437,7 +445,7 @@ Procesor 6502 obsahuje ve své datové cestě několik registrů. V~tabulce~\ref
 	\end{tblr}
 \end{table}
 
-Střadač v ISA 6502 má podobný účel jako v~jiné střadačové architektuře. Jedná se o~jediný univerzální registr, všechny operace musí být prováděny přes zásobník (kromě načítání a~ukládání, což zvládají i~indexovací registry). To znamená aritmetické a~logické operace, porovnávání, změny hodnot. Střadač je implicitním úložným místem pro výsledky operací.
+Střadač v ISA 6502 má podobný účel jako v~jiné střadačové architektuře. Jedná se o~jediný univerzální registr, kde všechny operace (kromě načítání a~ukládání, což zvládají i~indexovací registry) musí být prováděny přes zásobník. Střadač je implicitním úložným místem pro výsledky operací.
 
 Zásobník architektury 6502 je fixován na adresách \$0100--\$01FF. Jeho kapacita je tedy 256 bajtů a~roste odshora dolů. Se zásobníkem se manipuluje pomocí dedikovaných instrukcí, je možné na zásobník uložit střadač nebo obsah příznakového registru. Adresa vrcholu zásobníku je v~registru S. 
 
@@ -454,7 +462,7 @@ Tím, že registr B nemá hardwarovou reprezentaci, je jeho hodnota ignorována 
 
 \begin{table}[ht!]
 		\centering
-		\caption{Popis příznakového registru procesoru 6502\label{tab:6502-flags}}.
+		\caption{Popis příznakového registru procesoru 6502.}\label{tab:6502-flags}
 		\begin{tblr}{|Q[c,m]|Q[c,m]|X[c,m]|}
 			\hline
 			Index & Příznak &  Popis \\
@@ -495,7 +503,7 @@ Nejjednodušší adresní režim se skládá pouze z~operačního znaku (OZ, ang
 		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7} \\
 		\bitbox[]{8}{CLI} & \bitboxes*{1}[bgcolor=bfcommonlight]{01011000}
 	\end{bytefield}
-	\caption{~Struktura instrukce implikovaného adresního režimu s~příkladem instrukce Clear Interrupt Disable Bit (CLI)}\label{fig:6502-adr-impl}
+	\caption{~Struktura instrukce implikovaného adresního režimu s~příkladem instrukce Clear Interrupt Disable Bit (CLI).}\label{fig:6502-adr-impl}
 \end{figure}
 
 Další adresní režim pracuje s~konstantní hodnotou, která je uváděná ihned za operačním znakem. To znamená, že se zpracovávaná hodnota nemusí načítat z~paměti pomocí adresy, ale nachází se přímo ve zpracovávaném kódu. Označuje se jako \emph{okamžitý} (immediate) a~instrukci tak tvoří dva bajty. Příklad je uveden na obrázku~\ref{fig:6502-adr-imm}; instrukce AND provede logický součin hodnoty v~akumulátoru s~konstantou \$42.
@@ -509,7 +517,7 @@ Další adresní režim pracuje s~konstantní hodnotou, která je uváděná ihn
 		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7,8,15} \\
 		\bitbox[]{8}{AND} & \bitboxes*{1}[bgcolor=bfcommonlight]{00101001} & \bitboxes*{1}[bgcolor=bfcommonlight]{01000010}
 	\end{bytefield}
-	\caption{~Struktura instrukce okamžitého adresního režimu s~příkladem instrukce AND Memory with Accumulator (AND)}\label{fig:6502-adr-imm}
+	\caption{~Struktura instrukce okamžitého adresního režimu s~příkladem instrukce AND Memory with Accumulator (AND).}\label{fig:6502-adr-imm}
 \end{figure}
 
 Adresní režim, který již pracuje s~hodnotami adres, se označuje jako \emph{absolutní}. Součástí instrukce v~tomto režimu je přímá hodnota adresy, kde se nachází kýžená data. Instrukce je tedy 3 bajtová. Formát instrukce i~s~příkladem je na obrázku~\ref{fig:6502-adr-abs}; demonstrovaná instrukce načte do akumulátoru hodnotu ze~zařízení v~adresním prostoru procesoru na adrese \$102.
@@ -523,10 +531,10 @@ Adresní režim, který již pracuje s~hodnotami adres, se označuje jako \emph{
 		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7,8,15,16,23}  \\
 		\bitbox[]{8}{LDA} & \bitboxes*{1}[bgcolor=bfcommonlight]{10101101} & \bitboxes*{1}[bgcolor=bfcommonlight]{00000010} & \bitboxes*{1}[bgcolor=bfcommonlight]{00000001}
 	\end{bytefield}
-	\caption{~Struktura instrukce absolutního adresního režimu s~příkladem instrukce Load Accumulator (LDA)}\label{fig:6502-adr-abs}
+	\caption{~Struktura instrukce absolutního adresního režimu s~příkladem instrukce Load Accumulator (LDA).}\label{fig:6502-adr-abs}
 \end{figure}
 
-Absence univerzálních registrů je částečně suplována existencí adresním režimem \emph{nulté stránky} (zero-page). Adresa, která je uvedena za OZ, je jednobajtová. V~tomto režimu je možné indexovat pouze v~rámci jedné stránky, a~to té první (při indexování od nuly nulté) (adresní rozsah \$0000--\$00FF). Zato však tyto instrukce zabírají dva bajty v~instrukční paměti a~jejich zpracování je rychlejší. Na nultou paměťovou stránku je tak možné nahlížet jako na formu ručně spravované cache~---~v~programátorském manuálu řady MSC6500~\cite{mos:sw-manual} je zdůrazněno, že je program možné optimalizovat přesunem nejčastěji používaných hodnot právě do nulté stránky. Formát je znázorněn na obrázku~\ref{fig:6502-adr-zp}; instrukce Store Accumulator načte do akumulátoru bajt z~první paměťové stránky s offsetem \$42.
+Absence univerzálních registrů je částečně suplována existencí adresního režimu \emph{nulté stránky} (zero-page). Adresa, která je uvedena za OZ, je jednobajtová. V~tomto režimu je možné indexovat pouze v~rámci jedné stránky, a~to té první (při indexování od nuly nulté) (adresní rozsah \$0000--\$00FF). Zato však tyto instrukce zabírají dva bajty v~instrukční paměti a~jejich zpracování je rychlejší. Na nultou paměťovou stránku je tak možné nahlížet jako na formu ručně spravované cache~---~v~programátorském manuálu řady MSC6500~\cite{mos:sw-manual} je zdůrazněno, že je program možné optimalizovat přesunem nejčastěji používaných hodnot právě do nulté stránky. Formát je znázorněn na obrázku~\ref{fig:6502-adr-zp}; instrukce Store Accumulator načte do akumulátoru bajt z~první paměťové stránky s offsetem \$42.
 
 \begin{figure}[ht!]
 	\centering
@@ -537,10 +545,10 @@ Absence univerzálních registrů je částečně suplována existencí adresní
 		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7,8,15}  \\
 		\bitbox[]{8}{STA} & \bitboxes*{1}[bgcolor=bfcommonlight]{10000101} & \bitboxes*{1}[bgcolor=bfcommonlight]{01000010}
 	\end{bytefield}
-	\caption{~Struktura instrukce adresního režimu nulté stránky s~příkladem instrukce Store Accumulator (STA)}\label{fig:6502-adr-zp}
+	\caption{~Struktura instrukce adresního režimu nulté stránky s~příkladem instrukce Store Accumulator (STA).}\label{fig:6502-adr-zp}
 \end{figure}
 
-\emph{Relativní} adresování je používáno výlučně instrukcemi větvení. Obsahuje pouze jeden adresní bajt, který reprezentuje offset v~dvojkovém doplňku. Vyhodnotí-li se podmínka skoku kladně a~skok se tedy provádí, je hodnota offsetu přičítána k~adrese následující instrukce (než se podmínka skoku vyhodnotí, nachází se již programový čítač na další adrese). V~JSA obecně není nutné uvádět offset explicitně, uvádí se konkrétní adresa, nebo návěští; pomocí těchto údajů je assembler schopen výsledný offset dopočítat. Režim je demonstrován na instrukci Branch On Carry Set na obrázku~\ref{fig:6502-adr-rel} s~offsetem \$42.
+\emph{Relativní} adresování je používáno výlučně instrukcemi větvení. Obsahuje pouze jeden adresní bajt, který reprezentuje offset v~dvojkovém doplňku. Vyhodnotí-li se podmínka skoku kladně a~skok se tedy provádí, je hodnota offsetu přičítána k~adrese následující instrukce (než se podmínka skoku vyhodnotí, nachází se již programový čítač na další adrese). V~JSA obecně není nutné uvádět offset explicitně, uvádí se konkrétní adresa, nebo návěští; pomocí těchto údajů je assembler schopen výsledný offset dopočítat. Režim je demonstrován na instrukci Branch~On~Carry~Set na obrázku~\ref{fig:6502-adr-rel} s~offsetem \$42.
 
 \begin{figure}[ht!]
 	\centering
@@ -551,24 +559,24 @@ Absence univerzálních registrů je částečně suplována existencí adresní
 		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7,8,15}  \\
 		\bitbox[]{8}{BCS} & \bitboxes*{1}[bgcolor=bfcommonlight]{10110000} & \bitboxes*{1}[bgcolor=bfcommonlight]{01000010}
 	\end{bytefield}
-	\caption{~Struktura instrukce relativního adresování s~příkladem instrukce Branch On Carry Set (BCS)}\label{fig:6502-adr-rel}
+	\caption{~Struktura instrukce relativního adresování s~příkladem instrukce Branch On Carry Set (BCS).}\label{fig:6502-adr-rel}
 \end{figure}
 
 \subsubsection{Adresní režimy s~indexací}
-Složitější adresní režimy přinášejí další možnost přístupu k~datům v~paměti. Do této chvíle byly uvedeny pouze takové režimy, které disponují pouze pevně stanovenou adresou. Často je však nutné adresy měnit, nebo vytvářet zcela dynamicky. Takový typ adres označuje manuál~\cite{mos:sw-manual} jako počítané adresy. Pro práci s~počítanými adresami obsahuje ISA speciální adresní režimy využívající indexovací registry: absolutní režim s~indexací a~režim nulté stránky s~indexací.
+Složitější adresní režimy přinášejí další možnosti přístupu k~datům v~paměti. Do této chvíle byly uvedeny pouze takové režimy, které disponují pouze pevně stanovenou adresou. Často je však nutné adresy měnit, nebo vytvářet zcela dynamicky. Takový typ adres označuje manuál~\cite{mos:sw-manual} jako počítané adresy. Pro práci s~počítanými adresami obsahuje ISA speciální adresní režimy využívající indexovací registry: absolutní režim s~indexací a~režim nulté stránky s~indexací.
 
 \begin{example}[Kopírování souvislých dat bez indexace]
 Jedním ze základních řídicích struktur programovacích jazyků jsou cykly, které mohou posloužit jako nástroj pro práci s~bloky dat. Typickým příkladem nechť je kopírování dat z~jednoho paměťového místa na jiné. Ve střadačové architektuře se provádí načtením do střadače a~uložením.
 
-Byla-li by implementace provedena pouze za použitím pevných adres, muselo by se pro každé paměťové místo uvést instrukci načtení i~instrukci zápisu. Vytváří-li se adresy dynamicky, je možné provést operace v~cyklu. Ačkoliv existuje způsob úpravy pevných adres za běhu programu pomocí techniky samomodifikujícího se kódu (viz stranu 72 manuálu~\normalfont{\cite{mos:sw-manual}}), představují adresní režimy s~indexací elegantnější alternativu nevyžadující přepisovatelnou instrukční paměť.
+Byla-li by implementace provedena pouze za použití pevných adres, musela by se pro každé paměťové místo uvést instrukce načtení i~instrukce zápisu. Vytváří-li se adresy dynamicky, je možné provést operace v~cyklu. Ačkoliv existuje způsob úpravy pevných adres za běhu programu pomocí techniky samomodifikujícího se kódu (viz stranu 72 manuálu~\normalfont{\cite{mos:sw-manual}}), představují adresní režimy s~indexací elegantnější alternativu nevyžadující přepisovatelnou instrukční paměť.
 \end{example}
 
-Nechť je jako první uveden \emph{absolutní adresní režim s~indexací}. Tento režim přidává absolutnímu režimu možnost přičíst k~původní adrese i~offset z~registru X, nebo Y; dle zvoleného registru se tak jedná o~dva různé adresní režimy. Adresa pevně určená instrukcí je nazývaná jako základová (base). Výsledná adresa je vypočtena jednoduše: $zakladova\_adresa + offset$. Struktura je stejná jako u standardního absolutního režimu na obrázku~\ref{fig:6502-adr-abs}.
+Nechť je jako první uveden \emph{absolutní adresní režim s~indexací}. Tento režim přidává absolutnímu režimu možnost přičíst k~původní adrese i~offset z~registru X, nebo Y; dle zvoleného registru se tak jedná o~dva různé adresní režimy. Adresa pevně určená instrukcí je nazývaná jako základová (base). Výsledná adresa je vypočtena jednoduše součtem základové adresy a~offsetu. Struktura je stejná jako u standardního absolutního režimu na obrázku~\ref{fig:6502-adr-abs}.
 
-Podobně jako u~standardních režimů existuje možnost pracovat pouze s~nultou stránkou, k~tomu~účelu slouží \emph{režim nulté stránky s~indexací}. Struktura instrukce je opět stejná jako na obrázku~\ref{fig:6502-adr-zp}. V~tomto režimu nedochází k~překročení paměťových stránek při přičtení indexu, horní bajt je ignorován a~výpočty tak efektivně probíhají v~modulu \$100. Výpočet tedy probíhá jako: $(zakladova\_adresa + offset) \mod 256$. Kromě instrukcí LDX a~STX, kdy jsou k~dispozici oba indexovací registry k~výběru, je tento režim použitelný pouze s~registrem X.
+Podobně jako u~standardních režimů existuje možnost pracovat pouze s~nultou stránkou. K~tomu~účelu slouží \emph{režim nulté stránky s~indexací}. Struktura instrukce je opět stejná jako na obrázku~\ref{fig:6502-adr-zp}. V~tomto režimu nedochází k~překročení paměťových stránek při přičtení indexu, horní bajt je ignorován a~výpočty tak efektivně probíhají v~modulu \$100. Výpočet tedy probíhá jako: $(\textrm{zakladova\_adresa} + \textrm{offset}) \mod 256$. Kromě instrukcí LDX a~STX, kdy jsou k~dispozici oba indexovací registry k~výběru, je tento režim použitelný pouze s~registrem X.
 
 \subsubsection{Nepřímé adresování}
-V~architektuře 6502 existuje ještě \emph{nepřímé adresování}, které umožňuje pracovat s~ukazateli, namísto s~přímou hodnotou adresy. Takové režimy jsou dva, indexovaný-nepřímý a nepřímý-indexovaný. Názvy režimů jsou odvozené podle pořadí, ve kterém se přičítá index.
+V~architektuře 6502 existuje ještě \emph{nepřímé adresování}, které umožňuje pracovat s~ukazateli namísto s~přímou hodnotou adresy. Takové režimy jsou dva, indexovaný-nepřímý a nepřímý-indexovaný. Názvy režimů jsou odvozené podle pořadí, ve kterém se přičítá index.
 
 První zmíněný režim, \emph{indexovaný-nepřímý}, pracuje s~jednobajtovou adresou následovanou po operačním znaku. Tato adresa je základ ukazatele do nulté stránky. K~základu se přičte hodnota indexovacího registru X. Součet probíhá opět v modulu 256, vyšší bajt je totiž zahazován. Vznikne tak výsledný ukazatel, který směřuje na místo nacházející se v~nulté stránce, které obsahuje první bajt kýžené adresy. Ta je opět uspořádána ve formátu nižší bajt a~vyšší bajt. Příklad na obrázku~\ref{fig:6502-adr-idx-ind} ukazuje variantu instrukce STA v~indexovaném-nepřímém režimu. Samotný OZ se základem ukazatele je umístěn v~instrukční pamětí na adrese \$F000. K~základu \$42 je přičten obsah registru X \$10. Výsledkem je adresa \$52, na které se již nachází 16bitová konečná adresa. Instrukce STA v~popsaném příkladě tedy uloží hodnotu akumulátoru až na adresu zjištěnou v~posledním kroku: \$3412.
 
@@ -587,7 +595,7 @@ První zmíněný režim, \emph{indexovaný-nepřímý}, pracuje s~jednobajtovou
 		
 		\bitbox[]{8}{} & \bitbox{8}[bgcolor=bfcommonlight]{\$12} & \bitbox{8}[bgcolor=bfcommonlight]{\$34}
 	\end{bytefield}
-	\caption{~Struktura instrukce indexovaného-nepřímého režimu s~příkladem instrukce STA}\label{fig:6502-adr-idx-ind}
+	\caption{~Struktura instrukce indexovaného-nepřímého režimu s~příkladem instrukce STA.}\label{fig:6502-adr-idx-ind}
 \end{figure}
 
 Druhý režim, \emph{nepřímý-indexovaný}, funguje podobně, ale přičítání indexu probíhá až v~druhém kroku a~používá se registr Y. Po operačním znaku následuje hodnota ukazatele, která se již nemění. Ukazuje do nulté stránky, kde se nachází dvojbajtový základ konečné adresy. K~základu se přičte hodnota registru Y. Vznikne tak konečná adresa, se kterou může daná instrukce dále pracovat. Příklad opět na instrukci STA je uveden na obrázku~\ref{fig:6502-adr-ind-idx}. Tentokrát bude hodnota akumulátoru uložena na adresu \$3422.
@@ -607,7 +615,7 @@ Druhý režim, \emph{nepřímý-indexovaný}, funguje podobně, ale přičítán
 		
 		\bitbox[]{8}{Výpočet:} & \bitbox{8}[bgcolor=bfcommonlight]{\$3412} & \bitbox{1}[]{+} & \bitbox{8}[bgcolor=bfauxlight]{\$10} \\
 	\end{bytefield}
-	\caption{~Struktura instrukce nepřímého-indexovaného režimu s~příkladem instrukce STA}\label{fig:6502-adr-ind-idx}
+	\caption{~Struktura instrukce nepřímého-indexovaného režimu s~příkladem instrukce STA.}\label{fig:6502-adr-ind-idx}
 \end{figure}
 
 Existuje ještě jeden nepřímý režim, označovaný jako \emph{nepřímý absolutní}. Tento režim je použit pouze instrukcí skoku (JMP). Princip je podobný jako u~zmíněných nepřímých režimů s~tím rozdílem, že nedochází k~přičítání indexu. Instrukce se skládá z~operačního znaku a~dvou adresních bajtů, které fungují jako 16bitový ukazatel na výslednou adresu, na kterou se má skočit. V~příkladu na obrázku~\ref{fig:6502-adr-ind} instrukce JMP skočí na adresu uloženou na adrese \$2010, jejíž hodnota je \$FA55 --- skok bude tedy proveden na adresu \$FA55.
@@ -625,7 +633,7 @@ Existuje ještě jeden nepřímý režim, označovaný jako \emph{nepřímý abs
 		
 		\bitbox[]{8}{} & \bitbox{8}[bgcolor=bfcommonlight]{\$55} & \bitbox{8}[bgcolor=bfcommonlight]{\$FA} \\
 	\end{bytefield}
-	\caption{~Struktura instrukce JMP využívající nepřímý absolutní adresní režim s~příkladem skoku na adresu \$FA55}\label{fig:6502-adr-ind}
+	\caption{~Struktura instrukce JMP využívající nepřímý absolutní adresní režim s~příkladem skoku na adresu \$FA55.}\label{fig:6502-adr-ind}
 \end{figure}
 
 \begin{example}[Využití nepřímého adresování]
@@ -661,7 +669,7 @@ Instrukční cyklus odpovídá standardnímu cyklu procesoru, jako uvádí prof.
 		\draw [arrow] (EX) -| (aux);
 		\draw [arrow] (aux) -- (IC);
 	\end{tikzpicture} 
-	\caption{~Instrukční cyklus procesoru}\label{fig:6502-instrukcni-cyklus}
+	\caption{~Instrukční cyklus procesoru.}\label{fig:6502-instrukcni-cyklus}
 \end{figure}
 
 Přesné dodržení instrukčního cyklu nemusí být u~emulace nutné, dokonce bývá zvykem velkou část cyklu zjednodušit pro dosažení většího výkonu tak, že se pracuje pouze na úrovni instrukcí. Jelikož je ale v~systému komponent více, je nutné se zabývat alespoň délkou trvání jednotlivých instrukcí, aby nedocházelo ke ztrátě synchronizace. 
@@ -676,7 +684,7 @@ Poslední výjimkou jsou instrukce větvení. Dojde-li ke kladnému vyhodnocení
 	Procesor 6502 zároveň provádí více činností --- operace na vnitřní sběrnici provádí souběžně s~operacemi na vnější sběrnici. Zatímco na vnější sběrnici se připravuje operační znak a~příslušné adresy, na vnitřní probíhají výpočty (inkrementace programového čítače, operace na aritmeticko-logické jednotce a~další). Díky pipeliningu je možné instrukce zpracovat v~méně cyklech. Pro účely emulace to však není relevantní a~zájemci si mohou o~problematice více přečíst v~manuálu~\normalfont{\cite{mos:sw-manual}}.
 \end{note}
 
-Podrobný rozpis vykonávaných úkonů při zpracování instrukcí je s~přesností na strojové cykly uveden na v~příloze A hardwarového manuálu~\cite{mos:hw-manual}.
+Podrobný rozpis vykonávaných úkonů při zpracování instrukcí je s~přesností na strojové cykly uveden v~příloze A hardwarového manuálu~\cite{mos:hw-manual}.
 
 \subsubsection{Dekódování instrukcí}
 \label{sec:6502-dekodovani-instrukci}
@@ -688,7 +696,7 @@ Příklad několika záznamů je uveden v~tabulce~\ref{tab:6502-PLA}, kde např�
 
 \begin{table}[ht!]
 	\centering
-	\caption{Ukázka záznamů v~PLA procesoru 6502~\cite{Steil2008:illegal-opcodes}}\label{tab:6502-PLA}
+	\caption{Ukázka záznamů v~PLA procesoru 6502~\cite{Steil2008:illegal-opcodes}.}\label{tab:6502-PLA}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|X[c,m]|}
 		\hline
 		Maska & Cyklus &  Popis \\
@@ -711,7 +719,7 @@ Popis instrukcí většinou bývá ve formě tabulky. První tabulkou je přehle
 
 \begin{table}[ht!]
 	\centering
-	\caption{Ukázka popisu instrukcí logických operací}\label{tab:6502-instr-priklad}
+	\caption{Ukázka popisu instrukcí logických operací.}\label{tab:6502-instr-priklad}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|Q[c,m]|X[c,m]|}
 		\hline
 		Instrukce & N & Z & C & I & D & V & Popis \\
@@ -739,11 +747,11 @@ Další instrukce nastavují příznaky zvláštním způsobem, popřípadě jso
 
 Má-li být emulace věrohodná, je třeba ctít stav po restartu zařízení. Tabulka~\ref{tab:6502-restart} popisuje obsah registrů po restartu. Nejdůležitější je hodnota programového čítače, bez korektního nastavení jeho hodnoty se začne program vykonávat z~nesprávné adresy.
 
-Po spuštění dojde k~7cyklové inicializaci, nakonec se provede instrukce skoku (JMP) na adresu nacházející se ve vektoru resetu \$FFFC--\$FFFD.
+Po spuštění dojde k~inicializaci o~7 procesorových cyklech, nakonec se provede instrukce skoku (JMP) na adresu nacházející se ve vektoru resetu \$FFFC--\$FFFD.
 
 \begin{table}[ht!]
 	\centering
-	\caption{Stav registrů 6502 po restartu}\label{tab:6502-restart}
+	\caption{Stav registrů 6502 po restartu.}\label{tab:6502-restart}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|}
 		\hline
 		Registr & Hodnota \\
@@ -767,7 +775,7 @@ Přerušení se dá použít mimo jiné pro synchronizaci systémových komponen
 
 \begin{table}[ht!]
 	\centering
-	\caption{Vektory přerušení a~resetu}\label{tab:6502-vektory}
+	\caption{Vektory přerušení a~resetu.}\label{tab:6502-vektory}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|}
 		\hline
 		Přerušení & Vektor \\
@@ -810,7 +818,7 @@ Přerušení NMI (non-maskable interrupt) je nemaskovatelné a~vyvolává se ste
 			\end{scope}
 		\end{pgfonlayer}
 	\end{tikztimingtable}
-	\caption{~Detekce přerušení NMI}\label{fig:6502-detekce-nmi}
+	\caption{~Detekce přerušení NMI.}\label{fig:6502-detekce-nmi}
 \end{figure}
 
 \subsubsection*{IRQ}
@@ -848,7 +856,7 @@ Další zvláštností je převážení přerušení (komunitně označováno ja
 			\end{scope}
 		\end{pgfonlayer}
 	\end{tikztimingtable}
-	\caption{Převážení přerušení BRK přerušením NMI}\label{fig:6502-nmi-brk-prevazeni}
+	\caption{Převážení přerušení BRK přerušením NMI.}\label{fig:6502-nmi-brk-prevazeni}
 \end{figure}
 
 \subsection{Specifika Ricoh 2A03}
@@ -875,7 +883,7 @@ Jak již bylo zmíněno v~úvodu, čip PPU je připojen do dvou sběrnic. Jednak
 
 \begin{table}[ht!]
 	\centering
-	\caption{Adresní prostor vlastní sběrnice PPU}\label{tab:ppu-pametova-mapa}
+	\caption{Adresní prostor vlastní sběrnice PPU.}\label{tab:ppu-pametova-mapa}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|X[c,m]|X[c,m]}
 		\hline
 		Rozsah & Popis & Standardně připojeno \\
@@ -904,7 +912,7 @@ Jak již bylo zmíněno v~úvodu, čip PPU je připojen do dvou sběrnic. Jednak
 Nakonec je čip PPU připojen zvlášť ještě k~paměti OAM obsahující sprajty, viz podkapitola~\ref{sec:ppu-oam}.
 
 \subsubsection{Paletová RAM}
-Před další diskusí je třeba popsat, jak funguje práce s~barvami v~konzoli NES. Konzole jako taková má pevně danou množinu barev, kterou může používat. Množina je dána verzí čipu v~závislosti na tom, jestli se generuje přímo kompozitní signál, nebo RGB signál, což používaly především arkádové skříňové automaty. Palety lze vygenerovat v~závislosti na různých nastaveních například nástrojem \url{https://bisqwit.iki.fi/utils/nespalette.php}.
+Před další diskusí je třeba popsat, jak funguje práce s~barvami v~konzoli NES. Konzole jako taková má pevně danou množinu barev, kterou může používat. Množina je dána verzí čipu v~závislosti na tom, jestli se generuje přímo kompozitní signál, nebo RGB signál, což používaly především arkádové skříňové automaty. Palety lze vygenerovat v~závislosti na různých nastaveních například nástrojem od Joela Yliluomy~\cite{Yliluoma:nes-pal-generator}.
 
 Třebaže je tato množina barev už tak omezená, není možné ji používat v~jednu chvíli celou. Množina aktivních barev je uložena v~RAM integrované přímo v~čipu PPU dostupná na sběrnici na adresách \$3F00--\$3F1F. Tato paměť obsahuje čtyři palety pro pozadí a~další čtyři pro sprajty. Úplně první barva (\$3F00) je také nazývána jako univerzální barva. Každá paleta obsahuje hodnotu tří barev ze zmiňované množiny a~dále jednu barvu, která je zrcadlem univerzální barvy pozadí. Obrázek~\ref{fig:ppu-palety} ukazuje vnitřní uspořádání paletové paměti s~ukázkou možného obsahu. Uctivý čtenář si ráčí všimnout, že první barva palety je vždy stejná, totiž taková, která je obsažena na adrese \$3F00. Jedná se  o~zrcadlo tohoto paměťového místa, a~tudíž první barvu lze zvolit pouze pro všechny palety stejnou; proto také označení univerzální barva.
 
@@ -940,11 +948,11 @@ Třebaže je tato množina barev už tak omezená, není možné ji používat v
 		\end{rightwordgroup} \\
 		
 	\end{bytefield}
-	\caption{Část paletové paměti RAM s~ukázkou hodnot barev z~množiny dostupné pro čip 2C02}\label{fig:ppu-palety}
+	\caption{Část paletové paměti RAM s~ukázkou hodnot barev z~množiny dostupné pro čip 2C02.}\label{fig:ppu-palety}
 \end{figure}
 
 \subsubsection{Pattern table}
-Pattern table (volně přeložitelné jako tabulka tvarů) je část paměti typicky obsažené v~kazetě ve počtu dvou po sobě jdoucích tabulek. Zde se ukládají tvary, ze kterých se poté skládá výsledný obraz, ať už v~pozadí, nebo ve formě sprajtu. Každá pattern table obsahuje 256 dlaždic. Diagram jedné pattern table je k~nahlédnutí na obrázku~\ref{fig:ppu-pattern-table}, kde jednotlivé dlaždice jsou označeny jako D následované indexem dlaždice.
+Pattern table (volně přeložitelné jako tabulka tvarů) je část paměti typicky obsažená v~kazetě ve dvou po sobě jdoucích tabulkách. Zde se ukládají tvary, ze kterých se poté skládá výsledný obraz, ať už v~pozadí, nebo ve formě sprajtu. Každá pattern table obsahuje 256 dlaždic. Diagram jedné pattern table je k~nahlédnutí na obrázku~\ref{fig:ppu-pattern-table}, kde jednotlivé dlaždice jsou označeny písmenem~\enquote{D} následované indexem dlaždice.
 
 \begin{figure}[ht!]
 	\centering	
@@ -963,7 +971,7 @@ Pattern table (volně přeložitelné jako tabulka tvarů) je část paměti typ
 		% Poslední řádek.
 		\forloop{tileIndex}{240}{\value{tileIndex} < 256}{\ifx\tileIndex>0 & \fi \bitbox{16}{D\arabic{tileIndex}}} \\ 	
 	\end{bytefield}
-	\caption{~Struktura pattern table čipu PPU}\label{fig:ppu-pattern-table}
+	\caption{~Struktura pattern table čipu PPU.}\label{fig:ppu-pattern-table}
 \end{figure}
 
 Každá dlaždice je reprezentována dvěma v~paměti po sobě jdoucími částmi. Každá část má 8~bajtů, dohromady má tedy dlaždice 16 bajtů. Každý bajt jedné části představuje řádek obrázku; každý bit poté představuje část hodnoty pixelu. Poněvadž se dlaždice skládá ze dvou částí, je pro každý pixel definována dvoubitová hodnota. Dolní bit této hodnoty reprezentuje bit z~první části; horní bit pak ten z~druhé části. Hodnota pixelu se používá pro výběr barvy z~aktivní palety --- celkem jsou k~dispozici čtyři různé barvy, z~toho první barva je pro všechny palety stejná. Princip skládání hodnot pixelu je znázorněn na obrázku~\ref{fig:ppu-pattern-tile}, kde je ukázán i~potenciální výsledný obrázek, pokud by se používala paleta pozadí 3 z~obrázku~\ref{fig:ppu-palety}.
@@ -1012,7 +1020,7 @@ Každá dlaždice je reprezentována dvěma v~paměti po sobě jdoucími částm
 		\drawpixels{\pixels}{pixel}
 	\end{tikzpicture}
 
-	\caption{Ukázka složení částí dlaždic ve výsledný obraz za použití palety pozadí 3 z~obrázku~\ref{fig:ppu-palety}}\label{fig:ppu-pattern-tile}
+	\caption{Ukázka složení částí dlaždic ve výsledný obraz za použití palety pozadí 3 z~obrázku~\ref{fig:ppu-palety}.}\label{fig:ppu-pattern-tile}
 \end{figure}
 
 \subsubsection{Nametable}
@@ -1037,7 +1045,7 @@ Tabulka atributů se nachází vždy na konci nametable. Každý bajt tabulky ur
 
 Pořadí indexů v~bajtů přísluší jednotlivým kvadrantům v~tomto pořadí od~nejvyšších dvou bitů: dolní pravý, dolní levý, horní pravý, horní levý.
 
-Srozumitelná ukázka je k~dispozici na stránce~\cite{Nesdev:attribute-table}
+Srozumitelná ukázka je k~dispozici na stránce~\cite{Nesdev:attribute-table}.
 
 \subsubsection{Object Attribute Memory}
 \label{sec:ppu-oam}
@@ -1081,14 +1089,14 @@ PPU je řízeno pomocí osmi registrů mapovaných do paměťového prostoru pro
 
 \subsection{Pracovní registry}
 \label{sec:ppu-pracovni-registry}
-PPU obsahuje také dvě skupiny pracovních registrů sloužící k~průběžnému ukládání vyhodnocovaných a~následně vykreslovaných dat, ale i~pro přístup na grafickou sběrnici zvenčí. První skupina souvisí s~přístupem na videopaměti, což je prováděno nejen programátorem, ale i~čipem PPU samotným. Druhá skupina slouží k~vykreslování sprajtů.
+PPU obsahuje také dvě skupiny pracovních registrů sloužící k~průběžnému ukládání vyhodnocovaných a~následně vykreslovaných dat, ale i~pro přístup na grafickou sběrnici zvenčí. První skupina souvisí s~přístupem do videopaměti, což je prováděno nejen programátorem, ale i~čipem PPU samotným. Druhá skupina slouží k~vykreslování sprajtů.
 
 \subsubsection{Pozadí a~práce s~videopamětí}
 Data pro vykreslování pozadí jsou uložena ve videopaměti (VRAM), se kterou kromě programátora při zápisu do této paměti pracuje i~PPU při vykreslování obrazu na obrazovku televizoru. Pro adresaci v~rámci paměti se používají dva 15bitové registry, tyto registry jsou sdíleny pro obě aktivity; jak modifikace programátorem, tak čtení samotným čipem. Tabulka~\ref{tab:ppu-vram} ukazuje všechny registry používané pro indexaci ve videopaměti a~jejich abstrahovaný význam v~souvislosti s~posuvem souřadnic na obrazovce.
 
 \begin{table}[htp!]
 	\centering
-	\caption{Pracovní registry pro práci s~videopamětí}\label{tab:ppu-vram}
+	\caption{Pracovní registry pro práci s~videopamětí.}\label{tab:ppu-vram}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|Q[c,m]|X[l,m]|}
 		\hline
 		Označení & Popis & Bity & Popis bitů \\
@@ -1104,11 +1112,11 @@ Data pro vykreslování pozadí jsou uložena ve videopaměti (VRAM), se kterou 
 	\end{tblr}
 \end{table}
 
-Registr T je přístupný pomocí registrů \$2000 (PPUCTRL), \$2005 (PPUSCROLL) a~\$2006 (PPUADDR). Slouží k~úpravě programátorem, nepoužívá se pro samotnou indexaci. Do registru PPUCTRL stačí zapsat jednou a~přenáší se do T pouze index nametable. Do zbývajících dvou registrů se musí zapsat dvakrát, oba sdílejí stejný přepínač pořadí (W) a~oba slouží k~úpravě posuvů. Registr PPUSCROLL je zaměřený na úpravu před začátkem vykreslování snímku pro nastavení posuvu v~rámci videopaměti (zjednodušeně řečeno: tímto se nastavuje okno do videopaměti, které je viditelné na obrazovce, díky principu zrcadlení paměti je takto možné zobrazit části více nametable zároveň). Registr PPUADDR je poté zaměřen na práci se surovými daty vkládané do paměti programátorem pomocí registru PPUDATA, pro adresu do dočasného registru T vkládá v~jiném pořadí a~navíc při druhém zápisu rovnou data aktualizuje i~v~aktivním registru V --- počítá se s~tím, že programátor bude do videopaměti přistupovat okamžitě.
+Registr T je přístupný pomocí registrů \$2000 (PPUCTRL), \$2005 (PPUSCROLL) a~\$2006 (PPUADDR). Slouží k~úpravě programátorem, nepoužívá se pro samotnou indexaci. Do registru PPUCTRL stačí zapsat jednou a~přenáší se do T pouze index nametable. Do zbývajících dvou registrů se musí zapsat dvakrát, oba sdílejí stejný přepínač pořadí (W) a~oba slouží k~úpravě posuvů. Registr PPUSCROLL je zaměřený na úpravu před začátkem vykreslování snímku pro nastavení posuvu v~rámci videopaměti (zjednodušeně řečeno: tímto se nastavuje okno do videopaměti, které je viditelné na obrazovce, díky principu zrcadlení paměti je takto možné zobrazit části více nametable zároveň). Registr PPUADDR je poté zaměřen na práci se surovými daty vkládané do paměti programátorem pomocí registru PPUDATA, proto adresu do dočasného registru T vkládá v~jiném pořadí a~navíc při druhém zápisu rovnou data aktualizuje i~v~aktivním registru V --- počítá se s~tím, že programátor bude do videopaměti přistupovat okamžitě.
 
 Registr V již slouží pro přímou indexaci ve videopaměti. Horizontální posuvy jsou aktualizovány registrem T buďto okamžitě při druhém zápisu do registru PPUADDR, nebo je aktualizován průběžně v~každém obrazovém bodu 257 každého obrazového řádku. Dále je hodnota posuvu souřadnice Y průběžně aktualizována v~obrazovém bodu 256 každého řádku. Vertikální posuvy jsou aktualizovány registrem T poté na konci intervalu VBL v~bodech 280--304. Nakonec je hodnota V inkrementována dle nastavení v~PPUCTRL vždy při čtení, nebo zápisu do PPUDATA.
 
-Další informace, příklady a~podrobnosti lze nalézt na příslušné stránce Nesdev:~\cite{Nesdev:ppu-scroll}.
+Další informace, příklady a~podrobnosti lze nalézt na příslušné stránce Nesdev~\cite{Nesdev:ppu-scroll}.
 
 Kromě pracovních registrů jsou v~čipu obsaženy i~posuvné registry, sloužící k~ukládání pixelů a~metadat aktuálně vykreslovaných. Jsou to dva 16bitové registry pro vzory zkopírované z~pattern table a~dva 8bitové pro ukládání souvisejících atributů.
 
@@ -1120,7 +1128,7 @@ Pro práci se sprajty kromě hlavní a~vedlejší OAM existuje i~osm párů 8bit
 Všechny registry u~PPU je možné po spuštění vynulovat. Dočasné paměti jako OAM a~paletová RAM nemají definovaný stav po spuštění; od programátora se očekává, že tuto paměť korektně inicializuje.
 
 \subsection{Renderování}
-Proces renderování obrazu je pevně spjat s~jeho průběžným vykreslováním na obrazovku. Po načtení veškerých potřebných dat do pamětí a~nastavení čipu pomocí registrů je důležité se zabývat, jak čip s~dodanými daty pracuje. Přehledný, komunitou vytvořený, diagram celého procesu včetně operací na pozadí je součástí přílohy~\ref{apx:ppu}.
+Proces renderování obrazu je pevně spjat s~jeho průběžným vykreslováním na obrazovku. Po načtení veškerých potřebných dat do pamětí a~nastavení čipu pomocí registrů je důležité se zabývat tím, jak čip s~dodanými daty pracuje. Přehledný, komunitou vytvořený, diagram celého procesu včetně operací na pozadí je součástí přílohy~\ref{apx:ppu}.
 
 \subsubsection{Pozadí}
 \label{sec:ppu-pozadi}
@@ -1130,7 +1138,7 @@ Na viditelných řádcích (0-239) se provádí sled vnitřních (negenerující
 
 \begin{table}[ht!]
 	\centering
-	\caption{Vnitřní operace PPU během viditelných obrazových řádků}\label{tab:ppu-pozadi-cykly}
+	\caption{Vnitřní operace PPU během viditelných obrazových řádků.}\label{tab:ppu-pozadi-cykly}
 	\begin{tblr}{|Q[c,m]|X[c,m]|}
 		\hline
 		Cyklus & Operace \\
@@ -1174,7 +1182,7 @@ Na každém řádku nejprve probíhá proces vyhodnocování, kdy se rozhoduje, 
 Samotné vykreslování probíhá souběžně s~pipeline řešící pozadí. V~každém cyklu se dekrementují čítače uchovávající horizontální souřadnice sprajtů pro daný řádek. Je-li nějaký čítač nulový, začne se sprajt postupně vykreslovat pixel po pixelu --- dojde k~postupnému vysouvání dat z~posuvných registrů příslušící danému sprajtu. Je-li aktivních více sprajtů, vybere se ten, který má na výstupu zrovna neprůhledný pixel (nenulová hodnota) a~zároveň má nejmenší index v~paměti, a~pošle se do multiplexeru, kde se vyhodnotí, jestli se vykreslí pixel sprajtu, nebo pozadí, čemuž se věnuje sekce~\ref{sec:ppu-priority}.
 
 \begin{note}[Chyba v~inkrementaci]
-Chyba v~kontrole popisovaná v~bodu 3 se projevuje chybnou inkrementací. První sprajt po nalezení osmi aktivních sprajtů se vyhodnotí správně, poté ale autoinkrementace způsobí vyhodnocování jiných bajtů namísto toho uchovávající souřadnici Y. Jedná se právě o~jednu z~chyb, kterou je také nutné emulovat v~případě, že je třeba spouštět software, který se na tyto chyby spoléhá (což je ale velice vzácné; většina programů se na špatně definované či chybné chování nespoléhala).
+Chyba v~kontrole popisovaná v~bodu 3 se projevuje chybnou inkrementací. První sprajt po nalezení osmi aktivních sprajtů se vyhodnotí správně, poté ale autoinkrementace způsobí vyhodnocování jiných bajtů namísto toho uchovávající souřadnici~Y. Jedná se právě o~jednu z~chyb, kterou je také nutné emulovat v~případě, že je třeba spouštět software, který se na tyto chyby spoléhá (což je ale velice vzácné; většina programů se na špatně definované či chybné chování nespoléhala).
 \end{note}
 
 Podrobnější popis je k~dispozici na stránce~\cite{Nesdev:ppu-sprites}.
@@ -1187,7 +1195,7 @@ Těsně před vykreslením se pixel pozadí a~pixel popředí (sprajtu) účastn
 	Jak bylo uvedeno, do rozhodování vstupuje pixel sprajtu, který je neprůhledný a~má nejnižší index, i~když má tento sprajt v~atributech nastaveno, že prioritu má pozadí. Může se tedy stát, že přestože v~seznamu osmi aktivních sprajtů pro obrazový řádek existuje prioritní sprajt, dojde stejně k~vykreslení pozadí, protože se zkrátka priorita sprajtu v~moment vstupu do rozhodovacího procesu nebere v~potaz.
 \end{note}
 
-Samotný rozhodovací proces spočívá v~několika krocích, kdy se nejprve kontroluje \enquote{nulovost} pixelu. Nulová hodnota pixelu totiž indexuje v~paletě univerzální barvu pozadí, což je bráno jako transparentní pixel. Nejsou-li žádný z~pixelů nulové, vykreslí se pixel dle nastavené priority v~atributech sprajtu. Tento proces je graficky znázorněn na obrázku~\ref{fig:ppu-vyber-pixelu}.
+Samotný rozhodovací proces spočívá v~několika krocích, kdy se nejprve kontroluje \enquote{nulovost} pixelu. Nulová hodnota pixelu totiž indexuje v~paletě univerzální barvu pozadí, což je bráno jako transparentní pixel. Není-li žádný z~pixelů nulový, vykreslí se pixel dle nastavené priority v~atributech sprajtu. Tento proces je graficky znázorněn na obrázku~\ref{fig:ppu-vyber-pixelu}.
 
 \begin{figure}[ht!]
 	\centering
@@ -1220,7 +1228,7 @@ Samotný rozhodovací proces spočívá v~několika krocích, kdy se nejprve kon
 		\draw [arrow] (BGZERO) -| node[anchor=south] {ano} (RENDERSPR);
 		\draw [arrow] (SPRZERO) -| node[anchor=south] {ano} (RENDERBG);
 	\end{tikzpicture}
-	\caption{Proces výběru pixelu k~vykreslení}\label{fig:ppu-vyber-pixelu}
+	\caption{Proces výběru pixelu k~vykreslení.}\label{fig:ppu-vyber-pixelu}
 \end{figure}
 
 \section{Game Pak}
@@ -1230,7 +1238,7 @@ Každá kazeta obsahuje paměť pro program, PRG~ROM, volitelně pracovní pamě
 
 \begin{table}[ht!]
 	\centering
-	\caption{Mapování kazety do rozsahu CPU a~PPU}\label{tab:gamepak-mapovani}
+	\caption{Mapování kazety do rozsahu CPU a~PPU.}\label{tab:gamepak-mapovani}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|}
 		\hline
         Rozsah & Mapování \\
@@ -1278,7 +1286,7 @@ Díky využití přepínaní bank umožňuje mapper 001 oproti mapperu 000 adres
 
 \begin{table}[ht!]
 	\centering
-	\caption{Adresy a~popis vnitřních registrů MMC1}\label{tab:mmc1-registry-adresy}
+	\caption{Adresy a~popis vnitřních registrů MMC1.}\label{tab:mmc1-registry-adresy}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|X[c,m]|}
 		\hline
         Adresa & Název & Popis \\
@@ -1298,13 +1306,13 @@ Díky využití přepínaní bank umožňuje mapper 001 oproti mapperu 000 adres
 \label{sec:analyza-format-souboru}
 První emulátory znamenaly také nutnost vytvoření jednotného formátu, pomocí kterého se budou ukládat obsahy a~konfigurace kazet. Prvním formátem, dodnes hojně používaným, je iNES.
 
-Formát iNES se skládá z~16bajtové hlavičky. Následuje volitelný \enquote{trainer}, což byly pomocné informace pro rané emulátory, o~velikosti 512~B. Poté je uložen jeden, nebo více 16KiB bloků PRG~ROM a~volitelně jeden, nebo více 8KiB bloků CHR~ROM. Dále mohou být součástí dodatečná data systému PlayChoice, čímž se bakalářská práce nezabývá.
+Formát iNES se skládá z~16bajtové hlavičky. Následuje volitelný \enquote{trainer}, což byly pomocné informace pro rané emulátory, o~velikosti 512~B. Poté je uložen jeden nebo více 16KiB bloků PRG~ROM a~volitelně jeden nebo více 8KiB bloků CHR~ROM. Dále mohou být součástí dodatečná data systému PlayChoice, čímž se bakalářská práce nezabývá.
 
-Formát hlavičky je uveden v~tabulce~\ref{tab:ines}. Jednotlivá struktura je opět velmi dobře dokumentována, proto je pro další informace možné nahlédnout na wiki~\cite{Nesdev:iNES}.
+Formát hlavičky je uveden v~tabulce~\ref{tab:ines}. Jednotlivá struktura je opět velmi dobře dokumentována, proto je pro další informace možné nahlédnout do komunitní dokumentace Nesdev~\cite{Nesdev:iNES}.
 
 \begin{table}[ht!]
 	\centering
-	\caption{Formát hlavičky iNES}\label{tab:ines}
+	\caption{Formát hlavičky iNES.}\label{tab:ines}
 	\begin{tblr}{|Q[c,m]|X[c,m]|}
 		\hline
 		Offset (B) & Obsah \\
@@ -1327,19 +1335,19 @@ Formát hlavičky je uveden v~tabulce~\ref{tab:ines}. Jednotlivá struktura je o
 \end{table}
 
 \section{Periferie}
-Základní periferií, která byla dodávaná s~konzolí, jsou dva herní ovladače (každý pro jednoho hráče). Všechny periferie komunikují přes stejný typ portu. Kromě 5voltového napájení a hodin obsahuje port tři datové piny označované jako D0, D3 a~D4, kde pro ovladače je použit pouze D0.
+Základními periferiemi, které byly dodávány s~konzolí, jsou dva herní ovladače (každý pro jednoho hráče). Všechny periferie komunikují přes stejný typ portu. Kromě 5V napájení a hodin obsahuje port tři datové piny označované jako D0, D3 a~D4, kde pro ovladače je použit pouze D0.
 
 \begin{note}
-Mimo herních ovladačů existovalo mnoho dalších periferií, hodně známou je například Zapper, což je model zbraně používaný ve hře Duck Hunt. Později se objevily i~pokročilejší periferie, například klávesnice pro Family BASIC, Famicom 3D brýle, interaktivní robot R.O.B., disketová jednotka Family Disk System~\normalfont{\cite{Nesdev:inputs}}, nebo dokonce síťová karta (pouze pro Famicom) s~vlastních procesorem, který sloužila pro přístup k~bankovnictví, sázecím programům a~dalším~\cite{Takano1995:famicom-modem}. Pokročilejší periferie se připojovaly expanzním portem, který byl k~dispozici pouze u~japonské verze konzole Family Computer.
+Mimo herních ovladačů existovalo mnoho dalších periferií, hodně známou je například Zapper, což je model zbraně používaný ve hře Duck Hunt. Později se objevily i~pokročilejší periferie, například klávesnice pro Family BASIC, Famicom 3D brýle, interaktivní robot R.O.B., disketová jednotka Family Disk System~\normalfont{\cite{Nesdev:inputs}}, nebo dokonce síťová karta (pouze pro Famicom) s~vlastních procesorem, která sloužila pro přístup k~bankovnictví, sázecím programům a~dalším~\cite{Takano1995:famicom-modem}. Pokročilejší periferie se připojovaly expanzním portem, který byl k~dispozici pouze u~japonské verze konzole Family Computer.
 \end{note}
 
 \subsection{Herní ovladače}
-Ovladače obsahují celkem 8~tlačítek, jak ukazuje ilustrační obrázek~\ref{fig:periferie-ovladac}. Výstup z~tlačítek je udržován v~logické jedničce pomocí rezistoru, jejich zmáčknutím dojde ke spojení se zemí (GND, 0 V) a~na výstupu je tak logická nula.
+Ovladače obsahují celkem 8~tlačítek, jak ukazuje ilustrační obrázek~\ref{fig:periferie-ovladac}. Výstup z~tlačítek je udržován v~logické jedničce pomocí rezistoru. Jejich zmáčknutím dojde ke spojení se zemí (GND, 0 V) a~na výstupu je tak logická nula.
 
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=0.5\textwidth]{images/nes-ovladac.jpg}
-	\caption{Standardní ovladač konzole NES (foto \copyright~2016 Evan-Amos)}
+	\caption{Standardní ovladač konzole NES (foto \copyright~2016 Evan-Amos).}
 	\label{fig:periferie-ovladac}
 \end{figure}
 
@@ -1349,7 +1357,7 @@ Při čtení jsou k~dispozici všechny tři piny, které jsou umístěny do jedn
 
 \begin{table}[ht!]
 	\centering
-	\caption{Funkce vstupních pinů portů konzole}\label{tab:periferie-cteci-piny}
+	\caption{Funkce vstupních pinů portů konzole.}\label{tab:periferie-cteci-piny}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|}
 		\hline
 		Pin & Funkce \\
@@ -1382,7 +1390,7 @@ APU obsahuje celkem čtyři konfigurovatelné syntezátory; dva generující pul
 
 \begin{table}[ht!]
 	\centering
-	\caption{Registry APU}\label{tab:navrh-apu-registry}
+	\caption{Registry APU.}\label{tab:navrh-apu-registry}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|}
 		\hline
 		Adresa & Funkce \\
@@ -1406,32 +1414,32 @@ APU obsahuje celkem čtyři konfigurovatelné syntezátory; dva generující pul
 \label{sec:analyza-citac-ramcu}
 Základem APU je takzvaný čítač rámců, které generuje hodinový signál pro všechny kanály. Navíc je tato jednotka schopná generovat přerušení s~frekvencí 60~Hz. Samotný čítač je řízen hodinami CPU dělenými dvěma, tudíž každý druhý cyklus procesoru je poslán hodinový cyklus i~do APU. Čítač lze nastavit registrem \$4017, který má následující strukturu: \texttt{MI------}. Je-li bit \texttt{M} roven 0, APU pracuje ve~čtyřkrokovém režimu, jinak pracuje v pětikrokovém režimu. Bit \texttt{I} je maskou přerušení; je-li tento bit nastaven, poté nebude přerušení vyvoláváno.~\cite{Nesdev:apu-frame-counter}
 
-Čítač pracuje ve dvou režimech. Režim říká, v~kolika krocích bude APU pracovat a~co budou tyto kroky zahrnovat. Může pracovat buďto v~režimu sestávající ze čtyř, nebo z~pěti kroků. Krok je vykonán zhruba každých 3728~APU cyklů. Ve čtyřkrokovém řežimu je při každém kroku poslán hodinový signál do první skupiny komponent (generátor obálky a~čítač trojúhelníkového generátoru); každý druhý krok je poté poslán hodinový signál do druhé skupiny komponent (čítač délky a~regulátor period). V pětikrokovém režimu je hodinový signál do první skupiny zaslán ve všech krocích kromě čtvrtého, do druhé skupiny ve druhém kroku a~v~kroku pátém.~\cite{Nesdev:apu-frame-counter}
+Čítač pracuje ve dvou režimech. Režim říká, v~kolika krocích bude APU pracovat a~co budou tyto kroky zahrnovat. Může pracovat buďto v~režimu sestávajícím ze čtyř, nebo z~pěti kroků. Krok je vykonán zhruba každých 3728~APU cyklů. Ve čtyřkrokovém řežimu je při každém kroku poslán hodinový signál do první skupiny komponent (generátor obálky a~čítač trojúhelníkového generátoru); každý druhý krok je poté poslán hodinový signál do druhé skupiny komponent (čítač délky a~regulátor period). V pětikrokovém režimu je hodinový signál do první skupiny zaslán ve všech krocích kromě čtvrtého, do druhé skupiny ve druhém kroku a~v~kroku pátém.~\cite{Nesdev:apu-frame-counter}
 
 Podrobnější informace o~fungování čítače lze nalézt v~\cite{Nesdev:apu-frame-counter}.
 
 \subsubsection{Mix}
 Míchání všech výstupů probíhá v~mixu. Každý kanál má vlastní digitálně-analogový převodník, výsledkem je pak nelineární míchací schéma odhadnutelné například následujícím výpočtem převzatým z~\cite{Nesdev:apu-mixer}.
 
-\[vystup = suma\_pulz + suma\_tnd\]
+\[\textrm{výstup} = \textrm{suma\_pulz} + \textrm{suma\_tnd}\]
 	
 kde jsou jednotlivé složky vyjádřitelné jako
 	
-\[suma\_pulz = \frac{95,88}{\frac{8128}{pulz1 + pulz2} + 100}\]
+\[\textrm{suma\_pulz} = \frac{95,88}{\frac{8128}{\textrm{pulz1} + \textrm{pulz2}} + 100}\]
 
-\[suma\_tnd = \frac{159,79}{\frac{1}{\frac{trojuhelnik}{8227} + \frac{sum}{12241} + \frac{pcm}{22638}} + 100}\]
+\[\textrm{suma\_tnd} = \frac{159,79}{\frac{1}{\frac{\textrm{trojúhelnik}}{8227} + \frac{\textrm{šum}}{12241} + \frac{\textrm{pcm}}{22638}} + 100}\]
 
 \subsection{Generátor pulzů}
 APU obsahuje celkem dva generátory pulzů. Oba se povolují zápisem hodnoty 1 do příslušných bitů ve společném registru \$4015; pro první kanál se jedná o~nejnižší bit a~pro druhý kanál druhý nejnižší bit. Každý z~generátorů se skládá z~pěti komponent:
 \begin{itemize}
 	\item generátor obálky signálu (viz~\cite{Nesdev:apu-envelope}),
-	\item regulátor periody,
+	\item regulátor periody (označován jako sweep unit),
 	\item 11bitový časovač řízený hodinami CPU dělenými dvěma (tudíž o~poloviční frekvenci),
 	\item sekvencer (generátor průběhu) pracující v~osmi krocích,
 	\item čítač délky (viz~\cite{Nesdev:apu-length-counter}).
 \end{itemize}
 
-Regulátory periody existují ve dvou jednotkách, každý pulzní kanál má svou jednotku. Ovládá se registry \$4001 pro první kanál a~\$4005 pro druhý. Oba mají stejnou strukturu: \texttt{EPPPNSSS}, kde \texttt{E} je povolení regulátoru (1 znamená povoleno), \texttt{PPP} je perioda děličky regulátoru, \texttt{N} určuje, zdali se se perioda přičítá (hodnota 0), nebo odčítá (hodnota 1), \texttt{SSS} je počet bitů k~posuvu. Je-li regulátor periody aktivní, upravuje hodnotu hlavního časovače v~těchto krocích:
+Regulátory periody existují ve dvou jednotkách, každý pulzní kanál má svou jednotku. Ovládají se registry \$4001 pro první kanál a~\$4005 pro druhý. Oba mají stejnou strukturu: \texttt{EPPPNSSS}, kde \texttt{E} je povolení regulátoru (1 znamená povoleno), \texttt{PPP} je perioda děličky regulátoru, \texttt{N} určuje, zdali se se perioda přičítá (hodnota 0), nebo odčítá (hodnota 1), \texttt{SSS} je počet bitů k~posuvu. Je-li regulátor periody aktivní, upravuje hodnotu hlavního časovače v~těchto krocích:
 \begin{enumerate}
 	\item Načtení hodnoty 11bitového časovače a~posuv této hodnoty vpravo dle nastavení (bity \texttt{SSS}).
 	\item Je-li bit \texttt{N} roven 1, poté je hodnota negována (první kanál narozdíl od druhého pracuje s~jedničkovým doplňkem, tudíž je hodnota ještě o~1 menší).
@@ -1440,9 +1448,9 @@ Regulátory periody existují ve dvou jednotkách, každý pulzní kanál má sv
 
 Regulátor periody má za jistých podmínek schopnost celý kanál vyřadit, což je včetně dalších podrobností fungování dokumentováno na stránce~\cite{Nesdev:apu-sweep}.
 
-Třetí komponenta, 11bitový čítač, slouží k~taktování sekvenceru. Jeho hodnota je upravována pomocí dvou registrů: \$4001 (\$4006 pro druhý kanál) slouží k~nastavení výchozích spodních osmi bitů časovače; spodní tři bity \$4003 (\$4007 pro druhý kanál) poté nastavují výchozí horní tři bity časovače. 11bitová výchozí hodnota je perioda časovače. Každý APU hodinový takt je hodnota čítače dekrementována, po dosažení nuly se do čítače načte nakonfigurovaná výchozí hodnota a~sekvencer je posunut o~1~krok vpřed.~\cite{Nesdev:apu-pulse}
+Třetí komponenta, 11bitový čítač, slouží k~taktování sekvenceru. Jeho hodnota je upravována pomocí dvou registrů: \$4002 (\$4006 pro druhý kanál) slouží k~nastavení výchozích spodních osmi bitů časovače; spodní tři bity \$4003 (\$4007 pro druhý kanál) poté nastavují výchozí horní tři bity časovače. 11bitová výchozí hodnota je perioda časovače. Každý APU hodinový takt je hodnota čítače dekrementována, po dosažení nuly se do čítače načte nakonfigurovaná výchozí hodnota a~sekvencer je posunut o~1~krok vpřed.~\cite{Nesdev:apu-pulse}
 
-Sekvencer slouží ke generování průběhu signálu. APU obsahuje vnitřní tabulku o~čtyřech řádcích, kdy každý řádek reprezentuje jeden průběh signálu lišící se ve střídě. Jednotlivé hodnoty jsou omezeny pouze na 1 (maximální amplituda) a 0 (nulová amplituda --- ztlumení). Index řádku (a~tedy hodnotu střídy) lze nakonfigurovat pomocí registru dvou nejvyšších bitů registru \$4000 pro první, respektive \$4004 pro druhý kanál, což přesně odpovídá čtyřem možným hodnotám. Obrázek~\ref{fig:apu-signaly} ukazuje vzhled jednotlivých průběhů dle nakonfigurovaného indexu i~s~odpovídající hodnotou střídy v~procentech.~\cite{Nesdev:apu-pulse}
+Sekvencer slouží ke generování průběhu signálu. APU obsahuje vnitřní tabulku o~čtyřech řádcích, kdy každý řádek reprezentuje jeden průběh signálu lišící se ve střídě. Jednotlivé hodnoty jsou omezeny pouze na 1 (maximální amplituda) a 0 (nulová amplituda --- ztlumení). Index řádku (a~tedy hodnotu střídy) lze nakonfigurovat pomocí registru dvou nejvyšších bitů registru \$4000 pro první, respektive \$4004 pro druhý kanál, což přesně odpovídá čtyřem možným hodnotám~\cite{Nesdev:apu-pulse}. Obrázek~\ref{fig:apu-signaly} ukazuje vzhled jednotlivých průběhů dle nakonfigurovaného indexu i~s~odpovídající hodnotou střídy v~procentech.
 
 \begin{figure}[ht!]
 	\centering
@@ -1464,14 +1472,14 @@ Sekvencer slouží ke generování průběhu signálu. APU obsahuje vnitřní ta
 			\end{scope}
 		\end{pgfonlayer}
 	\end{tikztimingtable}
-	\caption{~Vzhled průběhů signálu pulzního kanálu APU}\label{fig:apu-signaly}
+	\caption{~Vzhled průběhů signálu pulzního kanálu APU.}\label{fig:apu-signaly}
 \end{figure}
 
 \begin{note}[Průběh signálu se 75\% střídou]
-	Signál odpovídající indexu~3 na obrázku~\ref{fig:apu-signaly} je oproti ostatním signálům posunut. To je způsobeno tím, že sekvencer je sice inicializován na nultý krok, ale kroky počítá dolů, v~tabulce se tedy pohybuje opačným směrem a~signál je i~takto zvláštně generován.~\normalfont{\cite{Nesdev:apu-pulse}}
+	Signál odpovídající indexu~3 na obrázku~\ref{fig:apu-signaly} je oproti ostatním signálům posunut. To je způsobeno tím, že sekvencer je sice inicializován na nultý krok, ale kroky počítá dolů, v~tabulce se tedy pohybuje opačným směrem a~signál je i~takto zvláštně generován~\normalfont{\cite{Nesdev:apu-pulse}}.
 \end{note}
 
-Sekvencer přivádí hodnotu vytvořenou generátorem obálky do mixu za těchto podmínek:
+Sekvencer přivádí hodnotu vytvořenou generátorem obálky do mixu pouze tehdy, jsou-li splněny všechny následující podmínky:
 \begin{itemize}
 	\item aktuální hodnota kroku sekvenceru je 1,
 	\item regulátor periody neztlumuje signál,
@@ -1488,9 +1496,9 @@ Generátor šumu je mnohem jednodušší jednotkou nežli generátor pulzních s
 	\item čítač délky (viz~\cite{Nesdev:apu-length-counter}).
 \end{enumerate}
 
-Jediné dvě konfigurovatelné hodnoty specifické pro generátor šumu je nastavení režimu a~výchozí hodnoty časovače, obojí pomocí registru \$400E s~následující strukturou: \texttt{M---PPPP}. \texttt{M} je režim rozhodující o~bitu jdoucím do zpětné vazby, \texttt{PPPP} volba výchozí hodnoty (periody) hlavního časovače.~\cite{Nesdev:apu-noise}. Konkrétní hodnota je určena dle tabulky, ta je k~nahlédnutí například v~\cite{Nesdev:apu-noise}.
+Jediné dvě konfigurovatelné hodnoty specifické pro generátor šumu jsou nastavení režimu a~výchozí hodnoty časovače, obojí pomocí registru \$400E s~následující strukturou: \texttt{M---PPPP}. \texttt{M} je režim rozhodující o~bitu jdoucím do zpětné vazby, \texttt{PPPP} volba výchozí hodnoty (periody) hlavního časovače~\cite{Nesdev:apu-noise}. Konkrétní hodnota je určena dle tabulky, ta je k~nahlédnutí například v~\cite{Nesdev:apu-noise}.
 
-Hlavní časovač funguje podobně jako u~pulzního kanálu, po dosažení nulové hodnoty dojde k~taktování tentokrát zpětnovazebního registru. Struktura registru je na obrázku~\ref{fig:apu-sum-LFSR}. Je-li nastaven bit M na 1, poté jsou zpětnovazební bity 0 a~6, jinak bity 0 a~1.~\cite{Nesdev:apu-noise}
+Hlavní časovač funguje podobně jako u~pulzního kanálu, po dosažení nulové hodnoty dojde k~taktování tentokrát zpětnovazebního registru. Struktura registru je na obrázku~\ref{fig:apu-sum-LFSR}. Je-li nastaven bit M na 1, poté jsou zpětnovazební bity 0 a~6, jinak bity 0 a~1~\cite{Nesdev:apu-noise}.
 
 % Inspirováno příspěvkem uživatele Excelsior na stránce https://tex.stackexchange.com/questions/592862/latex-using-tikz-to-draw-a-lfsr.
 \begin{figure}[ht!]
@@ -1519,7 +1527,7 @@ Hlavní časovač funguje podobně jako u~pulzního kanálu, po dosažení nulov
 			\draw[color=lfsr] (ch1-6) -- (c6);
 		\end{scope}
 	\end{tikzpicture}
-	\caption{~Zpětnovazební registr generátoru šumu}\label{fig:apu-sum-LFSR}
+	\caption{~Zpětnovazební registr generátoru šumu.}\label{fig:apu-sum-LFSR}
 \end{figure}
 
 Generátor šumu přivádí hodnotu vytvořenou generátorem obálky do mixu za těchto podmínek:
@@ -1529,17 +1537,15 @@ Generátor šumu přivádí hodnotu vytvořenou generátorem obálky do mixu za 
 \end{itemize}
 
 \section{Existující řešení}
-Emulátory konzole NES vznikaly již pro platformy dnes nepoužívané, například MS-DOS. Emulátorů NES vzniklo mnoho: pro různé platformy, s~různými funkcemi a~různými cíli. Emulátory lze rozdělit do tří skupin.
+Emulátory konzole NES vznikaly již pro platformy dnes nepoužívané, například MS-DOS. Emulátorů NES vzniklo mnoho: pro různé platformy, s~různými funkcemi a~různými cíli. Přehledný seznam existujících implementací lze nalézt v~\cite{Nesdev:emus}. Emulátory lze rozdělit do tří skupin.
 
-\emph{Precizní výkonné emulátory}: cílí především na co nejvěrohodnější napodobení NES a~zároveň nízkou náročnost na hardware. Tento typ emulátorů vznikal od samého začátku snah především pro to, aby bylo možné spouštět původní programové vybavení pro NES (hlavně zábavní software) na novějších platformách co nejpřesněji s~ohledem na původní fungování na NES. Tomu odpovídá i~struktura kódu emulátoru. Využívají se různé triky, aby byla emulace věrohodná, ale zároveň nepříliš náročná, což vede k~nepřehlednému kódu (nejasné pojmenování funkcí a~proměnných, mnoho binárních operací bez dalších popisů\dots). Tím, že kód nebyl psán s~ohledem na modularitu, je často i~většina komponent silně provázaných. Komponenty nekomunikují přes abstrakci sběrnic a~signálních vodičů, ale bývá využívána ještě o~stupeň vyšší abstrakce. Dnes již tyto emulátory obsahují kromě prostředí pro samotné hraní i~například debugger a~jsou používány nejen hráči, ale díky své věrohodnosti i~jako simulátory pro vývojáře domácího softwaru pro NES (takzvaný homebrew vývoj). Pro účely bakalářské práce však vzhledem ke stylu napsaného kódu mohou posloužit pouze jako praktické ověření fungování konkrétních her a~porovnání s~implementací v~práci. Velmi věrohodným emulátorem je například fceux dostupný na: \url{https://github.com/TASEmulators/fceux}.
+\emph{Precizní výkonné emulátory}: cílí především na co nejvěrohodnější napodobení NES a~zároveň nízkou náročnost na hardware. Tento typ emulátorů vznikal od samého začátku snah především proto, aby bylo možné spouštět původní programové vybavení pro NES (hlavně zábavní software) na novějších platformách co nejpřesněji s~ohledem na původní fungování na NES. Tomu odpovídá i~struktura kódu emulátoru. Využívají se různé triky, aby byla emulace věrohodná, ale zároveň nepříliš náročná, což vede k~nepřehlednému kódu (nejasné pojmenování funkcí a~proměnných, mnoho binárních operací bez dalších popisů\dots). Tím, že kód nebyl psán s~ohledem na modularitu, je často i~většina komponent silně provázaných. Komponenty nekomunikují přes abstrakci sběrnic a~signálních vodičů, ale bývá využívána ještě o~stupeň vyšší abstrakce. Dnes již tyto emulátory obsahují kromě prostředí pro samotné hraní i~například debugger a~jsou používány nejen hráči, ale díky své věrohodnosti i~jako simulátory pro vývojáře domácího softwaru pro NES (takzvaný homebrew vývoj). Pro účely bakalářské práce však vzhledem ke stylu napsaného kódu mohou posloužit pouze jako praktické ověření fungování konkrétních her a~porovnání s~implementací v~práci. Velmi věrohodným emulátorem je například fceux dostupný na GitHubu~\cite{fceux}.
 
-\emph{Experimentální emulátory}: projekty (většinou) jednotlivců, kteří se chtějí dozvědět více o~fungování NES, popřípadě vytvořit emulátor nestandardním způsobem. Takových emulátorů vzniklo a~stále vzniká velké množství, často jde o~nedokončené projekty, kde bylo cílem vytvořit jen prototyp či koncept. Takové emulátory se běžně nepoužívají ani pro hraní her, ani pro vývoj. Narozdíl od první jmenované skupiny již bývá kód přehledný, jsou totiž psány bez vyšších nároků na výkon, naopak s~vyššími nároky na přehlednost, mohou být tedy zajímavou inspirací i~co se kódu týče. Příkladem je projekt olcNES dostupný na: \url{https://github.com/OneLoneCoder/olcNES}.
+\emph{Experimentální emulátory}: projekty (většinou) jednotlivců, kteří se chtějí dozvědět více o~fungování NES, popřípadě vytvořit emulátor nestandardním způsobem. Takových emulátorů vzniklo a~stále vzniká velké množství. Často jde o~nedokončené projekty, kde bylo cílem vytvořit jen prototyp či koncept. Takové emulátory se běžně nepoužívají ani pro hraní her, ani pro vývoj. Narozdíl od první jmenované skupiny již bývá kód přehledný, jsou totiž psány bez vyšších nároků na výkon, naopak s~vyššími nároky na přehlednost, mohou být tedy zajímavou inspirací i~co se kódu týče. Příkladem je projekt olcNES dostupný na GitHubu~\cite{olcNES}.
 
-\emph{Komerční emulátory}. Tyto vznikly pouze pro distribuci konkrétních her na nové platformy přímo společností Nintendo (například acNES pro Game Boy a~GameCube, Virtual Console pro Wii, Wii~U a~3DS). Jedná se o~proprietární aplikace a nebyl pro ně zveřejněn zdrojový kód. Nemá tedy smysl je dále studovat; jelikož jde pouze o~komerční zábavní využití.
+\emph{Komerční emulátory}. Tyto vznikly pouze pro distribuci konkrétních her na nové platformy přímo společností Nintendo (například acNES pro Game Boy a~GameCube, Virtual Console pro Wii, Wii~U a~3DS). Jedná se o~proprietární aplikace a nebyl pro ně zveřejněn zdrojový kód. Nemá tedy smysl je dále studovat, jelikož jde pouze o~komerční zábavní využití.
 
-Bakalářská práce cílí výhradně do druhé jmenované skupiny; experimentální. Nemá smysl se pokoušet vyvíjet nový co nejpřesnější emulátor, takový zájem je mnohem lepší aplikovat příspěvkem do již existujících projektů. Ve skupině experimentálních emulátorů stále chyběl takový, který by se pokusil NES implementovat tak, že struktura kódu odpovídá i~reálné implementaci (hlavně co se modularity komponent a~komunikace mezi nimi týče). Navíc samotná existence experimentálních emulátorů ukazuje, že implementace emulátoru může být zajímavou příležitostí k~prozkoumání prakticky používané počítačové architektury a~vzdělání se v~této oblasti. Příkladem je emulátor olcNES, kdy autor vytvořil i~sadu videí, kde vysvětluje zajímavé principy fungování konzole. Bylo by tedy v~zájmu širší skupiny co nejvíce takový experimentální vývoj podpořit a~zpřístupnit tak, aby se potenciální vývojáři již mohli soustředit výhradně na implementaci emulovaného systému a~jeho komponent. Na základě toho byla vytvořena myšlenka bakalářské práce; vytvořit univerzální emulační platformu, která zařídí vše, co je sice k~běhu emulátoru potřebné, ale přímo se k~vývoji emulovaných komponent nevztahuje, a~na této platformě vytvořit vzorovou implementaci systému, což je právě implementace NES.
-
-Přehledný seznam existujících implementací lze nalézt v~\cite{Nesdev:emus}.
+Bakalářská práce cílí výhradně do druhé jmenované skupiny; experimentální. Nemá smysl se pokoušet vyvíjet nový co nejpřesnější emulátor, takový zájem je mnohem lepší aplikovat příspěvkem do již existujících projektů. Ve skupině experimentálních emulátorů stále chyběl takový, který by se pokusil NES implementovat tak, že struktura kódu odpovídá i~reálné implementaci (hlavně co se modularity komponent a~komunikace mezi nimi týče). Navíc samotná existence experimentálních emulátorů ukazuje, že implementace emulátoru může být zajímavou příležitostí k~prozkoumání prakticky používané počítačové architektury a~vzdělání se v~této oblasti. Příkladem je emulátor olcNES, kdy autor vytvořil i~sadu videí, kde vysvětluje zajímavé principy fungování konzole. Bylo by tedy v~zájmu širší skupiny co nejvíce takový experimentální vývoj podpořit a~zpřístupnit tak, aby se potenciální vývojáři již mohli soustředit výhradně na implementaci emulovaného systému a~jeho komponent. Na základě toho byla do bakalářské práce zakomponována další myšlenka, a to vytvořit univerzální emulační platformu, která zařídí vše, co je sice k~běhu emulátoru potřebné, ale přímo se k~vývoji emulovaných komponent nevztahuje, a~až na této platformě vytvořit emulátor konzole NES.
 
 %---------------------------------------------------------------
 \chapter{Návrh}
@@ -1552,13 +1558,13 @@ Při analýze byly získány potřebné informace o~tom, z~čeho se NES skládá
 
 Nejprve je třeba navrhnout technologie, které se pro implementaci využijí. Dále je nutné navrhnout univerzální rozšiřitelnou platformu. Nakonec se za pomocí určených technologií a~platformy navrhne, jak implementovat samotnou konzoli NES.
 
-Kapitola slouží jako přehled návrhových rozhodnutí, které vyvstaly během řešení praktické části, a~jejich odůvodnění.
+Kapitola slouží jako přehled návrhových rozhodnutí, která vyvstala během řešení praktické části, a~jejich odůvodnění.
 
 \section{Výběr technologií}
 Na začátku vývoje je třeba vybrat správné nástroje tak, aby byl vývoj co nejefektivnější a~nejpohodlnější. Kromě jmenovaných požadavků je nutné brát v potaz také externí požadavky, které stanovuje jednak zadání, jednak výsledky samotného bádání v~analytické části.
 
 \subsection{Programovací jazyk}
-Zadání požaduje, aby byl emulátor implementován s~využitím principů objektově orientovaného programování. Vhodnost k~využití ve výuce pak znamená, že je třeba využít rozšířený jazyk, nebo takový jazyk, jehož syntaxe je běžným jazykům podobná. Nepřímo také vyplývá, že by mělo být možné výsledný kód spouštět na co největším množství platforem tak, aby byl emulátor, jakožto vzdělávací pomůcka, snadno dostupný. Nakonec se při výběru je nutné zaměřit na to, že se jedná o~implementaci počítačového systému. Zvolený jazyk by tedy neměl poskytovat příliš velkou abstrakci nad počítačovým hardwarem --- to by mohlo způsobit odstínění od vysvětlovaných principů.
+Zadání požaduje, aby byl emulátor implementován s~využitím principů objektově orientovaného programování. Vhodnost k~využití ve výuce pak znamená, že je třeba využít rozšířený jazyk, nebo takový jazyk, jehož syntaxe je běžným jazykům podobná. Nepřímo také vyplývá, že by mělo být možné výsledný kód spouštět na co největším množství platforem tak, aby byl emulátor, jakožto vzdělávací pomůcka, snadno dostupný. Nakonec je nutné se při výběru zaměřit na to, že se jedná o~implementaci počítačového systému. Zvolený jazyk by tedy neměl poskytovat příliš velkou abstrakci nad počítačovým hardwarem --- to by mohlo způsobit odstínění od vysvětlovaných principů.
 
 Zvoleným jazykem pro implementaci je C++ ve verzi C++20. Splňuje totiž veškeré požadavky dané zadáním i~ze zadání vyplývajících:
 \begin{itemize}
@@ -1576,7 +1582,7 @@ Zvoleným jazykem pro implementaci je C++ ve verzi C++20. Splňuje totiž veške
 
 Použití editoru se týká jen programátora, není tedy důležité toto rozhodnutí stanovit před začátkem projektu; nebude mít žádný vliv na výsledný projekt. Je však vhodné vyžadovat editor nabízející zvýrazňování syntaxe a~snadnou integrací s~dalšími částmi toolchainu, ať už se jedná o~pouhý editor, nebo celé integrované vývojové rozhraní (IDE). Pro účely projektu byl mezi dalšími možnostmi jako Visual Studio Code a~Qt Creator zvolen CLion (integrace s~CMake, přehledný grafický debugger, vestavěný linter).
 
-Při návrhu toolchainu je brán v~potaz jednoduchost použití tak, aby šlo pokud možno vše zařídit automaticky: od stažení závislostí, přes kompilaci, testování i~generování dokumentace. Zároveň je z~hlediska přístupnosti vhodné, aby šel program zkompilovat na více než jedné platformě za pomocí stejného nástroje. Pro popis postupu kompilace se v~C/C++ projektech často používá Makefile; ten však není možné jednoduše použít na jiných platformách (například Windows). Pro abstrakci nad nástroji jako Make existuje CMake. Ten se jeví jako mnohem vhodnější řešení, jelikož umí vše vyžadované včetně generování Makefile, projektu pro Visual Studio, kompilování pro WebAssembly a~další. Bude tedy zvolen CMake.
+Při návrhu toolchainu je brána v~potaz jednoduchost použití tak, aby šlo pokud možno vše zařídit automaticky: od stažení závislostí, přes kompilaci, testování i~generování dokumentace. Zároveň je z~hlediska přístupnosti vhodné, aby šel program zkompilovat na více než jedné platformě za pomocí stejného nástroje. Pro popis postupu kompilace se v~C/C++ projektech často používá Makefile; ten však není možné jednoduše použít na jiných platformách (například Windows). Pro abstrakci nad nástroji jako Make existuje CMake. Ten se jeví jako mnohem vhodnější řešení, jelikož umí vše vyžadované včetně generování Makefile, projektu pro Visual Studio, kompilování pro WebAssembly a~další. Bude tedy zvolen CMake.
 
 \subsection{Správa zdrojového kódu}
 Pro udržitelný vývoj většího projektu je vždy dobré mít přehled nad změnami, potažmo jednotlivými verzemi projektu. Možností verzování je několik. Nejjednodušší je prosté ukládání do několika složek v~souborovém systému, což ale brzy způsobí chaos a~špatně se synchronizují kolizní změny v~případě využití synchronizované složky. Standardem je dnes používání systémů správy verzí. Existují dvě možnosti: centralizovaná a~distribuovaná. Pro tento projekt byla zvolena distribuovaná, poněvadž umožňuje pracovat off-line a~téměř vždy existují alespoň dvě celé kopie repozitáře (lokální a~serverová). Konkrétním nástrojem byl zvolen Git, jelikož je standardem a~nabízí veškeré očekávané funkcionality distribuovaného systému pro správu verzí: lokální práci s~repozitářem, práce s~verzemi a~vývojovými větvemi, snadná komunikace se serverem, navíc i~jednoduché podepisování změň pomocí asymetrických kryptografických nástrojů.
@@ -1586,7 +1592,7 @@ Aby byl projekt v~rámci edukativnosti co nejdostupnější, je nutné použít 
 \subsection{Dokumentace}
 Dokumentace je nedílnou součástí projektu. Jednou z~možností, jak takovou dokumentaci tvořit, je průběžně vyplňovat externí textový dokument s~popisem kódu. Tato možnost je vhodná jen pro velice primitivní programy. Je možné totiž využít možností psaní dokumentace přímo v~kódu. Využívá se funkcionality komentářů, které jsou obohaceny o~možnosti vyplňování dalších údajů o~jednotlivých funkcích i~třídách; takovým komentářům se říká dokumentační. Z~takových komentářů lze pak jednoduše dokumentaci vygenerovat; proto je zvolena tato možnost.
 
-Pro konkrétní zvolený programovací jazyk, C++, existuje nástroj \emph{Doxygen}. Ten za pomocí speciální syntaxe v~komentářích vygeneruje například i~popisy parametrů funkcí, návratových hodnot, popřípadě možných vyvolaných výjimek. Takto vygenerovanou dokumentace již je možné číst lokálně i~na serveru. Výstup programu Doxygen lze však dále zpracovat a~vytvořit přehlednější dokumentaci, což je velice důležité, pakliže je požadováno využití ve výuce. Pomocí nástrojů \emph{Breathe} a~\emph{Exhale} dojde k~převedení do formátu podporovaného nástrojem \emph{Sphinx}, který umožňuje přidávat další dokumentační stránky ve formátu reStructuredText a~použití přehledných šablon (například šablona ReadTheDocs používaná pro mnoho open-source projektů, jmenovitě admesh, Zoneminder a~další). Celý proces generování dokumentace lze automatizovat nástrojem CMake, což ještě zjednoduší průběžné úpravy dokumentace. Z~toho důvodu bude implementována také automatizace.
+Pro konkrétní zvolený programovací jazyk, C++, existuje nástroj \emph{Doxygen}. Ten za pomocí speciální syntaxe v~komentářích vygeneruje například i~popisy parametrů funkcí, návratových hodnot, popřípadě možných vyvolaných výjimek. Takto vygenerovanou dokumentace již je možné číst lokálně i~na serveru. Výstup programu Doxygen lze však dále zpracovat a~vytvořit přehlednější dokumentaci, což je velice důležité, pakliže je požadováno využití ve výuce. Pomocí nástrojů \emph{Breathe} a~\emph{Exhale} dojde k~převedení do formátu podporovaného nástrojem \emph{Sphinx}, který umožňuje přidávat další dokumentační stránky ve formátu \emph{reStructuredText} a~použití přehledných šablon (například šablona \enquote{ReadTheDocs} používaná pro mnoho open-source projektů, jmenovitě Admesh, Zoneminder a~další). Celý proces generování dokumentace lze automatizovat nástrojem CMake, což ještě zjednoduší průběžné úpravy dokumentace. Z~toho důvodu bude implementována také automatizace.
 
 \subsection{Testování}
 Aby byl zajištěn soulad s~požadavky, je nutné program testovat. Úkolem této části je stanovit požadavky na testy a~na tom základu navrhnout vhodné metodiky a~nástroje.
@@ -1606,7 +1612,7 @@ Testy se dají provádět ručně i~automaticky. Jelikož je požadováno průb�
 
 Aby byl projekt co nejuniverzálnější, bude v~rámci projektu vyvinuta platforma zjednodušující vývoj libovolného emulátoru historického systému. Na základě důkladné analýzy konzole NES je možné vytvořit seznam požadavků pro takovou platformu, což poslouží jako reference pro návrh.
 
-Klíčovým požadavkem pevně souvisejícím s~principem fungování číslicového hardwaru je modularita, což představuje dělení na \emph{nezávislé komponenty}. Hardware vždy tvoří více nezávislých komponent, v~případě NES se i~ve vyšší úrovni abstrakce jedná třeba o~procesor, grafický čip a~kazetu. Samotné dělení na komponenty bude představovat implementace v~třídách v~rámci OOP, avšak je rozumné vyžadovat, aby měly komponenty stejné komunikační rozhraní tak, aby se daly univerzálně propojovat.
+Klíčovým požadavkem pevně souvisejícím s~principem fungování číslicového hardwaru je modularita, což představuje dělení na \emph{nezávislé komponenty}. Hardware vždy tvoří více nezávislých komponent. V~případě NES se i~ve vyšší úrovni abstrakce jedná třeba o~procesor, grafický čip a~kazetu. Samotné dělení na komponenty bude představovat implementace v~třídách v~rámci OOP, avšak je rozumné vyžadovat, aby měly komponenty stejné komunikační rozhraní tak, aby se daly univerzálně propojovat.
 
 První požadavek přirozeně vytváří další: po navržení jednotného rozhraní pro komponenty musí být navržen \emph{způsob vzájemné komunikace} a~to ideálně takový, který odpovídá skutečné implementaci a~zároveň je rozumně efektivní.
 
@@ -1631,12 +1637,12 @@ Požadavky přímo nevyplývající ze zadání se objevovaly postupně při vý
 \subsubsection{Platforma 1.0}
 První platforma vznikla čistě pro účely experimentování. Hlavní cíl bylo rychle vytvořit funkční prostředí, ve kterém je možné implementovat emulovaný hardware. Velkou výhodou první platformy tedy bylo to, že byla implementována velice rychle.
 
-Rozhraní komponent bylo různé a~systém byl ve své podstatě reprezentován třídou pro sběrnici. Tato vlastnost se projevila okamžitě při nutnosti testovat procesor 6502 zvlášť v~omezeném systému; bylo nutné buď duplikovat kód, nebo se kód stával rychle nepřehledným. I~z~toho důvodů byl jako požadavek pro další platformy stanovena především univerzální modularita.
+Rozhraní komponent bylo různé a~systém byl ve své podstatě reprezentován třídou pro sběrnici. Tato vlastnost se projevila okamžitě při nutnosti testovat procesor 6502 zvlášť v~omezeném systému; bylo nutné buď duplikovat kód, nebo se kód stával rychle nepřehledným. I~z~toho důvodů byla jako požadavek pro další platformy stanovena především univerzální modularita.
 
-Další velice nepříjemnou vlastností plynoucí z~absence modularity byla neexistence univerzálního způsobu prezentace stavů systému; vše bylo řešeno vystavením všech registrů a~pamětí přímo, nebo pomocí getterů. Často tedy docházelo k~porušení zapouzdření. Příklad takového špatného přístupu je ve výpisu kódu~\ref{list:navrh-platforma1.0}.
+Další velice nepříjemnou vlastností plynoucí z~absence modularity byla neexistence univerzálního způsobu prezentace stavu systému; vše bylo řešeno vystavením všech registrů a~pamětí přímo, nebo pomocí getterů. Často tedy docházelo k~porušení zapouzdření. Příklad takového špatného přístupu je v ukázce kódu~\ref{list:navrh-platforma1.0}.
 
 \begin{listing}
-	\caption{Zobrazení stavů registru \enquote{V} PPU na~platformě~1.0}
+	\caption{Zobrazení stavů registru \enquote{V} PPU na~platformě~1.0.}
 	\label{list:navrh-platforma1.0}
 	\begin{minted}{cpp}
 ImGui::Text("V nameY: %u", m_bus.getPPU().m_internalRegisters.v.bits.nameY);
@@ -1649,13 +1655,13 @@ ImGui::Text("V coX: %u",   m_bus.getPPU().m_internalRegisters.v.bits.coarseX);
 
 Poslední velkou nevýhodou této platformy byla vázanost na jeden video i~audio backend. To znemožňovalo jednoduchou výměnu těchto komponent a~snadnou přenositelnost na jiné platformy. I~tato nevýhoda byla eliminována v~poslední verzi platformy.
 
-Další nevýhody plynuly spíše pro uživatele, jednou z~nich byla například i~absence systému dokování oken, což vždy vyústilo v~nepřehledné uživatelské rozhraní. Velice špatně byl i~řešen zvukový výstup, samotná emulace probíhala ve stejném vlákně, jako callback pro zvukový ovladač, což vedlo k~trháním a~dalším zvukovým artefaktům.
+Další nevýhody plynuly spíše pro uživatele. Jednou z~nich byla například i~absence systému dokování oken, což vždy vyústilo v~nepřehledné uživatelské rozhraní. Velice špatně byl řešen i~zvukový výstup, samotná emulace probíhala ve stejném vlákně jako callback pro zvukový ovladač, což vedlo k~trháním a~dalším zvukovým artefaktům.
 
 \subsubsection{Platforma 1.5}
 \label{sec:navrh-platforma1.5}
 Mezikrok mezi platformami byl spíše prostorem pro vyzkoušení různých technik abstrakce grafického rozhraní. Jako první vznikla knihovna Elements, umožňující definovat soubor datových struktur k~ zobrazení bez závislosti nejen na grafickém backendu, ale i~na celé grafické knihovně. Projekt je dostupný na~\url{https://github.com/andreondra/elements}.
 
-Myšlenkou bylo vytvořit třetí vrstvu abstrakce, jako ukazuje diagram~\ref{fig:navrh-abstrakce-grafiky}. Důvod takového uvažování vznikl z~prosté myšlenky. První platforma řešila zobrazování vnitřního stavu komponent externě, tudíž do nich musela nějakým způsobem zasahovat (například přes gettery). To způsobilo vazbu mezi více třídami; zobrazování bylo vázáno na vnitřní implementaci a~nabízené rozhraní dané komponenty, které nebylo jednotné. Bylo navrženo, že by komponenta měla být zodpovědná sama za zobrazování vnitřních hodnot tak, aby na tyto informace nemuselo být vázáno okolí. Komponenta by pouze zveřejnila nutné rozhraní pro komunikaci. Aby však komponenta nebyla vázána na konkrétní grafickou knihovnu, byla vytvořena idea další abstrakce.
+Myšlenkou bylo vytvořit třetí vrstvu abstrakce, jak ukazuje diagram~\ref{fig:navrh-abstrakce-grafiky}. Důvod takového uvažování vznikl z~prosté myšlenky. První platforma řešila zobrazování vnitřního stavu komponent externě, tudíž do nich musela nějakým způsobem zasahovat (například přes gettery). To způsobilo vazbu mezi více třídami; zobrazování bylo vázáno na vnitřní implementaci a~nabízené rozhraní dané komponenty, které nebylo jednotné. Bylo navrženo, že by komponenta měla být zodpovědná sama za zobrazování vnitřních hodnot tak, aby na tyto informace nemuselo být vázáno okolí. Komponenta by pouze zveřejnila nutné rozhraní pro komunikaci. Aby však komponenta nebyla vázána na konkrétní grafickou knihovnu, byla vytvořena idea další abstrakce.
 
 \begin{figure}[ht!]
 	\centering
@@ -1670,7 +1676,7 @@ Myšlenkou bylo vytvořit třetí vrstvu abstrakce, jako ukazuje diagram~\ref{fi
 		\draw [arrow] (elements) -- (gui);
 		\draw [arrow] (gui) -- (backend);
 	\end{tikzpicture}
-	\caption{Úrovně abstrakce práce s~grafikou}\label{fig:navrh-abstrakce-grafiky}
+	\caption{Úrovně abstrakce práce s~grafikou.}\label{fig:navrh-abstrakce-grafiky}
 \end{figure}
 
 Úkolem knihovny Elements bylo poskytnout takové prostředky, pomocí kterých by programátor v~dané komponentě definoval, jaké proměnné a~v~jaké formě se mají zobrazovat v~grafickém rozhraní (otázka \emph{Co?}). Vše ostatní by řešila knihovna (otázka \emph{Jak?}). Třída představující abstrahovanou proměnnou a~další datové struktury byla označena jako Element. Každá část dat, která měla být reprezentována jakýmkoliv způsobem, by byla Element, ať už obsah registru, obsah paměti nebo surový grafický výstup. Tyto Elementy by byly strukturovány do balíčků označované jako Package. Takto bylo možné z~libovolné komponenty pomocí společného rozhraní \emph{getElements} získat abstraktní definici uživatelského rozhraní nezávislého na aktuální vnitřní reprezentaci.
@@ -1678,7 +1684,7 @@ Myšlenkou bylo vytvořit třetí vrstvu abstrakce, jako ukazuje diagram~\ref{fi
 Elementy umožňovaly získávat data nejen přímo, ale i~pomocí funkcí, bylo tedy možné hodnoty před zobrazením ještě upravit. Příkladem tvorby balíčku je kód ve~výpisu~\ref{list:navrh-elements-package}. Takový kód je prakticky spustitelný, v~repozitáři projektu je součástí příkladu v~souboru \texttt{main.cpp}.
 
 \begin{listing}
-	\caption{Tvorba Package z~Elementů}
+	\caption{Tvorba Package z~Elementů.}
 	\label{list:navrh-elements-package}
 	\begin{minted}{cpp}
 Elements::Package pkg("Test package", Elements::Types::Dock::LEFT);
@@ -1708,7 +1714,7 @@ Definice proměnných a~dalších struktur k~zobrazení měla probíhat ve veře
 
 Rekurzivní metoda počítala s~tím, že by funkce getElements vždy vrátila balíček, který by se začlenil do balíčku nadřazené komponenty. Takto by i~vznikla stromová struktura reprezentující hierarchii komponent. Registrační metoda by pak jako argument obdržela kontext, do kterého by vložila potřebné informace o~datech k~zobrazení bez nutnosti zanoření.
 
-Nakonec se ukázalo, že spousta dalších funkcionalit knihovny Elements by už přímo musela souviset s~emulací (například Elementy pro řízení časování); také vývoj abstrakce nad všemi potřebnými typy zobrazovaných dat by zabrala příliš mnoho času. Od vývoje knihovny bylo ustoupeno ve prospěch zcela nové platformy.
+Nakonec se ukázalo, že spousta dalších funkcionalit knihovny Elements by už přímo musela souviset s~emulací (například Elementy pro řízení časování); také vývoj abstrakce nad všemi potřebnými typy zobrazovaných dat by zabral příliš mnoho času. Od vývoje knihovny bylo ustoupeno ve prospěch zcela nové platformy.
 
 \subsection{Návrh platformy 2.0}
 Úkolem platformy druhé verze bylo již vytvořit univerzální multiplatformní prostředí pro vývoj emulátorů; takto vznikla verze 2.0 označována jako Universal System Emulator. Průběžným vývojem se objevilo mnoho problémů a~jejich řešení, což vyústilo v~celistvý seznam požadavků uvedený v~\ref{sec:navrh-pozadavky}.
@@ -1725,60 +1731,60 @@ První požadavek hovoří o~modularitě a~univerzálním rozhraní. Bude tedy i
 	\item rozhraní pro zvukový výstup.
 \end{itemize}
 
-Jediný problém, který při návrhu nastal, byla prostá otázka: co když nějaká z~výše uvedených funkcionalit ve skutečném hardwaru k~dispozici? Možností bylo specializovat komponenty dle typu zařízení (pasivní: paměť, aktivní: procesor~\dots). Toto řešení bylo rychle zavrženo, anžto by popíralo myšlenku zcela unifikovaného rozhraní. Výsledné řešení je prozaické: zkrátka dojde k~navrácení \enquote{prázdných} hodnot (odpovídá to realitě, absence funkcionality totiž odpovídá prázdnotě). Konkrétní definice prázdnoty je implementačně závislá: prázdný kontejner, vyvolání výjimky, vrácení hodnoty přiřazené prázdnotě. Například prázdný kontejner může být vrácen tam, kde se vždy vrací skupina hodnot (seznam grafických prvků), vyvolání výjimky může být vhodné tam, kde by běh aplikace již neměl smysl (programátor zvolí neexistující port), speciální hodnota reprezentující prázdnotu může být navrácena u~jednoduchých typů (například je-li zvuk reprezentován párem čísel, absence zvuku odpovídá nule).
+Jediný problém, který při návrhu nastal, byla prostá otázka: co když není nějaká z~výše uvedených funkcionalit ve skutečném hardwaru k~dispozici? Možností bylo specializovat komponenty dle typu zařízení (pasivní: paměť, aktivní: procesor~\dots). Toto řešení bylo rychle zavrženo, anžto by popíralo myšlenku zcela unifikovaného rozhraní. Výsledné řešení je prozaické: zkrátka dojde k~navrácení \enquote{prázdných} hodnot (odpovídá to realitě, absence funkcionality totiž odpovídá prázdnotě). Konkrétní definice prázdnoty je implementačně závislá: prázdný kontejner, vyvolání výjimky, vrácení hodnoty přiřazené prázdnotě. Například prázdný kontejner může být vrácen tam, kde se vždy vrací skupina hodnot (seznam grafických prvků), vyvolání výjimky může být vhodné tam, kde by běh aplikace již neměl smysl (programátor zvolí neexistující port), speciální hodnota reprezentující prázdnotu může být navrácena u~jednoduchých typů (například je-li zvuk reprezentován párem čísel, absence zvuku odpovídá nule).
 
 Díky existenci jednotného rozhraní bude možné s~komponentami pracovat hromadně; například zobrazování rozhraní bude spočívat v~zavolání stejné funkce napříč všemi komponentami v~jednom kontejneru.
 
 \subsubsection{Komunikace: třídy Port a~Connector}
 \label{sec:port-connector}
-Při návrhu komunikace mezi komponentami musí být brána v~potaz i~reálná implementace. Lze vyjít z~hardwarového schématu konzole, které je obsahem příloh jako obrázek~\ref{fig:nes001-hw}. Na obrázku je patrné, že komponenty obsahují jednak adresní (A), datové (D) a~řídicí  (R/W) signály tvořící sběrnici, jednak jednotlivé signály (NMI, IRQ, INT\dots). Při komunikaci na sběrnici je vždy nějaký prvek, který je řídicí a~přes sběrnici (nebo přímo) přistupuje ke komponentám. Popsané chování lze emulovat tak, že řízená komponenta vystaví rozhraní, kterým ji lze ovládat, a~řídicí komponenta toto rozhraní využije. Pro řízenou komponentu bude vytvořena třída \emph{Connector} a~pro řídicí komponentu třída \emph{Port}. Řízená komponenta tedy nabízí několik konektorů, které si může řídicí třída připojit do svého portu, prostřednictvím nějž bude s~řízenou komponentou komunikovat. Využitím rozhraní odděleného od konkrétních komponent je možné komponenty propojovat libovolně, což bude důležité v~budoucích fázích projektu, kdy bude možné komponenty skládat do systému v~grafickém rozhraní, bude tedy nutné mít možnost dostupné rozhraní enumerovat, což je díky takto univerzálnímu návrhu možné. Grafická reprezentace komunikace komponent je na obrázku~\ref{fig:navrh-komunikace-komponent}.
+Při návrhu komunikace mezi komponentami musí být brána v~potaz i~reálná implementace. Lze vyjít z~hardwarového schématu konzole, které je obsahem příloh jako obrázek~\ref{fig:nes001-hw}. Na obrázku je patrné, že komponenty obsahují jednak adresní (A), datové (D) a~řídicí  (R/W) signály tvořící sběrnici, jednak jednotlivé signály (NMI, IRQ, INT\dots). Při komunikaci na sběrnici je vždy nějaký prvek, který je řídicí a~přes sběrnici (nebo přímo) přistupuje ke komponentám. Popsané chování lze emulovat tak, že řízená komponenta vystaví rozhraní, kterým ji lze ovládat, a~řídicí komponenta toto rozhraní využije. Pro řízenou komponentu bude vytvořena třída \emph{Connector} a~pro řídicí komponentu třída \emph{Port}. Řízená komponenta tedy nabízí několik konektorů, které si může řídicí třída připojit do svého portu, jehož prostřednictvím bude s~řízenou komponentou komunikovat. Využitím rozhraní odděleného od konkrétních komponent je možné komponenty propojovat libovolně, což bude důležité v~budoucích fázích projektu, kdy bude možné komponenty skládat do systému v~grafickém rozhraní. Bude tedy nutné mít možnost dostupné rozhraní enumerovat, což je díky takto univerzálnímu návrhu možné. Grafická reprezentace komunikace komponent je na obrázku~\ref{fig:navrh-komunikace-komponent}.
 
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=0.4\textwidth]{images/port_connector.pdf}
-	\caption{Komunikace komponent pomocí tříd Port a~Connector}\label{fig:navrh-komunikace-komponent}
+	\caption{Komunikace komponent pomocí tříd Port a~Connector.}\label{fig:navrh-komunikace-komponent}
 \end{figure}
 
-Otázkou, kterou je třeba již v~návrhové fázi vyřešit je, zdali zůstane úroveň abstrakce u~jednotlivých signálu i~v~případě rozhraní pro sběrnici. Komunikaci je možné řešit stejně jako u~reálného hardwaru --- vystavení adresy a~příslušného řídicího stavu, poté přenos dat. Ukázalo se však, že ačkoliv by přístup věrně napodobil realitu, přinesl by zbytečné komplikace, přestože by výsledek byl stejný, jako u~abstraktnějších řešení. Případný zájemce o~vývoj vlastní komponenty by mohl být odrazen komplikovaností realistického přístupu. Výsledné řešení je kompromisem: ponechat možnost řízení na úrovni jednotlivých signálu, což by mohly navíc využít jednoduché signály (přerušení, hodinový signál) ; zároveň však i~zavést možnost, jak přenést všechny tři komunikační informace najednou (adresu, data i~řízení).
+Otázkou, kterou je třeba již v~návrhové fázi vyřešit, je zdali zůstane úroveň abstrakce u~jednotlivých signálu i~v~případě rozhraní pro sběrnici. Komunikaci je možné řešit stejně jako u~reálného hardwaru --- vystavení adresy a~příslušného řídicího stavu, poté přenos dat. Ukázalo se však, že ačkoliv by přístup věrně napodobil realitu, přinesl by zbytečné komplikace, přestože by výsledek byl stejný, jako u~abstraktnějších řešení. Případný zájemce o~vývoj vlastní komponenty by mohl být odrazen komplikovaností realistického přístupu. Výsledné řešení je kompromisem: ponechat možnost řízení na úrovni jednotlivých signálu, což by mohly navíc využít jednoduché signály (přerušení, hodinový signál); zároveň však i~zavést možnost, jak přenést všechny tři komunikační informace najednou (adresu, data i~řízení).
 
-Sdružení komunikace přináší i~otázku, jak reprezentovat šířku komunikačního kanálu. Adresní sběrnice může být u~různých systémů různě široká, tak stejně i~datová. V~prvotních fázích bylo uvažováno, že šířka může být reprezentována pomocí šablon (templates), které C++ nabízí; adresa i~data by tak byla omezena zcela nativně datovým typem (například \texttt{uint8\_t}). Ukázalo se však, že mnohem lepší alternativou je použít dostatečně široký datový typ pro historické systémy (32 bitů) a~samotné ořezávání nastavit konstruktorem. Důvody jsou dva: obsahuje-li třída šablony, je nutné vše specifikovat v~hlavičkovém souboru (nepřehledné), navíc existují i~šířky sběrnic, pro které neexistují nativní datové typy (například adresní sběrnice pro komunikaci PPU s~kazetou je široká 14~bitů).
+Sdružení komunikace přináší i~otázku, jak reprezentovat šířku komunikačního kanálu. Adresní sběrnice může být u~různých systémů různě široká, stejně tak i~datová. V~prvotních fázích bylo uvažováno, že šířka může být reprezentována pomocí šablon (templates), které C++ nabízí; adresa i~data by tak byla omezena zcela nativně datovým typem (například \texttt{uint8\_t}). Ukázalo se však, že mnohem lepší alternativou je použít dostatečně široký datový typ pro historické systémy (32 bitů) a~samotné ořezávání nastavit konstruktorem. Důvody jsou dva: obsahuje-li třída šablony, je nutné vše specifikovat v~hlavičkovém souboru (nepřehledné), navíc existují i~šířky sběrnic, pro které neexistují nativní datové typy (například adresní sběrnice pro komunikaci PPU s~kazetou je široká 14~bitů).
 
 \subsubsection{Abstrakce systému: třída System}
-Po vymyšlení reprezentace komponent a~jejich vzájemné komunikace je možné navrhnout abstrakci systému. Systém by měl poskytnout pro komponenty místo (stejně, jako jsou například v~NES v~krabičce na desce plošných spojů). To bude vyřešeno jednoduchým kontejnerem. Mělo by možné pomocí systému řídit celou emulaci až na úrovni jednotlivých cyklů, bude tedy dedikována metoda pro zaslání hodinového taktu do všech komponent.
+Po vymyšlení reprezentace komponent a~jejich vzájemné komunikace je možné navrhnout abstrakci systému. Systém by měl poskytnout pro komponenty místo (stejně, jako jsou například v~NES v~krabičce na desce plošných spojů). To bude vyřešeno jednoduchým kontejnerem. Mělo by být možné pomocí systému řídit celou emulaci až na úrovni jednotlivých cyklů. Bude tedy dedikována metoda pro zaslání hodinového taktu do všech komponent.
 
-Dále by měla existovat metoda umožňující běh v~reálném čase, která bude taktovací metodu využívat. Není možné běžící vlákno uspávat na časový úsek odpovídající prodlevě mezi jednotlivými takty o~frekvenci v~jednotkách megahertz, proto je vhodné takových taktů provést více. To, kolik taktů je nutné provést, záleží na četnosti volání zodpovědné metody. Nabízí se jednoduchý výpočet: $pocet\_volani= \frac{f_{taktovaci}}{f_{volani}}$.
+Dále by měla existovat metoda umožňující běh v~reálném čase, která bude taktovací metodu využívat. Není možné běžící vlákno uspávat na časový úsek odpovídající prodlevě mezi jednotlivými takty o~frekvenci v~jednotkách megahertz, proto je vhodné takových taktů provést více. To, kolik taktů je nutné provést, záleží na četnosti volání zodpovědné metody. Nabízí se jednoduchý výpočet: $\textrm{počet\_volání} = \frac{f_{\textrm{taktovací}}}{f_{\textrm{volání}}}$.
 
 Díky tomu, že komponenty budou součástí jednoho kontejneru, je vhodné vytvořit i~metody, které automaticky zařídí přenos všech grafických i~zvukových informací.
 
 \subsubsection{Reprezentace vnitřních i~vnějších stavů}
-Poslední dva požadavky spolu úzce souvisí. Pro reprezentaci grafických dat bude vybrána vhodná grafická knihovna. Možností jsou dle návrhových vzorů dvě: \emph{immediate mode} a~\emph{retained} mode. Dle prvního návrhového vzoru vykreslování probíhá přímo v~místě volání příslušných funkcí grafické knihovny. Dle druhého je tato zodpovědnost přenechána grafické knihovně. Požadavkem je jednoduchost a~možnost přímo reprezentovat požadované údaje, což naplňuje první návrhový vzor.
+Poslední dva požadavky spolu úzce souvisí. Pro reprezentaci grafických dat bude vybrána vhodná grafická knihovna. Možnosti jsou dle návrhových vzorů dvě: \emph{immediate mode} a~\emph{retained mode}. Dle prvního návrhového vzoru vykreslování probíhá přímo v~místě volání příslušných funkcí grafické knihovny. Dle druhého je tato zodpovědnost přenechána grafické knihovně. Požadavkem je jednoduchost a~možnost přímo reprezentovat požadované údaje, což naplňuje první návrhový vzor.
 
-Nejpoužívanější a~nejlépe podporovanou immediate mode knihovnou je Dear ImGui.  Nabízí jednotné rozhraní nezávislé na subsystému řešící spolupráci s~konkrétní platformou (renderovací backend). Je možné vybrat mnoho backendů (OpenGL, SDL2, DirectX a~další). Platforma~1.0 používala jako backend knihovnu SDL2. Znalost konkrétního backendu přinesla široké možnosti optimalizace (práce přímo s~texturami), avšak i~určitá omezení v~podobě nemožnost kompilovat pro platformy nepodporované tímto backendem.
+Nejpoužívanější a~nejlépe podporovanou immediate mode knihovnou je Dear ImGui.  Nabízí jednotné rozhraní nezávislé na subsystému řešící spolupráci s~konkrétní platformou (renderovací backend). Je možné vybrat mnoho backendů (OpenGL, SDL2, DirectX a~další). Platforma~1.0 používala jako backend knihovnu SDL2. Znalost konkrétního backendu přinesla široké možnosti optimalizace (práce přímo s~texturami), avšak i~určitá omezení v~podobě nemožnosti kompilovat pro platformy nepodporované tímto backendem.
 
 Rozumnějším řešením je umožnit tyto backendy vybírat dynamicky a~pokud možno bez nutného zásahu programátora. Existuje projekt Hello~ImGui, který nabízí celý sestavovací skript postavený na CMake a~zároveň i~funkce zajišťující potřebné inicializace ovladačů, což přinese další zjednodušení i~flexibilitu. Pro bakalářskou práci bude zvoleno rozšíření označené jako ImGui~Bundle, které navíc obsahuje například funkcionality pro výběr souborů.
 
 Díky použití knihovny Dear ImGui je možné přenechat vykreslování na každé komponentě, kdy každá funkce reprezentuje jedno okno. Aby mohly komponenty zobrazovat oken více, bude zodpovědná funkce vracet kontejner obsahující renderovací rutiny. C++ pro ukládání function-like objektů nabízí \texttt{std::function}. Objekty této třídy lze navíc ukládat do kontejnerů, což přesně odpovídá požadované funkcionalitě. Vrátí-li každá komponenta kolekci vykreslovacích funkcí, může systém tyto kolekce sloučit, zpracovat a~předat k~vykreslení.
 
-Po návrh konkrétních vykreslovacích funkcí je nutné se zamyslet nad přístupem k~zobrazovaným datům. Vlastností immediate mode návrhového vzoru je to, že při vykreslování se přímo přistupuje k~datům, není tedy možné bez dalších úprav zároveň vykreslovat a~emulovat. Existují tři možnosti:
+Po návrh konkrétních vykreslovacích funkcí je nutné se zamyslet nad přístupem k~zobrazovaným datům. Vlastností immediate mode návrhového vzoru je to, že při vykreslování se přímo přistupuje k~datům. Není tedy možné bez dalších úprav zároveň vykreslovat a~emulovat. Existují tři možnosti:
 \begin{enumerate}
 	\item Nechat běžet vykreslování i~emulaci v~jednom vlákně.
 	\item Provádět aktivity paralelně a~přístup k~datům chránit synchronizačním mechanismem (například mutex).
 	\item Provádět aktivity paralelně a~data mezi vlákny synchronizovat.
 \end{enumerate}
 
-Paralelní přístup může lákat vyšším výkonem; mohl by však přinést zbytečně vyšší složitost platformy, přestože by neměl opodstatnění. Druhá možnost se ukázala jako zcela zbytečná, jelikož by téměř vždycky mohlo běžet jen jedno vlákno, tudíž by tento přístup odpovídal výkonu první varianty. To plyne z~faktu, že jeden hodinový cyklus může ovlivnit vnitřní stav všech komponent, tudíž vykreslovací vlákno by stejně muselo čekat. Třetí varianta by počítala s~tím, že by emulované komponenty vždy vkládaly vzorek svých vnitřních stavů do fronty, ze které by si je vybíralo vykreslovací vlákno. To odpovídá synchronizačnímu problému producent-konzument. Další problém by však nastal při požadavku na úpravu vnitřních stavů: již by muselo dojít k~zasílání i~druhým směrem a~musela by se tudíž vyvinout abstraktní knihovna podobná Elements popsané v~sekci~\ref{sec:navrh-platforma1.5}, což se ukázalo jako neekonomické. Nakonec byl zvolen první přístup, který dovoluje ve vykreslovacích funkcích specifikovat zobrazení požadovaných dat přímo, a tudíž velice jednoduše. Například stav příznaku procesoru: \mintinline{cpp}|ImGui::Checkbox("C", &m_registers.status.c);|.
+Paralelní přístup může lákat vyšším výkonem; mohl by však přinést zbytečně vyšší složitost platformy, přestože by neměl opodstatnění. Druhá možnost se ukázala jako zcela zbytečná, jelikož by téměř vždycky mohlo běžet jen jedno vlákno, tudíž by tento přístup odpovídal výkonu první varianty. To plyne z~faktu, že jeden hodinový cyklus může ovlivnit vnitřní stav všech komponent, tudíž vykreslovací vlákno by stejně muselo čekat. Třetí varianta by počítala s~tím, že by emulované komponenty vždy vkládaly vzorek svých vnitřních stavů do fronty, ze které by si je vybíralo vykreslovací vlákno. To odpovídá synchronizačnímu problému producent-konzument. Další problém by však nastal při požadavku na úpravu vnitřních stavů: již by muselo dojít k~zasílání i~druhým směrem a~musela by se tudíž vyvinout abstraktní knihovna podobná Elements popsané v~sekci~\ref{sec:navrh-platforma1.5}, což se ukázalo jako neekonomické. Nakonec byl zvolen první přístup, který dovoluje ve vykreslovacích funkcích specifikovat zobrazení požadovaných dat přímo a tudíž velice jednoduše. Například stav příznaku procesoru: \mintinline{cpp}|ImGui::Checkbox("C", &m_registers.status.c)|.
 
 \subsubsection{Zvukový výstup}
-Posledním problémem k~vyřešení je zvukový výstup. Zvukové zařízení (čip, karta) vyžaduje neustálý tok nových zvukových dat, který je vždy vyzvednut takzvaným callbackem běžící ve zvláštním vlákně. Dojde-li k~přerušení, vznikají různé nepříjemné vedlejší efekty (chrčení, zrnění), které jsou uživatelem zaznamenatelné citelněji, nežli občasné zpomalení uživatelského rozhraní. Jedná se tedy o~reprezentaci zpracování v~reálném čase, kde deadline je při vyprázdnění vyrovnávací paměti obsahující vzorky k~přehrání.
+Posledním problémem k~vyřešení je zvukový výstup. Zvukové zařízení (čip, karta) vyžaduje neustálý tok nových zvukových dat, který je vždy vyzvednut takzvaným callbackem běžícím ve zvláštním vlákně. Dojde-li k~přerušení, vznikají různé nepříjemné vedlejší efekty (chrčení, zrnění), které jsou uživatelem zaznamenatelné citelněji, nežli občasné zpomalení uživatelského rozhraní. Jedná se tedy o~reprezentaci zpracování v~reálném čase, kde deadline je při vyprázdnění vyrovnávací paměti obsahující vzorky k~přehrání.
 
-Prvním úkolem bylo nalezení vhodné knihovny. Mezi požadavky patřila podpora více platforem (GNU/Linux, Windows, macOS, Emscripten), vestavěné filtry (dolní propust) a~vestavěné možnosti synchronizace (vyrovnávací paměť). Mezi kandidáty byly knihovny libsoundio, ffaudio, Maximilian, libnyquist a~miniaudio. Nakonec se ukázalo, že nejlepším adeptem naplňující všechny požadavky je miniaudio.
+Prvním úkolem bylo nalezení vhodné knihovny. Mezi požadavky patřila podpora více platforem (GNU/Linux, Windows, macOS, Emscripten), vestavěné filtry (dolní propust) a~vestavěné možnosti synchronizace (vyrovnávací paměť). Mezi kandidáty byly knihovny libsoundio, ffaudio, Maximilian, libnyquist a~miniaudio. Adeptem naplňujícím všechny zmíněné požadavky je pouze miniaudio.
 
-Platforma by měla umožnit pracovat se zvukovým výstupem co nejjednodušeji. Veškerý zvukový výstup bude řešit zvláštní třída, která by měla miniaudio inicializovat, zaslat další vzorky k~přehrání a~zvuk spouštět i~zastavovat. Od komponent bude vyžadováno jen velice primitivní rozhraní odpovídající reálnému stavu: \emph{analogová} hodnota reprezentující amplitudu na výstupním portu. Veškeré časování bude zařízeno platformou, který se bude starat i~o~vyrovnávací paměť tak, aby nedošlo k~trhání zvuku. Očekávaný tok vzorků audio je znázorněn na diagramu~\ref{fig:navrh-audio-tok}. Takový mechanismus nabízí přímo knihovna miniaudio ve formě kruhového bufferu, který umí pracovat s~jedním producentem (emulační vlákno) a~jedním konzumentem (audio vlákno). Zde se opět ukazuje praktický výskyt synchronizačního problému producent-konzument. Zde již však oproti práce s~daty k~vykreslení je již nutné aplikovat synchronizační mechanismy.
+Platforma by měla umožnit pracovat se zvukovým výstupem co nejjednodušeji. Veškerý zvukový výstup bude řešit zvláštní třída, která by měla miniaudio inicializovat, zaslat další vzorky k~přehrání a~zvuk spouštět i~zastavovat. Od komponent bude vyžadováno jen velice primitivní rozhraní odpovídající reálnému stavu: \emph{analogová} hodnota reprezentující amplitudu na výstupním portu. Veškeré časování bude zařízeno platformou, která se bude starat i~o~vyrovnávací paměť tak, aby nedošlo k~trhání zvuku. Očekávaný tok vzorků audia je znázorněn na diagramu~\ref{fig:navrh-audio-tok}. Takový mechanismus nabízí přímo knihovna miniaudio ve formě kruhového bufferu, který umí pracovat s~jedním producentem (emulační vlákno) a~jedním konzumentem (audio vlákno). Zde se opět ukazuje praktický výskyt synchronizačního problému producent-konzument, avšak je nutné oproti práci s~daty k~vykreslení aplikovat synchronizační mechanismy.
 
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=1.0\textwidth]{images/tok_vzorku.pdf}
-	\caption{Tok zvukových vzorků v~platformě~2.0}\label{fig:navrh-audio-tok}
+	\caption{Tok zvukových vzorků v~platformě~2.0.}\label{fig:navrh-audio-tok}
 \end{figure}
 
 \subsubsection{Shrnutí návrhu}
@@ -1792,7 +1798,7 @@ Celkově se tedy platforma bude skládat ze:
 \end{itemize}
 
 \section{Emulace konzole}
-Emulační platforma je jen pomůckou pro vývoj --- nyní je třeba navrhnout, jak implementovat konkrétní komponenty. Všechny komponenty budou potomky třídy Component pro dodržení myšlenky univerzálního rozhraní napříč celým emulátorem. Většina práce bude přenesení analýz, ale některým částem je třeba věnovat zvláštní pozornost, což je popsáno v~následujícím textu.
+Emulační platforma samotná je jen nástrojem pro vývoj emulátorů --- nyní je třeba navrhnout jak implementovat konkrétní komponenty. Všechny komponenty budou potomky třídy Component pro dodržení myšlenky univerzálního rozhraní napříč celým emulátorem. Většina práce bude přenesení analýz, ale některým částem je třeba věnovat zvláštní pozornost, což je popsáno v~následujícím textu.
 
 \subsection{Základní komponenty}
 Základní komponenty je záhodno navrhnout univerzálně. Součástí NES je hlavní paměť a dvě sběrnice.
@@ -1828,9 +1834,9 @@ Tím, že nametable ve videopaměti přímo reprezentuje část pozadí, může 
 Další otázkou je reprezentace vnitřních pamětí grafického čipu. OAM~i~paletová paměť mohou být součástí PPU, jelikož je přímo používá pouze PPU (procesor musí přistupovat přes registry). Avšak videopaměť může být jak součástí PPU, tak kazety; záleží na tom, jaká konkrétní deska (mapper) byla použita. První myšlenkou je ponechat videopaměť v~PPU a~vystavit další rozhraní mezi PPU~a~kazetou, pomocí které bude kazeta PPU informovat, zdali se má vestavěná videopaměť používat a~jaký typ zrcadlení se má zvolit. Tím, že se ale kvůli zjednodušení sloučily adresní i~datové vodiče (viz část~\ref{sec:port-connector}), je vhodnější najít alternativní řešení. Tím je pevná integrace videopaměti do kazety --- stejně o~způsobu jejího používání vždy rozhoduje kazeta. Ačkoliv se takto přijde o~soulad s~hardwarovou reprezentací konzole, věrohodnost emulace to neovlivní, tudíž je možné tuto variantu zvolit.
 
 \subsection{Kazeta a~mappery}
-Kazeta jako taková je pouze obalem pro paměti a~řídicí desku, která rozhoduje o~mapování těchto pamětí (mapper). Takto to může být reprezentováno i~v~softwaru. Třída~\emph{Game Pak}, pojmenovaná po obchodním označení kazet pro NES, bude sloužit k~načtení souborům obsahujícím potřebná data (ve formátu iNES) a~vybrání správného mapperu dle zjištěných metadat v~hlavičce souboru.
+Kazeta jako taková je pouze obalem pro paměti a~řídicí desku, která rozhoduje o~mapování těchto pamětí (mapper). Takto to může být reprezentováno i~v~softwaru. Třída~\emph{Gamepak} (pojmenovaná po obchodním označení kazet pro NES) bude sloužit k~načtení souborů obsahujících potřebná data (ve formátu iNES) a~vybrání správného mapperu dle zjištěných metadat v~hlavičce souboru.
 
-Reprezentace pamětí bude velice jednoduchá, jelikož nejsou přístupné jinde než v~rámci kazety, není třeba vytvářet podsběrnici a~paměti reprezentovat jako samostatné komponenty. 
+Reprezentace pamětí bude velice jednoduchá. Jelikož paměti nejsou přístupné jinde než v~rámci kazety, není třeba vytvářet podsběrnici a~reprezentovat je jako samostatné komponenty. 
 
 Mapper již bude třeba reprezentovat sofistikovaněji. Pro práci s~mapperem je třeba jednotné rozhraní. Konkrétní implementace pak bude záviset na jednotlivých typech. Protože je v~C++ možné rozhraní implementovat pouze pomocí dědičnosti, budou jednotlivé mappery potomkem třídy Mapper. To, jaký konkrétní mapper je schován za rozhraním, bude známo jen při inicializaci, což ale stačí, jelikož vstupní parametry je třeba předat pouze při konstrukci mapperu. Dále tedy může být mapper zapouzdřen a~veškerá interakce bude probíhat přes jednotné rozhraní (čtení, zápis), což odpovídá realitě.
 
@@ -1840,7 +1846,7 @@ Zvukový syntezátor je vlastně skupinou registrů, které říkají, jak se m�
 Je možné pouze využít parametry a~zvuk generovat jiným způsobem. Existují dva návrhy, které budou vysvětleny na jednom kanálu --- pulse. Tento kanál generuje čtvercový signál. Posílal-li by se čistý čtverec na výstup, mohlo by dojít k~nepříjemným artefaktům, které jsou způsobeny příliš rychlými změnami signálu (čtverec jsou skoky mezi žádným signálem a~signálem o~maximální amplitudě). Proto se nabízí tento signál aproximovat Fourierovou řadou pomocí sčítání sinusových signálů, vznikne tak mnohem hladší signál. Druhou možností je využít filtrovacích mechanismů, které nabízí zvolená knihovna miniaudio. Využije-li se filtr typu dolní propusti, výsledek bude stejný, ale méně výpočetně náročný. Navíc se takto věrně napodobí chování původního hardwaru: byl generován surový signál, který byl přes sadu filtrů dopraven až do reproduktorů televizoru.
 
 \subsection{Herní ovladače}
-Vzhledem k~jednoduchosti herních ovladačů není nutné vytvářet speciální návrh, jde jen o~jednoduchou sadu registrů. Jediné, co je nutné zajistit, je integrace s~knihovnou ImInputBinder, která zajistí přenos úhozů kláves do komponenty. Tím, že knihovna pracuje s~jednoduchým callbackem, jedná se pouze o~vrácení callbacku přes systém až do emulátoru.
+Vzhledem k~jednoduchosti herních ovladačů není nutné vytvářet speciální návrh. Jde pouze o~sadu registrů. Jediné, co je nutné zajistit, je integrace s~knihovnou ImInputBinder, která zajistí přenos úhozů kláves do komponenty. Tím, že knihovna pracuje s~jednoduchým callbackem, jedná se pouze o~vrácení callbacku přes systém až do emulátoru.
 
 \subsection{Integrace do platformy}
 Pro přehled je na konec uveden diagram zachycující konkrétní realizaci emulátoru NES na platformě~2.0.
@@ -1848,7 +1854,7 @@ Pro přehled je na konec uveden diagram zachycující konkrétní realizaci emul
 \begin{figure}[htp!]
 	\centering
 	\includegraphics[width=1.0\textwidth]{images/navrh_prehled.pdf}
-	\caption{Integrace NES do platformy 2.0}\label{fig:navrh-prehled}
+	\caption{Integrace NES do platformy 2.0.}\label{fig:navrh-prehled}
 \end{figure}
 
 
@@ -1913,7 +1919,7 @@ Projekt je k~dispozici na veřejném repozitáři na platformě GitHub: \url{htt
 		.1 README\DTcomment{základní informace k~projektu}.
 		.1 main.cpp\DTcomment{hlavní kompilační jednotka projektu}.
 	}
-	\caption{Popis struktury projektu}\label{fig:impl-struktura-projektu}
+	\caption{Popis struktury projektu.}\label{fig:impl-struktura-projektu}
 \end{figure}
 
 \section{Emulační platforma}
@@ -1941,7 +1947,7 @@ Vývojář komponenty má za úkol implementovat funkce \mintinline{cpp}|getGUIs
 Nejdůležitějším přínosem platformy je jednoduchost tvorby grafického rozhraní a~zvukového výstupu. Nejprve je demonstrován proces tvorby rozhraní na zjednodušené komponentě ve výpisu kódu~\ref{list:use-konfigurace-gui}. Vše, co je potřebné definovat, je obsaženo v~jediné funkci, v~rámci níž je možné definovat libovolné množství lambda funkcí reprezentujících vykreslovaná okna. Tyto funkce jsou pak předány v~kontejneru typu vektor i~s~metadaty (kategorie, název okna, popřípadě preferovaný dok, do kterého se má okno umístit).
 
 \begin{listing}
-	\caption{Příklad konfigurace grafického rozhraní pro komponentu emulující procesor}
+	\caption{Příklad konfigurace grafického rozhraní pro komponentu emulující procesor.}
 	\label{list:use-konfigurace-gui}
 	\begin{minted}[tabsize=2]{cpp}
 std::vector<EmulatorWindow> MujProcesor::getGUIs() {
@@ -1994,7 +2000,7 @@ std::vector<EmulatorWindow> MujProcesor::getGUIs() {
 Mnohem jednodušší je předávání zvuku k~přehrání. Tím, že veškerou rutinní práci odvede již implementovaná specializovaná třída \mintinline{cpp}|Sound|, stačí v~rámci funkce \mintinline{cpp}|getSoundSampleSources()| předat dvouvzorkový rámec (jeden vzorek pro levý a~jeden pro pravý reproduktor) reprezentující amplitudu, která by byla v~reálné komponentě na analogovém výstupu. Pro většinu emulovaných zvukových čipů je to tedy otázka předání hodnot z~již hotové funkce generující zvuk (popřípadě i~převedení formátu, nejedná-li se o~výstup v~plovoucí desetinné čárce v~rozsahu $[-1, 1]$). Ukázka implementované funkce pro čip APU je obsažena ve výpisu kódu~\ref{list:use-konfigurace-audia}.
 
 \begin{listing}
-	\caption{Implementace rozhraní pro přístup ke zvukovým datům}
+	\caption{Implementace rozhraní pro přístup ke zvukovým datům.}
 	\label{list:use-konfigurace-audia}
 	\begin{minted}[tabsize=2]{cpp}
 SoundSampleSources APU::getSoundSampleSources() {
@@ -2013,9 +2019,9 @@ SoundSampleSources APU::getSoundSampleSources() {
 \end{listing}
 
 \subsection{Práce se zvukem}
-Pro co nejjednodušší zpřístupnění zvukového výstupu byla vytvořena třída \mintinline{cpp}|Sound|. Tato třída má velice jednoduché rozhraní: \mintinline{cpp}|start()| a~\mintinline{cpp}|stop()| pro spuštění či zastavení přehrávání dodaných zvukových rámců a~\mintinline{cpp}|writeFrames()| pro dodání rámců k~přehrání. Je zcela abstrahováno to, jaký zvukový ovladač se ve skutečnosti používá, jak dochází ke zpracování jednotlivých zvukových rámců i~jak probíhá komunikace s~audio callbackem (a tedy dodávání zpracovaných rámců) --- to vše zajistí platforma tak, aby bylo vývojáři emulátoru zpříjemněna a~zjednodušena práce.
+Pro co nejjednodušší zpřístupnění zvukového výstupu byla vytvořena třída \mintinline{cpp}|Sound|. Tato třída má velice jednoduché rozhraní: \mintinline{cpp}|start()| a~\mintinline{cpp}|stop()| pro spuštění či zastavení přehrávání dodaných zvukových rámců a~\mintinline{cpp}|writeFrames()| pro dodání rámců k~přehrání. Je zcela abstrahováno to, jaký zvukový ovladač se ve skutečnosti používá, jak dochází ke zpracování jednotlivých zvukových rámců i~jak probíhá komunikace s~audio callbackem (a tedy dodávání zpracovaných rámců) --- to vše zajistí platforma tak, aby byla vývojáři emulátoru zpříjemněna a~zjednodušena práce.
 
-Třídu \mintinline{cpp}|Sound| spravuje platforma (třída \mintinline{cpp}|Emulator|). Při nahrání emulovaného systému dojde k~vytvoření grafu reprezentující tok zvukových vzorků při jejich zpracování. Graf je tvořen vstupními body, jejichž počet závisí na počtu zdrojů zvuku (zjistí se zcela automaticky bez zásahu vývojáře systému, pakliže správně implementoval funkci pro získání seznamu zdrojů zvuku), všechny vstupní body jsou smíchány a předány dalšímu uzlu, což je filtr typu dolní propust. Ten je použit proto, aby byly omezeny příliš velké změny amplitud, které vedou k~nepříjemnému praskání na výstupu (v~reproduktorech či sluchátkách). Nakonec je smíchaný~a~filtrovaný výsledný zvuk přiveden na výstup. Graficky je tento tok znázorněn na obrázku~\ref{fig:impl-zvuk-tok-dat}.
+Třídu \mintinline{cpp}|Sound| spravuje platforma (třída \mintinline{cpp}|Emulator|). Při nahrání emulovaného systému dojde k~vytvoření grafu reprezentujícího tok zvukových vzorků při jejich zpracování. Počátek grafu je tvořen vstupními body, jejichž počet závisí na počtu zdrojů zvuku. Vstupní body se integrují zcela automaticky bez zásahu vývojáře systému, pakliže správně implementoval funkci pro získání seznamu zdrojů zvuku. Všechny vstupní body jsou smíchány a předány dalšímu uzlu, což je filtr typu dolní propust. Ten je použit proto, aby byly omezeny příliš velké změny amplitud, které vedou k~nepříjemnému praskání na výstupu (v~reproduktorech či sluchátkách). Nakonec je smíchaný~a~filtrovaný výsledný zvuk přiveden na výstup. Graficky je tento tok znázorněn na obrázku~\ref{fig:impl-zvuk-tok-dat}.
 
 \begin{figure}[ht!]
 	\centering
@@ -2034,7 +2040,7 @@ Třídu \mintinline{cpp}|Sound| spravuje platforma (třída \mintinline{cpp}|Emu
 		\draw [arrow] (zdroj3) -- (dp);
 		\draw [arrow] (dp) -- (out);
 	\end{tikzpicture}
-	\caption{~Schéma toku zvukových dat ze 3~zdrojů}\label{fig:impl-zvuk-tok-dat}
+	\caption{~Schéma toku zvukových dat ze 3~zdrojů.}\label{fig:impl-zvuk-tok-dat}
 \end{figure}
 
 Jak lze pozorovat na implementaci mechanismu zpracování zvuku, je jen na vývojáři emulovaných komponent, potažmo systému, kolik zdrojů zvuku platformě poskytne. Je možné vše smíchat vlastním způsobem a~klidně za celý systém předat jen jeden zdroj, nebo předat několik zdrojů za každou komponentu a~přenechat veškeré míchaní na platformě. Samozřejmě je možné nepředávat žádný zdroj, přehrávání zvuku tak nebude k~dispozici.
@@ -2042,12 +2048,12 @@ Jak lze pozorovat na implementaci mechanismu zpracování zvuku, je jen na vývo
 \subsection{Komunikace komponent}
 Jak bylo popsáno v~návrhové části, komunikace komponent probíhá pomocí tříd~\mintinline{cpp}|Port| a~\mintinline{cpp}|Connector|. Nejprve je ukázáno, jak se jednotlivé třídy používají, poté je vysvětlen princip jejich implementace.
 
-Chce-li komponenta zveřejnit port, pomocí nějž by řídila ostatní komponent, vybere typ portu a přidá jej jako datovou položku třídy. Poté v~konstruktoru přidá port do seznamu zveřejněných portů: \mintinline{cpp}|m_ports["nazev_portu"] = &m_mujPort|. Dle vybraného typu portu jsou pak k~dispozici různá rozhraní. Typ \mintinline{cpp}|DataPort| je emulací kombinace datových, adresních a~řídicích vodičů, umožňuje komunikovat pomocí metod \mintinline{cpp}|uint32_t read(uint32_t address)| pro přečtení dat z~vybrané adresy a~\mintinline{cpp}|void write(uint32_t address, uint32_t data)| pro zápis dat na zvolenou adresu. Typ \mintinline{cpp}|SignalPort| je poté emulace surových signálů. Umožňuje nastavit logickou úroveň na pomyslném vodiči pomocí \mintinline{cpp}|void set(bool active)|, popřípadě pouze zaslat jeden pomyslný signální pulz (změnu logické hodnoty; je na připojené komponentě, jak jej interpretuje) pomocí \mintinline{cpp}|void send();|. Nastavení logické úrovně je použitelné pro komunikaci s~úrovňovými detektory (u~6502 port IRQ), poslání signálu je poté užitečné pro hranové detektory (u~6502 port NMI).  Do portu je možné připojit konektor, takové rozhraní mají oba typy portů společné: \mintinline{cpp}|void connect(std::weak_ptr<Connector> connector)|. Port po připojení konektoru zkontroluje, zdali je v~konektoru definováno požadované rozhraní a~pokud ano, je možné pomocí portu komunikovat s~připojenou komponentou přes její konektor.
+Chce-li komponenta zveřejnit port, pomocí nějž by řídila ostatní komponenty, vybere typ portu a přidá jej jako datovou položku třídy. Poté v~konstruktoru přidá port do seznamu zveřejněných portů: \mintinline{cpp}|m_ports["nazev_portu"] = &m_mujPort|. Dle vybraného typu portu jsou pak k~dispozici různá rozhraní. Typ \mintinline{cpp}|DataPort| je emulací kombinace datových, adresních a~řídicích vodičů, umožňuje komunikovat pomocí metod \mintinline{cpp}|uint32_t read(uint32_t address)| pro přečtení dat z~vybrané adresy a~\mintinline{cpp}|void write(uint32_t address, uint32_t data)| pro zápis dat na zvolenou adresu. Typ \mintinline{cpp}|SignalPort| je poté emulace surových signálů. Umožňuje nastavit logickou úroveň na pomyslném vodiči pomocí \mintinline{cpp}|void set(bool active)|, popřípadě pouze zaslat jeden pomyslný signální pulz (změnu logické hodnoty; je na připojené komponentě, jak jej interpretuje) pomocí \mintinline{cpp}|void send();|. Nastavení logické úrovně je použitelné pro komunikaci s~úrovňovými detektory (u~6502 port IRQ), poslání signálu je poté užitečné pro hranové detektory (u~6502 port NMI).  Do portu je možné připojit konektor, takové rozhraní mají oba typy portů společné: \mintinline{cpp}|void connect(std::weak_ptr<Connector> connector)|. Port po připojení konektoru zkontroluje, zdali je v~konektoru definováno požadované rozhraní a~pokud ano, je možné pomocí portu komunikovat s~připojenou komponentou přes její konektor.
 
 Chce-li být komponenta řízena jinou komponentou, musí naopak zveřejnit konektor, toť jest typ třídy \mintinline{cpp}|Connector|.  Konektory jsou v~komponentách ukládány do kontejneru typu \mintinline{cpp}|std::map|. Deklarace i~definice probíhá v~konstruktoru. Výpis kódu~\ref{list:use-konfigurace-konektoru} ukazuje, jak lze nadefinovat jak typ konektoru poskytující datové rozhraní, tak typ konektoru poskytující signální rozhraní; prezentovaný kód by byl uveden v~konstruktoru.
 
 \begin{listing}
-	\caption{Definování konektorů různých typů}
+	\caption{Definování konektorů různých typů.}
 	\label{list:use-konfigurace-konektoru}
 	\begin{minted}[tabsize=2]{cpp}
 	// Konektor poskytujici signalni rozhrani emulujici hranovy detektor.
@@ -2086,7 +2092,7 @@ Chce-li být komponenta řízena jinou komponentou, musí naopak zveřejnit kone
 				m_register1 = data;
 			}
 		
-			// Registr 2 pouze pro cteni.
+			// (Registr 2 pouze pro cteni, neni potreba zadny kod.)
 		}
 	});
 	\end{minted}
@@ -2095,7 +2101,7 @@ Chce-li být komponenta řízena jinou komponentou, musí naopak zveřejnit kone
 \begin{note}[Důvod použití chytrých ukazatelů]
 	Jak bylo popsáno výše, port je vždy lokální datová položka komponenty, kdežto konektory se předávají napříč komponentami. Bylo tedy nutné vymyslet, jak se budou komponenty předávat. Myšlenka surového ukazatele byla v~rámci dodržování principů bezpečné práce s~pamětí zavržena. Předává-li se totiž surový ukazatel, nemusí být příliš zřejmé, kdo spravuje ukazovaný objekt. Dobrou volbou není ani \mintinline{cpp}|std::shared_ptr|, jelikož je sémanticky vlastníkem pouze komponenta, které konektor patří.
 	
-	 Nejideálnější volbou by byl \enquote{chytrý} pozorující (observing) ukazatel. Je to vlastně jen sémantický obal nad surovým ukazatelem, který však jasně říká, že se pracuje s~ukazatelem na objekt spravovaný někým jiným. Ten je však v~C++ zatím součástí plánovaných rozšíření, tudíž ve jmenném prostoru \mintinline{cpp}|std::experimental|, což není zcela vhodné používat ve stabilním kódu.~\normalfont{\cite{Brown2014:observing-ptr}} V~projektu byl proto použit pro předávání dalším komponentám \mintinline{cpp}|std::weak_ptr|, jakožto kompromisní (ale stabilní) řešení.
+	 Nejideálnější volbou by byl \enquote{chytrý} pozorující (observing) ukazatel. Je to vlastně jen sémantický obal nad surovým ukazatelem, který však jasně říká, že se pracuje s~ukazatelem na objekt spravovaný někým jiným. Ten je však v~C++ zatím součástí plánovaných rozšíření, tudíž ve jmenném prostoru \mintinline{cpp}|std::experimental|, což není zcela vhodné používat ve stabilním kódu~\normalfont{\cite{Brown2014:observing-ptr}}. V~projektu byl proto použit pro předávání dalším komponentám \mintinline{cpp}|std::weak_ptr|, jakožto kompromisní (ale stabilní) řešení.
 \end{note}
 
 \subsection{Systémy}
@@ -2109,10 +2115,10 @@ Systém obsahuje mnoho předpřipravených metod. Týká se to především prá
 	V~současné verzi platformy se počítá s~vytvářením systému pouze vyvinutím dalších tříd, které se poté ručně zakomponují do platformy přidáním do nabídky v~hlavní třídě \mintinline{cpp}|Emulator|. Návrh komponent proběhl však velice pečlivě tak, aby bylo možné do budoucna implementovat třídu reprezentující univerzální systém, který bude implementovatelný grafickým rozhraním. Počítá se s~využitím editoru grafů, pomocí nějž půjde skládat systém jak na úrovni komplexních komponent (procesor, grafický čip), tak na úrovni hradel.
 \end{note}
 
-Pro implementaci funkčního systému musí vývojář také definovat propojení komponent, vhodné je také definovat název systému. To se provádí v~konstruktoru systému. Díky univerzálnímu návrhu je to velice jednoduché, příklad jednoduchého propojení ukazuje výpis kódu~\ref{list:use-propojeni}, na něm je procesor řídicí prvek komunikace na sběrnici (master) a~RAM figuruje na sběrnici jako ukázka řízeného zařízení (slave).
+Pro implementaci funkčního systému musí vývojář také definovat propojení komponent, vhodné je definovat i~název systému. To se provádí v~konstruktoru systému. Díky univerzálnímu návrhu je to velice jednoduché. Příklad propojení ukazuje výpis kódu~\ref{list:use-propojeni}, v~němž je procesor řídicí prvek komunikace na sběrnici (master) a~RAM figuruje na sběrnici jako ukázka řízeného zařízení (slave).
 
 \begin{listing}
-	\caption{Propojení komponent v systému}
+	\caption{Propojení komponent v systému.}
 	\label{list:use-propojeni}
 	\begin{minted}[tabsize=2]{cpp}
 		// Definice nazvu systemu.
@@ -2141,7 +2147,7 @@ Po dokončení emulační platformy je možné implementovat jednotlivé kompone
 Aby mohl procesor komunikovat s~více komponentami, je potřebná \emph{sběrnice}. Koncept sběrnice je použitelný ve více systémech, proto je záhodno sběrnici navrhnout univerzálně. Téměř veškerá \enquote{logika} sběrnice spočívá v~komunikaci, proto je také většina kódu v~definici konektoru. Ukázkou toho, jak se dá emulovat univerzální čtecí a~zápisová logika sběrnice pro řídicí zařízení na platformě 2.0 (USE) je znázorněna ve výpisu kódu~\ref{list:use-sbernice}.
 
 \begin{listing}
-	\caption{Definice čtecí a~zápisové logiky sběrnice využívané například procesorem}
+	\caption{Definice čtecí a~zápisové logiky sběrnice využívané například procesorem.}
 	\label{list:use-sbernice}
 	\begin{minted}[tabsize=2]{cpp}
  m_connectors["master"] = std::make_shared<Connector>(
@@ -2174,10 +2180,10 @@ Aby mohl procesor komunikovat s~více komponentami, je potřebná \emph{sběrnic
 	\end{minted}
 \end{listing}
 
-Podobně jako sběrnice je i~\emph{paměť} komponentou, kterou je možné využít i~v~rámci jednoho systému hned několikrát, z~čehož vyplývá, že je vhodné ji také implementovat univerzálně. Stejně jako v~případě sběrnice se většina logiky nachází právě v~definici konektoru, neboli rozhraní pro zařízení, které bude k~paměti přistupovat. Zde již stojí za zmínku fakt, že k~paměti lze pomocí definovaného konektoru přistupovat buď přímo, tedy tak, že se přímo k~paměti připojí například procesor, nebo nepřímo, přes sběrnici, pakliže má procesor ve svém adresním prostoru více zařízení, což je případ procesoru 6502 v~konzoli NES. Zkrátka univerzálnost návrhu umožňuje s~komponentami pracovat modulárně tak, jako by se jednalo o~komponenty skutečné. Aby nebyla demonstrována jen tvorba konektorů, kterou lze prostudovat ve zdrojovém kódu práce, je v~případě paměti ukázán způsob, jakým se definuje počáteční stav komponenty pomocí metody \mintinline{cpp}|init()| ve výpisu kódu~\ref{list:use-init-pamet}.
+Podobně jako sběrnice je i~\emph{paměť} komponentou, kterou je možné využít i~v~rámci jednoho systému hned několikrát, z~čehož vyplývá, že je vhodné ji také implementovat univerzálně. Stejně jako v~případě sběrnice se většina logiky nachází právě v~definici konektoru, neboli rozhraní pro zařízení, které bude k~paměti přistupovat. Zde již stojí za zmínku fakt, že k~paměti lze pomocí definovaného konektoru přistupovat buď přímo, tedy tak, že se přímo k~paměti připojí například procesor, nebo nepřímo přes sběrnici, pakliže má procesor ve svém adresním prostoru více zařízení, což je případ procesoru 6502 v~konzoli NES. Zkrátka univerzálnost návrhu umožňuje s~komponentami pracovat modulárně tak, jako by se jednalo o~komponenty skutečné. Aby nebyla demonstrována jen tvorba konektorů, kterou lze prostudovat ve zdrojovém kódu práce, je v~případě paměti ukázán způsob, jakým se definuje počáteční stav komponenty pomocí metody \mintinline{cpp}|init()| ve výpisu kódu~\ref{list:use-init-pamet}.
 
 \begin{listing}
-	\caption{Definice počátečního stavu emulované paměti}
+	\caption{Definice počátečního stavu emulované paměti.}
 	\label{list:use-init-pamet}
 	\begin{minted}[tabsize=2]{cpp}
 void Memory::init() {
@@ -2193,24 +2199,28 @@ Kromě paměti a~sběrnice byla implementována ještě další komponenta, \min
 První implementovanou komponentou byl \emph{procesor 6502}. Před započetím implementace instrukcí bylo nutné implementovat způsob dekódování instrukcí. Jak bylo vybráno v~návrhové části, vhodnou možností je vyhledávací tabulka. Při implementaci záznamu vyhledávací tabulky bylo zváženo vše, co je třeba uchovávat spolu s~instrukcí. Jak bylo zjištěno v~analýze, instrukce existuje ve více variantách dle adresního režimu, má své zkrácené označení a~zároveň může její zpracování trvat různě dlouho, což je měřitelné ve strojových cyklech. Strukturu záznamu ukazuje výpis kódu~\ref{list:use-6502-zaznam}, kde byla pro jednoduchost přidána ještě délka instrukce. Celou tabulku lze nalézt ve zdrojovém kódu.
 
 \begin{listing}
-	\caption{Záznam instrukční tabulky procesoru 6502}
+	\caption{Záznam instrukční tabulky procesoru 6502.}
 	\label{list:use-6502-zaznam}
 	\begin{minted}[tabsize=2]{cpp}
-/// A single instruction.
 typedef struct {
-	char mnemonic[4]; 				 // ASM mnemonic.
-	uint8_t (MOS6502::*addrMode)();  // Pointer to the address mode function.
-	uint8_t (MOS6502::*instrCode)(); // Pointer to the instruction code.
-	uint8_t instrLen; 				 // Instruction length in bytes.
-	uint8_t cycles; 				 // Machine cycles count.
+	// Oznaceni OZ.
+	char mnemonic[4];
+	// Ukazatel na adresni rezim.
+	uint8_t (MOS6502::*addrMode)();
+	// Ukazatel na funkci nalezici instrukci.
+	uint8_t (MOS6502::*instrCode)();
+	// Delka instrukce v bajtech.
+	uint8_t instrLen;
+	// Pocet cyklu potrebnych k vykonani instrukce.
+	uint8_t cycles;
 } instruction_t;
 	\end{minted}
 \end{listing}
 
-Instrukce i~adresní režimy procesoru 6502 byly implementovány jako třídní metody. Příklad absolutního adresního režimu a~implementace instrukce pro sčítání s~přenosem (add with carry, ADC) je ve výpisu kódu~\ref{list:use-6502-instrukce}. Dále bylo nutné implementovat stav po spuštění (opět přetížením metody~\mintinline{cpp}|init()|) a~dále obsluhu přerušení tak, aby věrně napodobila skutečné chování procesoru 6502, jelikož je klíčová ke správné synchronizaci komponent. Zpracování přerušení probíhá v~několika krocích; jelikož je dosti rozsáhle, je zde zevrubně popsáno včetně názvů relevantních metod; je opět doporučeno nahlédnout do zdrojového kódu v~případě zájmu o~hlubší pochopení.
+Instrukce i~adresní režimy procesoru 6502 byly implementovány jako třídní metody. Příklad absolutního adresního režimu a~implementace instrukce pro sčítání s~přenosem (add with carry, ADC) je ve výpisu kódu~\ref{list:use-6502-instrukce}. Dále bylo nutné implementovat stav po spuštění (opět přetížením metody~\mintinline{cpp}|init()|) a~dále obsluhu přerušení tak, aby věrně napodobila skutečné chování procesoru 6502, jelikož je klíčová ke správné synchronizaci komponent. Zpracování přerušení probíhá v~několika krocích; protože je dosti rozsáhlé, je zde zevrubně popsáno včetně názvů relevantních metod. Opět je doporučeno nahlédnout do zdrojového kódu v~případě zájmu o~hlubší pochopení.
 
 \begin{listing}
-	\caption{Ukázka implementace absolutního adresního režimu 6502 a~instrukce ADC}
+	\caption{Ukázka implementace absolutního adresního režimu 6502 a~instrukce ADC.}
 	\label{list:use-6502-instrukce}
 	\begin{minted}[tabsize=2]{cpp}
 // Absolutni adresni rezim.
@@ -2256,7 +2266,7 @@ Při obdržení požadavku na přerušení (obvykle pomocí relevantního konekt
 Na základě analýz bylo zjištěno, že se v~NES používá upravená verze 6502 s~označením 2A03 od firmy Ricoh. Bylo využito principu dědění a~byla vytvořena třída \mintinline{cpp}|RP2A03|, kde bylo upraveno a~doplněno chování původního procesoru. Největším rozdílem (kromě syntezátoru APU, který byl pro přehlednost implementován v~jiné třídě) je přítomnost řadiče přímého přístupu do paměti. Tento řadič je dostupný pro použití programem pomocí jediného registru mapovaného do paměti, proto stačilo pouze přidat další konektor. Implementace konektoru (a~tedy i~celé logiky DMA) je znázorněno ve výpisu kódu~\ref{list:use-2a03-dma}.
 
 \begin{listing}
-	\caption{Implementace přímého přístupu do paměti v~čipu 2A03}
+	\caption{Implementace přímého přístupu do paměti v~čipu 2A03.}
 	\label{list:use-2a03-dma}
 	\begin{minted}[tabsize=2]{cpp}
 m_connectors["OAMDMA"] = std::make_shared<Connector>( DataInterface {
@@ -2287,11 +2297,11 @@ m_connectors["OAMDMA"] = std::make_shared<Connector>( DataInterface {
 \end{listing}
 
 \subsubsection{Grafický čip 2C02}
-Nejkomplexnější komponenta celého systému je grafický čip přezdívaný PPU implementována jako třída \mintinline{cpp}|R2C02|. Implementace se dá rozdělit do logických celků metod dle jejich účelu:
+Nejkomplexnější komponenta celého systému je grafický čip přezdívaný PPU implementován jako třída \mintinline{cpp}|R2C02|. Implementace se dá rozdělit do logických celků metod dle jejich účelu:
 \begin{itemize}
 	\item Definice rozhraní. 2C02 má několik registrů přístupných procesoru. Toto rozhraní se standardně definuje v~konstruktoru pomocí konektorů.
 	\item Implementace vnitřních operací. Během vykreslování i~mimo něj provádí PPU mnoho vnitřních operací, tyto jsou reprezentovány příslušnými metodami, které odpovídají operacím popsaných v~analýze.
-	\item Implementace strojového cyklu: volání metod příslušejících vnitřním operacím se provádí v~metodě \mintinline{cpp}|clock()|, která dle aktuálního obrazového řádku provede sled vnitřních operací.
+	\item Implementace strojového cyklu. Volání metod příslušejících vnitřním operacím se provádí v~metodě \mintinline{cpp}|clock()|, která dle aktuálního obrazového řádku provede sled vnitřních operací.
 	\item Implementace pomocných metod. Ty slouží především k~vykreslení obsahu vnitřních pamětí s~aplikovanými transformacemi (například vykreslení videopaměti za použití aktivní palety), nebo pro práci s~vnitřními paměťmi PPU, například paměti OAM a~paletová paměť.
 	\item Implementace emulačních metod. Jako u~každé komponenty je nutné implementovat její výchozí stav v~metodě \mintinline{cpp}|init()| a~grafické rozhraní v~metodě \mintinline{cpp}|getGUIs()|.
 \end{itemize}
@@ -2299,7 +2309,7 @@ Nejkomplexnější komponenta celého systému je grafický čip přezdívaný P
 Rozhraní přesně odpovídá analyzované množině registrů. Úryvek z~implementace rozhraní je ve výpisu~\ref{list:use-2c02-io}, kde je ukázána emulace registru PPUSTATUS pro čtení a~registru PPUSCROLL pro zápis.
 
 \begin{listing}
-	\caption{Úryvek implementace rozhraní čipu 2C02}
+	\caption{Úryvek implementace rozhraní čipu 2C02.}
 	\label{list:use-2c02-io}
 	\begin{minted}[tabsize=2]{cpp}
 
@@ -2352,21 +2362,21 @@ switch(address) {
 	\end{minted}
 \end{listing}
 
-Vnitřní operace byly rozděleny tak, aby se daly volat odděleně dle aktivního strojového cyklu. Těmito operacemi jsou například \mintinline{cpp}|verticalIncrement(), verticalTransfer()| a~\mintinline{cpp}|fetchNT(), fetchAT()|. Jedná se především o~průběžné aktualizace hodnot registrů (posuvy), načítání indexů z~videopaměti, načítání příslušných dlaždic dle indexů z~pattern table a~nakonec načítání atributů náležících dlaždicím. To vše je postupně ukládáno do posuvných registrů, se kterými se pracuje pomocí metod \mintinline{cpp}|feedShifters(), shiftShifters()|. Implementace těchto metod je zřejmá z~kódu, zde není uváděna, jelikož se jedná o~rutinní práci s~registry a~pamětí.
+Vnitřní operace byly rozděleny tak, aby se daly volat odděleně dle aktivního strojového cyklu. Těmito operacemi jsou například \mintinline{cpp}|verticalIncrement(), verticalTransfer(), fetchNT()| a~\mintinline{cpp}|fetchAT()|. Jedná se především o~průběžné aktualizace hodnot registrů (posuvy), načítání indexů z~videopaměti, načítání příslušných dlaždic dle indexů z~pattern table a~nakonec načítání atributů náležících dlaždicím. To vše je postupně ukládáno do posuvných registrů, se kterými se pracuje pomocí metod \mintinline{cpp}|feedShifters(), shiftShifters()|. Implementace těchto metod je zřejmá z~kódu. Zde není uváděna, jelikož se jedná o~rutinní práci s~registry a~pamětí.
 
-Strojový cyklus je pak místem, kde se veškeré operace provádějí. V~rámci emulace je evidován aktuální pozice s~ohledem na obrazové řádky a~body. Dle těchto hodnot je vybrán sled vnitřních operací a~také, odpovídá-li aktuální pozice zobrazitelnému úseku NTSC signálu (viz sekce~\ref{sec:analogove-video}), je vykreslován obraz. Vykreslování je řešeno jednodušší variantou, tedy variantou přímého vykreslování RGB hodnot, které se ukládají do dvourozměrného pole reprezentujícího obrazovku. Jelikož se vykreslování bitmapy z~dvourozměrného pole provádí na více místech aplikace (například i~v~debuggeru, kde se vykresluje obsah pattern table), byla navržena pomocná funkce \mintinline{cpp}|renderScalableBitmap(...)|. Prvním atributem funkce je bitmapa, druhým atributem je zvětšení. Bitmapa je předávána jako vektor, aby nemuselo být předávána zvlášť i~velikost --- tím by se riskovalo, že vývojář zvolí špatnou hodnotu rozměru a~dojde k~nezamýšlenému přístupu do irelevantní části paměti.
+Strojový cyklus je pak místem, kde se veškeré operace provádějí. V~rámci emulace je evidována aktuální pozice s~ohledem na obrazové řádky a~body. Dle těchto hodnot je vybrán sled vnitřních operací a~také, odpovídá-li aktuální pozice zobrazitelnému úseku NTSC signálu (viz sekce~\ref{sec:analogove-video}), je vykreslován obraz. Vykreslování je řešeno jednodušší variantou, tedy variantou přímého vykreslování RGB hodnot, které se ukládají do dvourozměrného pole reprezentujícího obrazovku. Jelikož se vykreslování bitmapy z~dvourozměrného pole provádí na více místech aplikace (například i~v~debuggeru, kde se vykresluje obsah pattern table), byla navržena pomocná funkce \mintinline{cpp}|renderScalableBitmap(...)|. Prvním atributem funkce je bitmapa, druhým atributem je zvětšení. Bitmapa je předávána jako vektor, aby nemusela být předávána zvlášť i~velikost --- tím by se riskovalo, že vývojář zvolí špatnou hodnotu rozměru a~dojde k~nezamýšlenému přístupu do irelevantní části paměti.
 
 Mezi pomocné metody se řadí například metoda \mintinline{cpp}|applyPixelEffects(...)| sloužící k~dodatečným úpravám barvy pixelu, kdy se používá saturovaná aritmetika: přičtení již hodnotu nezvýší více než je limit datového typu, podobně odčítání dovolí snížit hodnotu maximálně do nuly.
 
 Nakonec bylo nutné implementovat rozhraní pro platformu. Opět byla implementována metoda \mintinline{cpp}|init()| pro definování počátečního stavu, což jsou v~případě PPU stavy registrů, a~metoda \mintinline{cpp}|getGUIs()|.
 
 \subsubsection{Kazeta a~mappery}
-Další implementovanou komponentou byla kazeta, potažmo mappery, které jsou součástí těchto kazet. Jako reprezentace kazety byla vytvořena třída \mintinline{cpp}|Gamepak|. Tato třída je standardní komponentou systému. Její hlavní zodpovědností je načíst soubor s~kopií kazety, správně interpretovat metadata, na jejichž základě je vybrán odpovídající mapper a~načtena data (program a~grafická data). Načítání se provádí pomocí grafického rozhraní, které třída definuje standardně v~metodě \mintinline{cpp}|getGUIs|. Aby bylo rozhraní pro výběr souboru jednotné napříč platformami, byla vybrána knihovna ImGuiFileDialog. Knihovna vytvoří dialogové okno, ve kterém uživatel vybere požadovaný soubor. Aplikace se pokusí soubor otevřít, podaří-li se předá se otevřený stream metodě \mintinline{cpp}|load(std::ifstream & ifs)|, která již používá standardní C++ funkcionalitu pro práci se soubory.
+Další implementovanou komponentou byla kazeta, potažmo mappery, které jsou součástí těchto kazet. Jako reprezentace kazety byla vytvořena třída \mintinline{cpp}|Gamepak|. Tato třída je standardní komponentou systému. Její hlavní zodpovědností je načíst soubor s~kopií kazety a~správně interpretovat metadata, na jejichž základě je vybrán odpovídající mapper a~načtena data (program a~grafická data). Načítání se provádí pomocí grafického rozhraní, které třída definuje standardně v~metodě \mintinline{cpp}|getGUIs|. Aby bylo rozhraní pro výběr souboru jednotné napříč platformami, byla vybrána knihovna ImGuiFileDialog. Knihovna vytvoří dialogové okno, ve kterém uživatel vybere požadovaný soubor. Aplikace se pokusí soubor otevřít, podaří-li se předá se otevřený stream metodě \mintinline{cpp}|load(std::ifstream & ifs)|, která již používá standardní C++ funkcionalitu pro práci se soubory.
 
 Načítání probíhá dle struktury popsané v~analytické části (sekce~\ref{sec:analyza-format-souboru}). Složitější bylo určit, o~jakou verzi formátu souboru se jedná. Jelikož pro tuto informaci nebylo v~hlavičce vyhrazeno zvláštní místo, je proces identifikace formátu založen na odhadech dle obsahu hlavičky. Výňatek funkce \mintinline{cpp}|load(...)| zachycující algoritmus pro zjištění formátu souboru zachycuje výpis kódu~\ref{list:impl-dedukce-formatu}.
 
 \begin{listing}
-	\caption{Dedukce formátu kopie kazety}
+	\caption{Dedukce formátu kopie kazety.}
 	\label{list:impl-dedukce-formatu}
 	\begin{minted}[tabsize=2]{cpp}
 // Prvni dedukce probiha na zaklade dvou bitu v priznaku 7.
@@ -2412,7 +2422,7 @@ Mapper sice nebude zvláštní komponentou, ale také bude vyžadovat vykreslen�
 Implementace mapperu~0 byla přímočará, šlo jen o~správné mapování obsahu PRG~ROM a~CHR~ROM. Složitější byla implementace mapperu~1, kdy bylo nutné implementovat emulaci přepínání paměťových bank a~zároveň i~správné mapování dle nastaveného přepnutí. Porovnání funkce čtení PRG~ROM procesorem v~mapperu~0 a~v~mapperu~1 ukazuje výpis kódu~\ref{list:impl-mapper-prg-rom}.
 
 \begin{listing}
-	\caption{Ukázka čtení PRG~ROM v~mapperu}
+	\caption{Ukázka čtení PRG~ROM v~mapperu.}
 	\label{list:impl-mapper-prg-rom}
 	\begin{minted}[tabsize=2]{cpp}
 
@@ -2454,7 +2464,7 @@ if(addr >= 0x8000 && addr <= 0xBFFF) {
 \label{sec:impl-dalsi}
 Dalšími implementovanými komponentami byly APU a~herní ovladače.
 
-APU bylo implementováno dle analýz a~návrhu, šlo hlavně o~správnou implementaci registrů v~rozhraní pro procesor. Byly implementovány dva druhy kanálů. Zajímavý problém k~řešení nastal při implementaci výstupu pulzního kanálu APU. V~první verzi platformy nebyl k~dispozici filtr typu dolní propusti, proto nešlo přímo použít surový generovaný signál. Místo toho byla pulzní vlna aproximována za použití Fourierovy řady pro 10 sčítanců. Porovnání lze vidět na obrázku~\ref{fig:impl-fourier}. Použitý vzorec je následující ($f$ frekvence, $d$ střída, $t$ čas):
+APU bylo implementováno dle analýz a~návrhu. Důležitá byla především správná implementace registrů v~rozhraní pro procesor. Byly implementovány dva druhy kanálů. Zajímavý problém k~řešení nastal při implementaci výstupu pulzního kanálu APU. V~první verzi platformy nebyl k~dispozici filtr typu dolní propusti, proto nešlo přímo použít surový generovaný signál. Místo toho byla pulzní vlna aproximována za použití Fourierovy řady pro 10 sčítanců. Porovnání lze vidět na obrázku~\ref{fig:impl-fourier}. Použitý vzorec je následující ($f$ frekvence, $d$ střída, $t$ čas):
 
 \[
 vzorek(t) = \frac{2 \cdot amplituda}{\pi}\sum_{n = 1}^{25}{\frac{1}{n}\sin(\pi n d)\cos(2 \pi f t n)}
@@ -2489,11 +2499,11 @@ vzorek(t) = \frac{2 \cdot amplituda}{\pi}\sum_{n = 1}^{25}{\frac{1}{n}\sin(\pi n
 			}
 		\end{axis}
 	\end{tikzpicture}
-	\caption{Porovnání surového čtvercového signálu a~jeho aproximace Fourierovou řadou}\label{fig:impl-fourier}
+	\caption{Porovnání surového čtvercového signálu a~jeho aproximace Fourierovou řadou.}\label{fig:impl-fourier}
 \end{figure}
 
 \begin{note}[Přebuzení v~aproximaci]
-	Na obrázku~\ref{fig:impl-fourier} lze vidět, že při aproximaci dochází k~překročení amplitudy, dochází poté ke zkreslení signálu (přebuzení). Tomu lze zabránit vynásobením konstantou a~snížením tak výsledné amplitudy, popřípadě lze použít funkce zvukové knihovny, které přebuzení zabrání a~do zvukového ovladače pošlou regulovaný signál.
+	Na obrázku~\ref{fig:impl-fourier} lze vidět, že při aproximaci dochází k~překročení amplitudy, dochází poté ke zkreslení signálu (přebuzení). Tomu lze zabránit vynásobením konstantou z~intervalu $(0,1)$ a~snížením tak výsledné amplitudy, popřípadě lze použít funkce zvukové knihovny, které přebuzení zabrání a~do zvukového ovladače pošlou regulovaný signál.
 \end{note}
 
 Do této aproximace musely být doplněny parametry vlny, ty jsou ale díky architektuře APU jednoduše zjistitelné. Střída je konfigurována přímo registrem. Čas i~frekvence se dají implementovat dvěma způsoby. Jedna možnost je taková, že bude frekvence jednoduše zjištěna pomocí vzorce, kde $f_{apu}$ je frekvence hodin APU (pro NTSC zhruba 1,79~MHz) a~$t$ je nastavená výchozí hodnota hlavního časovače pulzního kanálu (perioda je tudíž o jedničku vyšší):
@@ -2502,9 +2512,9 @@ Do této aproximace musely být doplněny parametry vlny, ty jsou ale díky arch
 	f = \frac{f_{apu}}{8 \cdot (t + 1)}
 \]
 
-Tento vzorec vychází z~faktu, že sekvencér je osmikrokový, časovač tedy musí osmkrát posunout sekvencér pro vygenerování jedné periody signálu. Časovač je dekrementován každý hodinový takt APU a~na nule posouvá sekvencér o~krok vpřed, tudíž musí být časovač dekrementován $8\cdot perioda$. Z~toho vyplývá, že se vlastně jedná o~děličku frekvence APU, výpočet je pak přímočarý.
+Tento vzorec vychází z~faktu, že sekvencér je osmikrokový, časovač tedy musí osmkrát posunout sekvencér pro vygenerování jedné periody signálu. Časovač je dekrementován každý hodinový takt APU a~na nule posouvá sekvencér o~krok vpřed, tudíž musí být časovač dekrementován až na nulu (a~nastaven zpět na hodnotu periody) celkem 8krát. Z~toho vyplývá, že se vlastně jedná o~děličku frekvence APU, výpočet je pak přímočarý.
 
-Toto řešení bylo funkční, ale ukázalo se, že je zcela nevhodné pro signál o~měnící se frekvenci; při změně frekvence se objevily příliš velké skoky, které způsobovaly stejný problém, jako surový čtvercový signál. Řešením by bylo buď měnit frekvenci postupně, nebo elegantněji použít fázový akumulátor. Akumulátor uchovává hodnotu, která reprezentuje čas (aktuální pozici v~signálu). K~této hodnotě je přičítán zlomek periody dle aktuální frekvence, tudíž při její změně dojde k~plynulému navázání signálu. Nakonec však bylo díky existence dolní propusti zvoleno řešení mnohem jednodušší, které umožňovalo přesnou emulaci chování skutečného čipu.
+Toto řešení bylo funkční, ale ukázalo se, že je zcela nevhodné pro signál o~měnící se frekvenci; při změně frekvence se objevily příliš velké skoky, které způsobovaly stejný problém, jako surový čtvercový signál. Řešením by bylo buď měnit frekvenci postupně, nebo elegantněji použít fázový akumulátor. Akumulátor uchovává hodnotu, která reprezentuje čas (aktuální pozici v~signálu). K~této hodnotě je přičítán zlomek periody dle aktuální frekvence, tudíž při její změně dojde k~plynulému navázání signálu. Nakonec však bylo díky existenci dolní propusti zvoleno řešení mnohem jednodušší, které umožňovalo přesnou emulaci chování skutečného čipu.
 
 Poslední komponentou k~emulaci byly herní ovladače. Tyto ovladače jsou v~případě konzole NES dva shodné pro každého hráče. Jedná se o~přímočarou implementaci posuvných registrů. Jediný problém, který byl během implementace řešen, byl fakt, že je nutné po přečtení všech tlačítek vracet hodnotu logické jedničky. Není-li výstup posuvného registru takto vyřešen, některé hry nelze spustit. Například hra \enquote{Super Mario Bros.} přestane reagovat na veškeré vstupy již v~hlavní nabídce. Může se tedy jednat o~jistou formu kontroly, že software běží na legitimním systému.
 
@@ -2533,7 +2543,7 @@ Pro účely vývoje emulátoru byl vytvořen fork originálního repozitáře s 
 Test pro ověření funkce přerušení vyžaduje mapování pinů NMI a IRQ do paměti tak, aby je bylo možné ovládat programově. Součástí nastavení je tedy adresa mapování, způsob řízení a umístění signálů dle bitů. Ve výpisu~\ref{list:6502-test-konfigurace} jsou čtyři konfigurované položky.
 
 \begin{listing}[ht!]
-	\caption{Příklad konfigurace testu pro procesor 6502}
+	\caption{Příklad konfigurace testu pro procesor 6502.}
 	\label{list:6502-test-konfigurace}
 	\begin{minted}{ca65}
 I_port    = $bffc   ; Adresa mapovani do pameti.
@@ -2546,7 +2556,7 @@ NMI_bit   = 1       ; Cislo bitu prirazene NMI (-1, neni-li k dispozici).
 Po patřičném nastavení testů je možné vytvořit konfiguraci automatického sestavení. Přímo v~repozitáři je vytvořen soubor \mintinline{text}|build-release.yaml| v~adresáři \mintinline{text}|.github/workflows|. Tato konfigurace při každé změně spustí virtuální stroj, zkompiluje zdrojové kódy a~publikuje je v~novém vydání. Samotná kompilace probíhá pomocí assembleru as65, který je obsažen přímo v~repozitáři (na původní webové stránce již není k~dispozici). Výpis~\ref{list:6502-test-sestaveni} ukazuje výňatek, ve kterém je spouštěn kompilátor i~s~popisem použitých přepínačů. Velice důležitý je přepínač \mintinline{text}|-l|, který vygeneruje listing (viz kapitola~\ref{sec:testovaci-programy}). Pomocí něj je možné určit, v~jaké části programu došlo zacyklení, a~tedy jestli byl test úspěšný či nikoliv a~proč.
 
 \begin{listing}[ht!]
-	\caption{Kompilace testů v automatickém sestavení}
+	\caption{Kompilace testů v automatickém sestavení.}
 	\label{list:6502-test-sestaveni}
 	\begin{minted}{yaml}
 jobs:
@@ -2571,7 +2581,7 @@ Výsledkem každé změny je soubor spustitelných programů ve formě strojové
 \begin{figure}[ht!]
 	\centering
     \includegraphics[width=0.8\textwidth]{images/vydani-testu-6502.png}
-    \caption{Vydání testů pro procesor 6502}
+    \caption{Vydání testů pro procesor 6502.}
     \label{fig:vydani-testu-6502}
 \end{figure}
 
@@ -2579,7 +2589,7 @@ Výsledkem každé změny je soubor spustitelných programů ve formě strojové
 Nakonfigurované a sestavené testy je nyní možné spouštět ručně. Pro automatické spouštění je nutné vytvořit testovací funkci pro platformu Google Test. Aby byly dodržovány zásady dobrého testování, je vhodné test vytvořit za použití existující komponenty, do které se nebudou přidávat žádné funkcionality pouze pro běh testu. Případné změny lze totiž provést přímo v~testu, a~to za použití dědičnosti. Ve výpisu~\ref{list:6502-test-uprava} je znázorněna upravená třída procesoru. Je použit název DUT (design under test), který se používá například při tvorbě testů ve VHDL. Důležitou úpravou je přidání rozhraní pro úpravu programového čítače, což je nutné pro spuštění testu a~kontroly stavu testu.
 
 \begin{listing}[htp!]
-	\caption{Upravený procesor 6502 v Google Test}
+	\caption{Upravený procesor 6502 v Google Test.}
 	\label{list:6502-test-uprava}
 	\begin{minted}{c++}
 class DUT : public MOS6502 {
@@ -2613,7 +2623,7 @@ public:
 Samotný test pak probíhá v~jednoduchém cyklu, kde podmínkou pro opuštění je opakovaná hodnota programového čítače. Ověření výsledku probíhá porovnáním poslední hodnoty programového čítače. Dle listingu vygenerovaného assemblerem lze zjistit, že úspěch je signalizován zacyklením na adrese \mintinline{text}|$06e5|, což ukazuje výňatek ve výpisu~\ref{fig:6502-test-uspech}. Celý testovací cyklus s~ověřením výsledku se nachází ve výpisu~\ref{list:6502-test-cyklus}.
 
 \begin{listing}[ht!]
-	\caption{Řádek signalizující úspěch v listingu testu 6502}
+	\caption{Řádek signalizující úspěch v listingu testu 6502.}
 	\label{fig:6502-test-uspech}
 	\begin{minted}{ca65}
                                 success         ; Navesti makra uspechu.
@@ -2622,7 +2632,7 @@ Samotný test pak probíhá v~jednoduchém cyklu, kde podmínkou pro opuštění
 \end{listing}
 
 \begin{listing}[ht!]
-	\caption{Testovací cyklus procesoru 6502 v Google Test}
+	\caption{Testovací cyklus procesoru 6502 v Google Test.}
 	\label{list:6502-test-cyklus}
 	\begin{minted}{c++}
 do {
@@ -2643,7 +2653,7 @@ Jedním z~problému, které se v~průběhu vývoje objevily, byl problém s~čas
 Test se zastavil na adrese \mintinline{text}|$6b2|. Dle listingu tato adresa odpovídá sekci, kde se testují oba přerušení, NMI a~IRQ. Část způsobující chybu je vyobrazena ve výpisu~\ref{list:6502-test-hledani-chyby}. Nejprve se nastaví vyvolání obou typů přerušení instrukcí \mintinline{text}|sta I_port|, přičemž IRQ bylo maskováno (pro stručnost není proces maskování uveden). Čeká se na provedení obslužné rutiny NMI a~otestuje se, zdali proběhlo. Poté se povolí přerušení IRQ instrukcí \mintinline{text}|cli|. Nyní by měla proběhnout rutina IRQ, k~tomu však nedojde a~test se zastaví.
 
 \begin{listing}[htp!]
-	\caption{Výňatek z~kódu testu signalizující chybu}
+	\caption{Výňatek z~kódu testu signalizující chybu.}
 	\label{list:6502-test-hledani-chyby}
 	\begin{minted}{ca65}
 ; Testovani IRQ a NMI s maskovanim preruseni.
@@ -2679,7 +2689,7 @@ Skutečný procesor 6502 každé přerušení detekuje jiným způsobem. Přeru�
 Stačí tedy funkci odpovídající pinu IRQ implementovat tak, aby se dal nastavovat jeho stav (aktivní a neaktivní), nikoliv pouze vyvolávat signál, jako je to u~NMI. Klíčovou část kódu ukazuje výpis~\ref{list:6502-preruseni-irq-oprava}.
 
 \begin{listing}[ht!]
-	\caption{Oprava chybné implementace IRQ}
+	\caption{Oprava chybné implementace IRQ.}
 	\label{list:6502-preruseni-irq-oprava}
 	\begin{minted}{c++}
 void MOS6502::IRQ(bool active){
@@ -2712,7 +2722,7 @@ První krokem bylo zjistit, který kanál je zdrojem problému, tudíž z~výsle
 \begin{figure}[ht!]
 	\centering
 	\includegraphics[width=0.5\textwidth]{images/audacity_chybne.png}
-	\caption{Ukázka chybného výstupu generátoru šumu}
+	\caption{Ukázka chybného výstupu generátoru šumu.}
 	\label{fig:test-sum-chybne}
 \end{figure}
 
