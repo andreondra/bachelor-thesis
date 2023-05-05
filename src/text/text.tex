@@ -29,7 +29,7 @@ Práce je členěna na několik hlavních částí:
 	\item[Návrh] Po zpracování potřebné teorie i~konkrétních faktů týkající se konzole je možné vytvořit vhodné řešení. V~kapitole je možné nalézt diskusi k~samotnému vývojovému procesu, který je nezbytný k~rychlému a~pohodlnému vývoji, dále pak úvahy nad způsoby vytvoření univerzální emulační platformy a~nakonec i~způsob integrace konzole NES do navrženého systému.
 	\item[Implementace] Implementační kapitola je popisem procesu tvorby emulační platformy a~emulovaných komponent. Ukazuje konkrétní problémy, které byly řešeny a~nabádá čtenáře k~souběžnému průzkumu zdrojového kódu.
 	\item[Testování] Předposlední kapitola je zaměřena na testování projektu. Popisuje nejen průběžné testování aplikace, ale i~porovnání věrnosti s~reálným systémem metodou spouštění necertifikovaného kódu na originálním hardwaru.
-	\item[Navazující práce] Poslední kapitola je věnována shrnutí zbývajících funkcionalit, které budou implementovány v~dalších verzích emulační platformy. Slouží především jako pobídka dalším čtenářům-vývojářům, kteří by měli zájem projekt rozšířit ať už v~rámci sebevzdělávání nebo v~rámci vlastní závěrečné práce.
+	\item[Navazující práce] Poslední kapitola je věnována popsání funkcionalit, které mohou být implementovány v~dalších verzích emulační platformy. Slouží především jako pobídka dalším čtenářům-vývojářům, kteří by měli zájem projekt rozšířit ať už v~rámci sebevzdělávání nebo v~rámci vlastní závěrečné práce.
 \end{description}
 
 \begin{note*}[Terminologie]
@@ -1877,7 +1877,7 @@ Projekt je podrobně dokumentován. V~případě většího zájmu o~implementa�
 \end{note}
 
 \section{Struktura projektu}
-Projekt je k~dispozici na veřejném repozitáři na platformě GitHub: \url{https://github.com/andreondra/use}. Součástí repozitáře je celá platforma, implementace NES i~dokumentace a~veškeré pomocné nástroje. Obrázek~\ref{fig:impl-struktura-projektu} strukturu projektu znázorňuje graficky.
+Projekt je k~dispozici na veřejném repozitáři na platformě GitHub~\cite{Golasowski2023:use}. Součástí repozitáře je celá platforma, implementace NES i~dokumentace a~veškeré pomocné nástroje. Obrázek~\ref{fig:impl-struktura-projektu} strukturu projektu znázorňuje graficky.
 
 \begin{figure}[p!]
 %	\centering
@@ -2739,3 +2739,50 @@ Kazeta a~mappery poté byly testovány automaticky pomocí testů na platformě 
 
 \section{Shrnutí}
 Jak je zřejmé z~předchozích odstavců, bez průběžného testování by nebylo možné emulátor vyvinout. I~přes to však zbývá mnoho prostoru pro vylepšení testů, především pro zvukový a~grafický čip. Pro grafický čip je možné testy provádět tak, že se pořídí snímek obrazovky, vytvoří se kontrolní součet a~ten se porovná se \enquote{zlatým standardem}, neboli s~výstupem emulátoru, který je určitě implementován správně. Takové testy budou užitečné především pro budoucí implementátory emulátorů, kteří by si chtěli jednoduše vyzkoušet, jestli je jejich emulátor správně fungující.
+
+%---------------------------------------------------------------
+\chapter{Navazující práce}
+%---------------------------------------------------------------
+Bakalářská práce otevřela mnoho témat, se kterými lze dále pracovat a~na které lze navázat další prací, což stručně popisuje tato kapitola. Navazovat lze nejen na vývoj emulátoru NES, ale i~emulační platformy, popřípadě lze emulační platformu využít pro vývoj jiných emulátorů.
+
+\section{Rozšíření emulátoru konzole}
+Emulovaná konzole NES v~projektu sice již obsahuje vše, co je potřeba pro spouštění jednodušších i~složitějších her, avšak vzhledem ke komplexitě systému je mnoho prostoru pro rozšíření a~zvýšení věrohodnosti emulace.
+
+Přímočaře lze rozšířit množství emulovaných mapperů. Tím, že pro NES vzniklo mnoho softwaru, vzniklo spoustu mapperů použitých třeba~jen v~jednotkách kazet. Mnoho mapperů vzniklo i~pro podporu kazet s~více hrami (takzvané multicarts).
+
+Dále lze jednoznačně rozšířit počet emulovaných zvukových kanálu čipu APU. Ještě zbývá implementovat emulaci generátoru trojúhelníkového signálu a~kanálu pro přehrávání surových zvukových dat.
+
+Hotové emulované součásti NES je také možné ještě vylepšit, například lze implementovat další hardwarové specifika grafického čipu, aby bylo možné spouštět hry simulující trojrozměrný prostor (například \enquote{Ferrari Grand Prix Challenge}).
+
+\section{Rozšíření emulační platformy}
+Dalším výsledkem práce je emulační platforma Universal~System~Emulator. Platforma je zveřejněna v~repozitáři na~GitHubu~\cite{Golasowski2023:use}. Rozšiřování projektu se dá rozdělit do dvou různých částí: rozšíření platformy a~rozšiřování balíku podporovaných komponent a~systémů.
+
+\subsection{Rozšíření funkcionality}
+Samotná platforma má několik chybějících funkcionalit, které jsou využitelné napříč různými emulátory, například zaznamenávání historie stavu komponent a~jeho ukládání. Další funkcionality vhodné k~implementaci se týkají především přenositelnosti emulátoru: zajištění správného fungování zvuku na všech platformách a~nastavení automatické kompilace pro webové prohlížeče (WebAssembly, nástroj Emscripten).
+
+Rozsáhlým plánovaným rozšířením je grafický editor systémů. Rozhraní komponenty bylo již v~rámci bakalářské práce navrhováno tak, aby bylo možné do platformy přidat způsob, jakým s~komponentami pracovat v~grafickém editoru a~skládat je takto do funkčního systému. Tím, že platforma nabízí možnosti komunikace mezi komponentami až na úrovni digitálních signálů, nabízí se mnoho různých zajímavých využití potenciálního grafického editoru. Implementují-li se do platformy hradla, bude možné sestavovat logické obvody. Samozřejmě bude možné propojovat i~stávající komponenty, do obvodu bude tedy jednoduché zapojit například i~procesor 6502. 
+
+Bude-li implementován grafický editor, bude vhodné prozkoumat další využití tohoto editoru ve výuce. Jedním z~návrhů je implementace komponent potřebných k~sestavení mikroarchitektury založené na RISC-V ISA. Takto by bylo možné RISC-V kompatibilní procesor sestavit graficky a~sledovat průběhy signálů mezi jednotlivými komponentami, což bude zajímavé především pro účely výuky počítačových architektur. V~rámci dodatečné rešerše bylo zjištěno, že existují projekty schopné překládat komponenty popsané v~jazyce Verilog do jazyka C/C++ (například \emph{v2c} a~\emph{Verilator}). Vytvořilo-li by se rozhraní mezi existujícími metodami propojení komponent a~rozhraním generovaným těmito nástroji, bude možné do platformy přímo importovat komponenty popsané v~jazyce pro popis hardwaru.
+
+S~výše uvedeným editorem systémů také souvisí možnost vytvářet a~upravovat kód v~jazyce symbolických adres, který by byl na systémech spouštěn. Díky tomu bude moct uživatel napsat kód, který se přeloží do spustitelného strojového kódu přímo na emulované komponentě, kde uživatel uvidí, jak dochází ke zpracování jím napsaného programu.
+
+\subsection{Implementace komponent}
+Tím, že je platforma navržena univerzálně, lze libovolně přidávat další emulované komponenty. Mezi navrženými komponentami, které by byly zajímavé na implementaci, je například jednoduchý $16 \times 2$ LCD displej mapovaný do paměti. Tento displej by bylo možné připojit například k~procesoru, který by na displej mohl vypisovat přímo z~programu.
+
+Dalším návrhem je implementace procesoru CHIP-8, což je jednoduchý procesor obsahující i~primitivní způsob vykreslování grafiky. Je možné implementovat i například~koncept procesoru URISC (ultimate reduced instruction set computer, procesor s~ISA obsahující jedinou instrukci), což je užitečné jako demonstrace primitivního, ale univerzálního počítače.
+
+\section{Vývoj dalších emulátorů}
+Emulační platforma je vhodná jako základ pro využití dalšími projekty, které mají za cíl vytvořit celý emulátor nějakého systému. Díky projektu tito vývojáři nebudou muset přemýšlet, jak vytvořit grafický debugger, jak implementovat zvuk, nebo pro jakou platformu vyvíjet. Platforma Universal System Emulator totiž vše zmíněné zařizuje sama a~navíc je plánována podpora všech hlavních operačních systémů --- Linux, Windows, macOS, Android a~všechny ostatní, na kterých běží moderní webový prohlížeč (Firefox, Safari a~prohlížeče založené na projektu Chromium).
+
+Vývojář emulátoru se tak bude již od začátku vývoje emulátoru zabývat pouze vývojem jednotlivých komponent a~jejich propojování do fungujícího systému, což ušetří mnoho času a~umožní vývojáři se soustředit na části vývoje spjaté s~hardwarem.
+
+Aby se vývoj emulátorů co nejvíce ulehčil, byla vytvořena podrobná dokumentace obsahující popis rozhraní generovaný z~komentářů v~kódu emulátoru a~také podrobný návod k~vývoje vlastních komponent a~systému. Tuto dokumentaci si mohou vývojáři buďto vygenerovat sami pomocí návodu v~repozitáři~\cite{Golasowski2023:use}, nebo mohou využít průběžně automaticky generovanou dokumentaci na GitHub~Pages, na níž je odkazováno také v~repozitáři projektu~\cite{Golasowski2023:use}.
+
+Emulační platformu Universal System Emulator nemusí využít jenom hobby programátoři, kteří se chtějí o~svém oblíbeném systému dozvědět více vývojem emulátoru, ale například i~studenti, kteří takto chtějí bádat v~rámci své závěrečné práce; ať už maturitní nebo bakalářské.
+
+%---------------------------------------------------------------
+\chapter*{Závěr}\addcontentsline{toc}{chapter}{Závěr}\markboth{Závěr}{Závěr}
+%---------------------------------------------------------------
+Primárním cílem práce bylo vytvořit funkční softwarový emulátor konzole Nintendo Entertainment System. Tento primární cíl zahrnoval využití ve výuce, což vyžadovalo vývoj přehledného grafického rozhraní. Tento primární cíl byl v~průběhu 2~let vývoje bakalářského projektu značně rozšířen o~cíle sekundární, kdy nejdůležitějším byl vývoj univerzální platformy pro vývoj emulátorů.
+
+Pro dosažení primárního cíle byla nutná důkladná analýza. Za pomocí hardwarových manuálů, ale i~komunitní dokumentace byl vytvořen přehled principů stojících za fungováním jednotlivých komponent konzole NES. Výsledky analýzy byly podrobně popsány v~textu bakalářské práce, což z~textu vytvořilo užitečný přehled pro potenciální zájemce nejen o~vývoj vlastního emulátoru NES, ale i~o~pochopení principu fungování velmi rozšířené herní konzole.
