@@ -1923,7 +1923,7 @@ Projekt je k~dispozici na veřejném repozitáři na platformě GitHub~\cite{Gol
 \end{figure}
 
 \section{Emulační platforma}
-Princip fungování emulační platformy bude rozebrán od té nejnižší úrovně --- komponenty --- až na celou emulační platformu.
+Princip fungování emulační platformy bude rozebrán od té nejnižší úrovně --- komponenty --- až po celou emulační platformu.
 
 \subsection{Komponenty}
 Každá komponenta, která má být součástí platformy, musí splňovat rozhraní definované abstraktní třídou \mintinline{cpp}|Component|, což se v~C++ provede snadno principem dědění: \mintinline{cpp}|class mojeKomponenta : public Component|. Úkolem této abstraktní třídy je poskytnout komponentě vše potřebné pro začlenění do libovolného systému i~pro samotný běh emulace a~debugging. Pro komunikaci s~ostatními komponentami jsou připraveny následující metody:
@@ -2048,7 +2048,7 @@ Jak lze pozorovat na implementaci mechanismu zpracování zvuku, je jen na vývo
 \subsection{Komunikace komponent}
 Jak bylo popsáno v~návrhové části, komunikace komponent probíhá pomocí tříd~\mintinline{cpp}|Port| a~\mintinline{cpp}|Connector|. Nejprve je ukázáno, jak se jednotlivé třídy používají, poté je vysvětlen princip jejich implementace.
 
-Chce-li komponenta zveřejnit port, pomocí nějž by řídila ostatní komponenty, vybere typ portu a přidá jej jako datovou položku třídy. Poté v~konstruktoru přidá port do seznamu zveřejněných portů: \mintinline{cpp}|m_ports["nazev_portu"] = &m_mujPort|. Dle vybraného typu portu jsou pak k~dispozici různá rozhraní. Typ \mintinline{cpp}|DataPort| je emulací kombinace datových, adresních a~řídicích vodičů, umožňuje komunikovat pomocí metod \mintinline{cpp}|uint32_t read(uint32_t address)| pro přečtení dat z~vybrané adresy a~\mintinline{cpp}|void write(uint32_t address, uint32_t data)| pro zápis dat na zvolenou adresu. Typ \mintinline{cpp}|SignalPort| je poté emulace surových signálů. Umožňuje nastavit logickou úroveň na pomyslném vodiči pomocí \mintinline{cpp}|void set(bool active)|, popřípadě pouze zaslat jeden pomyslný signální pulz (změnu logické hodnoty; je na připojené komponentě, jak jej interpretuje) pomocí \mintinline{cpp}|void send();|. Nastavení logické úrovně je použitelné pro komunikaci s~úrovňovými detektory (u~6502 port IRQ), poslání signálu je poté užitečné pro hranové detektory (u~6502 port NMI).  Do portu je možné připojit konektor, takové rozhraní mají oba typy portů společné: \mintinline{cpp}|void connect(std::weak_ptr<Connector> connector)|. Port po připojení konektoru zkontroluje, zdali je v~konektoru definováno požadované rozhraní a~pokud ano, je možné pomocí portu komunikovat s~připojenou komponentou přes její konektor.
+Chce-li komponenta zveřejnit port, pomocí nějž by řídila ostatní komponenty, vybere typ portu a přidá jej jako datovou položku třídy. Poté v~konstruktoru přidá port do seznamu zveřejněných portů: \mintinline{cpp}|m_ports["nazev_portu"] = &m_mujPort|. Dle vybraného typu portu jsou pak k~dispozici různá rozhraní. Typ \mintinline{cpp}|DataPort| je emulací kombinace datových, adresních a~řídicích vodičů, umožňuje komunikovat pomocí metod \mintinline{cpp}|uint32_t read(uint32_t address)| pro přečtení dat z~vybrané adresy a~\mintinline{cpp}|void write(uint32_t address, uint32_t data)| pro zápis dat na zvolenou adresu. Typ \mintinline{cpp}|SignalPort| je poté emulace surových signálů. Umožňuje nastavit logickou úroveň na pomyslném vodiči pomocí \mintinline{cpp}|void set(bool active)|, popřípadě pouze zaslat jeden pomyslný signální pulz (změnu logické hodnoty; je na připojené komponentě, jak jej interpretuje) pomocí \mintinline{cpp}|void send()|. Nastavení logické úrovně je použitelné pro komunikaci s~úrovňovými detektory (u~6502 port IRQ), poslání signálu je poté užitečné pro hranové detektory (u~6502 port NMI).  Do portu je možné připojit konektor, takové rozhraní mají oba typy portů společné: \mintinline{cpp}|void connect(std::weak_ptr<Connector> connector)|. Port po připojení konektoru zkontroluje, zdali je v~konektoru definováno požadované rozhraní a~pokud ano, je možné pomocí portu komunikovat s~připojenou komponentou přes její konektor.
 
 Chce-li být komponenta řízena jinou komponentou, musí naopak zveřejnit konektor, toť jest typ třídy \mintinline{cpp}|Connector|.  Konektory jsou v~komponentách ukládány do kontejneru typu \mintinline{cpp}|std::map|. Deklarace i~definice probíhá v~konstruktoru. Výpis kódu~\ref{list:use-konfigurace-konektoru} ukazuje, jak lze nadefinovat jak typ konektoru poskytující datové rozhraní, tak typ konektoru poskytující signální rozhraní; prezentovaný kód by byl uveden v~konstruktoru.
 
@@ -2277,10 +2277,6 @@ m_connectors["OAMDMA"] = std::make_shared<Connector>( DataInterface {
 	},
 
 	.write = [&](uint32_t address, uint32_t data) {
-		
-		// Dump contents of 0xXX00-0xXXFF to OAM memory through OAMDATA register.
-		// High byte of address is determined by write to this register (0x4014).
-
 		// Zapisem do 0x4014 se zkopiruje obsah pametove stranky s indexem
 		// dle zapsane hodnoty do pameti OAM cipu PPU.
 		// Napriklad zapisem 0xAA do registru 0x4014 se
@@ -2467,7 +2463,7 @@ Dalšími implementovanými komponentami byly APU a~herní ovladače.
 APU bylo implementováno dle analýz a~návrhu. Důležitá byla především správná implementace registrů v~rozhraní pro procesor. Byly implementovány dva druhy kanálů. Zajímavý problém k~řešení nastal při implementaci výstupu pulzního kanálu APU. V~první verzi platformy nebyl k~dispozici filtr typu dolní propusti, proto nešlo přímo použít surový generovaný signál. Místo toho byla pulzní vlna aproximována za použití Fourierovy řady pro 10 sčítanců. Porovnání lze vidět na obrázku~\ref{fig:impl-fourier}. Použitý vzorec je následující ($f$ frekvence, $d$ střída, $t$ čas):
 
 \[
-vzorek(t) = \frac{2 \cdot amplituda}{\pi}\sum_{n = 1}^{25}{\frac{1}{n}\sin(\pi n d)\cos(2 \pi f t n)}
+vzorek(t) = \frac{2 \cdot amplituda}{\pi}\sum_{n = 1}^{10}{\frac{1}{n}\sin(\pi n d)\cos(2 \pi f t n)}
 \]
 
 \begin{figure}[ht!]
@@ -2710,7 +2706,7 @@ Jako první bylo nutné ověřit, jestli je správně mapován obsah grafické p
 
 Dalším krokem byla implementace zobrazování videopaměti. U~jednoduchých her jako \enquote{Donkey Kong}, které nepoužívají zrcadlení, stačí vykreslit první polovinu paměti tak, jak je uložena --- není potřeba pečlivě provádět sekvenci kroků popisovanou v~části~\ref{sec:ppu-pozadi}. To, jestli je obsah paměti správně vykreslen, lze velice jednoduše ověřit opět několika způsoby: spuštěním softwaru na jiném emulátoru, na skutečné konzoli, nebo prostým porovnáním screenshotů z~fór a~diskusí (což je však nejméně věrohodný zdroj).
 
-Podobným způsobem byla vždy implementována další funkcionalita a~byla testována a~opravována tak dlouho, dokud nebyla funkční. Po implementaci všech základních funkcí čipu je možné zkoušet spouštět různé hry a~zjišťovat, zdali se chovají dle očekávání. Zde však existuje riziko, že samotná hra obsahuje neočekávané chování; některé hry například chybným přístupem do paměti způsobily poškození obrazu, popřípadě zobrazení nesmyslných textů. Například hra \enquote{Ghostbusters} načítá závěrečný text ze špatné pattern table, tudíž dojde k~zobrazení prázdné obrazovky.~\cite{Nesdev:game-bugs} Je jasné, že cílem softwarové emulace je především to, aby správně běželo původní programové vybavení, tudíž testování spouštěním tohoto softwaru je validní. Ovšem důkladnější ladění je možné jen při použití softwaru, jehož chování je přesně definováno. Takovou roli zastávají testy vytvořené komunitou, která vyvinula testovací programy, definovala jejich chování na reálném systému a~zveřejnila je. Velká část používaných testů pochází z~Nesdev~\cite{Nesdev:tests}.
+Podobným způsobem byla vždy implementována další funkcionalita a~byla testována a~opravována tak dlouho, dokud nebyla funkční. Po implementaci všech základních funkcí čipu je možné zkoušet spouštět různé hry a~zjišťovat, zdali se chovají dle očekávání. Zde však existuje riziko, že samotná hra obsahuje neočekávané chování; některé hry například chybným přístupem do paměti způsobily poškození obrazu, popřípadě zobrazení nesmyslných textů. Například hra \enquote{Ghostbusters} načítá závěrečný text ze špatné pattern table, tudíž dojde k~zobrazení prázdné obrazovky~\cite{Nesdev:game-bugs}. Je jasné, že cílem softwarové emulace je především to, aby správně běželo původní programové vybavení, tudíž testování spouštěním tohoto softwaru je validní. Ovšem důkladnější ladění je možné jen při použití softwaru, jehož chování je přesně definováno. Takovou roli zastávají testy vytvořené komunitou, která vyvinula testovací programy, definovala jejich chování na reálném systému a~zveřejnila je. Velká část používaných testů pochází z~Nesdev~\cite{Nesdev:tests}.
 
 \subsection{APU}
 Komponentu APU je složité testovat automatizovanými testy, jelikož je zvukový výstup ovlivněn vlastnostmi použitého filtru. Ruční testy lze provádět pomocí nahrávání zvukového výstupu aplikace a~analýzy výsledného průběhu signálu. Nástroj, který lze pro tyto účely použít, je Audacity.
@@ -2767,12 +2763,12 @@ Bude-li implementován grafický editor, bude vhodné prozkoumat další využit
 S~výše uvedeným editorem systémů také souvisí možnost vytvářet a~upravovat kód v~jazyce symbolických adres, který by byl na systémech spouštěn. Díky tomu bude moct uživatel napsat kód, který se přeloží do spustitelného strojového kódu přímo na emulované komponentě, kde uživatel uvidí, jak dochází ke zpracování jím napsaného programu.
 
 \subsection{Implementace komponent}
-Tím, že je platforma navržena univerzálně, lze libovolně přidávat další emulované komponenty. Mezi navrženými komponentami, které by byly zajímavé na implementaci, je například jednoduchý $16 \times 2$ LCD displej mapovaný do paměti. Tento displej by bylo možné připojit například k~procesoru, který by na displej mohl vypisovat přímo z~programu.
+Tím, že je platforma navržena univerzálně, lze libovolně přidávat další emulované komponenty. Mezi navrženými komponentami, které by byly zajímavé na implementaci, je například jednoduchý $16 \times 2$ LCD mapovaný do paměti. Tento displej by bylo možné připojit například k~procesoru, který by na displej mohl vypisovat přímo z~programu.
 
 Dalším návrhem je implementace procesoru CHIP-8, což je jednoduchý procesor obsahující i~primitivní způsob vykreslování grafiky. Je možné implementovat i například~koncept procesoru URISC (ultimate reduced instruction set computer, procesor s~ISA obsahující jedinou instrukci), což je užitečné jako demonstrace primitivního, ale univerzálního počítače.
 
 \section{Vývoj dalších emulátorů}
-Emulační platforma je vhodná jako základ pro využití dalšími projekty, které mají za cíl vytvořit celý emulátor nějakého systému. Díky projektu tito vývojáři nebudou muset přemýšlet, jak vytvořit grafický debugger, jak implementovat zvuk, nebo pro jakou platformu vyvíjet. Platforma Universal System Emulator totiž vše zmíněné zařizuje sama a~navíc je plánována podpora všech hlavních operačních systémů --- Linux, Windows, macOS, Android a~všechny ostatní, na kterých běží moderní webový prohlížeč (Firefox, Safari a~prohlížeče založené na projektu Chromium).
+Emulační platforma je vhodná jako základ pro využití dalšími projekty, které mají za cíl vytvořit celý emulátor nějakého systému. Díky projektu tito vývojáři nebudou muset přemýšlet, jak vytvořit grafický debugger, jak implementovat zvuk, nebo pro jaký operační systém vyvíjet. Platforma Universal System Emulator totiž vše zmíněné zařizuje sama a~navíc je plánována podpora všech hlavních operačních systémů --- Linux, Windows, macOS, Android a~všechny ostatní, na kterých běží moderní webový prohlížeč (Firefox, Safari a~prohlížeče založené na projektu Chromium).
 
 Vývojář emulátoru se tak bude již od začátku vývoje emulátoru zabývat pouze vývojem jednotlivých komponent a~jejich propojování do fungujícího systému, což ušetří mnoho času a~umožní vývojáři se soustředit na části vývoje spjaté s~hardwarem.
 
