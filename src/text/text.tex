@@ -104,7 +104,7 @@ Instrukce bývají v paměti číslicových počítačů reprezentovány jako st
 		\draw [arrow] (jsa) -- (strojkod);
 		\draw [arrow] (strojkod) -- (signaly);
 	\end{tikzpicture}
-	\caption{~Úrovně abstrakce softwaru.}\label{fig:abstrakce-sw}
+	\caption{Úrovně abstrakce softwaru.}\label{fig:abstrakce-sw}
 \end{figure}
 
 Druhá otázka se již zabývá přiřazením smyslu jednotlivým instrukcím. Množina podporovaných instrukcí včetně dalších potřebných informací (především o způsobu reprezentace a ukládání dat) je součástí architektury procesoru (ISA)~\cite{Kubatova2018:SAP}.
@@ -132,7 +132,7 @@ Všechny úrovně shrnuje diagram~\ref{fig:abstrakce-hw}, kde je zvýrazněna ú
 		\draw [arrow] (reg) -- (hradlo);
 		\draw [arrow] (hradlo) -- (tranzistor);
 	\end{tikzpicture} 
-	\caption{~Úrovně abstrakce hardwaru.}\label{fig:abstrakce-hw}
+	\caption{Úrovně abstrakce hardwaru.}\label{fig:abstrakce-hw}
 \end{figure}
 
 \section{Klíčové hardwarové principy}
@@ -300,7 +300,7 @@ Hlavní sběrnice, kterou ilustruje obrázek~\ref{fig:nes-hlavnisbernice}, je ad
 		\node[slave, below=of s4] (periferie) {Periferie};	
 		\draw[dashed] (s4)--(periferie);
 	\end{tikzpicture}
-	\caption{~Hlavní sběrnice konzole NES.}\label{fig:nes-hlavnisbernice}
+	\caption{Hlavní sběrnice konzole NES.}\label{fig:nes-hlavnisbernice}
 \end{figure}
 
 Procesor má k~dispozici 2~kB paměti RAM. Přímo v~procesoru se nachází čip pro generování zvuku, přezdívaný jako Audio Processing Unit (APU).  Na sběrnici se dále nachází grafický čip \emph{2C02}, označovaný jako Picture Processing Unit (PPU). Jako poslední je na sběrnici několik vstupně-výstupních (I/O) rozhraní: slot pro paměťové médium typu kazeta (cartridge), obchodně označovaná jako Game~Pak, pomocí níž se distribuoval veškerý software pro konzoli, a~porty pro periferie, především herní ovladače.
@@ -342,7 +342,7 @@ Systém obsahuje i~vedlejší sběrnici adresovanou 14~bity (celkem tedy 16~kB a
 		\draw[dashed] (m) -- (s3);
 		
 	\end{tikzpicture}
-	\caption{~Grafická sběrnice konzole NES.}\label{fig:nes-grafickasbernice}
+	\caption{Grafická sběrnice konzole NES.}\label{fig:nes-grafickasbernice}
 \end{figure}
 
 \section{Procesor 6502}
@@ -358,7 +358,7 @@ Adresní prostor je v~terminologii produktové řady MCS650X rozdělen na strán
 
 \begin{table}[ht!]
 	\centering
-	\caption{~Adresní prostor CPU.}\label{tab:cpu-adresniprostor}
+	\caption{Adresní prostor CPU.}\label{tab:cpu-adresniprostor}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|}
 		\hline
 		Adresní rozsah & Zařízení \\
@@ -404,7 +404,7 @@ Komunikace je řízena dvoufázovými systémovými hodinami. V~první fázi se 
 			\end{scope}
 		\end{pgfonlayer}
 	\end{tikztimingtable}
-	\caption{~Časování čtení procesoru.}\label{fig:6502-casovani-cteni}
+	\caption{Časování čtení procesoru.}\label{fig:6502-casovani-cteni}
 \end{figure}
 
 Kromě systémové sběrnice existuje další způsob komunikace, a~to je přerušení. Všechny procesory v~produktové řadě MCS650X obsahují celkem tři vstupy reprezentující různá přerušení: RST, IRQ a~NMI.
@@ -425,7 +425,7 @@ Procesor 6502 obsahuje ve své datové cestě několik registrů. V~tabulce~\ref
 
 \begin{table}[ht!]
 	\centering
-	\caption{~Registry procesoru 6502.}\label{tab:6502-registry}
+	\caption{Registry procesoru 6502.}\label{tab:6502-registry}
 	\begin{tblr}{|Q[c,m]|Q[c,m]|Q[c,m]|X[c,m]|}
 		\hline
 		Registr & Zkratka & Velikost (bit) & Obsah \\
@@ -503,7 +503,7 @@ Nejjednodušší adresní režim se skládá pouze z~operačního znaku (OZ, ang
 		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7} \\
 		\bitbox[]{8}{CLI} & \bitboxes*{1}[bgcolor=bfcommonlight]{01011000}
 	\end{bytefield}
-	\caption{~Struktura instrukce implikovaného adresního režimu s~příkladem instrukce Clear Interrupt Disable Bit (CLI).}\label{fig:6502-adr-impl}
+	\caption{Struktura instrukce implikovaného adresního režimu s~příkladem instrukce Clear Interrupt Disable Bit (CLI).}\label{fig:6502-adr-impl}
 \end{figure}
 
 Další adresní režim pracuje s~konstantní hodnotou, která je uváděná ihned za operačním znakem. To znamená, že se zpracovávaná hodnota nemusí načítat z~paměti pomocí adresy, ale nachází se přímo ve zpracovávaném kódu. Označuje se jako \emph{okamžitý} (immediate) a~instrukci tak tvoří dva bajty. Příklad je uveden na obrázku~\ref{fig:6502-adr-imm}; instrukce AND provede logický součin hodnoty v~akumulátoru s~konstantou \$42.
@@ -517,7 +517,7 @@ Další adresní režim pracuje s~konstantní hodnotou, která je uváděná ihn
 		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7,8,15} \\
 		\bitbox[]{8}{AND} & \bitboxes*{1}[bgcolor=bfcommonlight]{00101001} & \bitboxes*{1}[bgcolor=bfcommonlight]{01000010}
 	\end{bytefield}
-	\caption{~Struktura instrukce okamžitého adresního režimu s~příkladem instrukce AND Memory with Accumulator (AND).}\label{fig:6502-adr-imm}
+	\caption{Struktura instrukce okamžitého adresního režimu s~příkladem instrukce AND Memory with Accumulator (AND).}\label{fig:6502-adr-imm}
 \end{figure}
 
 Adresní režim, který již pracuje s~hodnotami adres, se označuje jako \emph{absolutní}. Součástí instrukce v~tomto režimu je přímá hodnota adresy, kde se nachází kýžená data. Instrukce je tedy 3 bajtová. Formát instrukce i~s~příkladem je na obrázku~\ref{fig:6502-adr-abs}; demonstrovaná instrukce načte do akumulátoru hodnotu ze~zařízení v~adresním prostoru procesoru na adrese \$102.
@@ -531,7 +531,7 @@ Adresní režim, který již pracuje s~hodnotami adres, se označuje jako \emph{
 		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7,8,15,16,23}  \\
 		\bitbox[]{8}{LDA} & \bitboxes*{1}[bgcolor=bfcommonlight]{10101101} & \bitboxes*{1}[bgcolor=bfcommonlight]{00000010} & \bitboxes*{1}[bgcolor=bfcommonlight]{00000001}
 	\end{bytefield}
-	\caption{~Struktura instrukce absolutního adresního režimu s~příkladem instrukce Load Accumulator (LDA).}\label{fig:6502-adr-abs}
+	\caption{Struktura instrukce absolutního adresního režimu s~příkladem instrukce Load Accumulator (LDA).}\label{fig:6502-adr-abs}
 \end{figure}
 
 Absence univerzálních registrů je částečně suplována existencí adresního režimu \emph{nulté stránky} (zero-page). Adresa, která je uvedena za OZ, je jednobajtová. V~tomto režimu je možné indexovat pouze v~rámci jedné stránky, a~to té první (při indexování od nuly nulté) (adresní rozsah \$0000--\$00FF). Zato však tyto instrukce zabírají dva bajty v~instrukční paměti a~jejich zpracování je rychlejší. Na nultou paměťovou stránku je tak možné nahlížet jako na formu ručně spravované cache~---~v~programátorském manuálu řady MSC6500~\cite{mos:sw-manual} je zdůrazněno, že je program možné optimalizovat přesunem nejčastěji používaných hodnot právě do nulté stránky. Formát je znázorněn na obrázku~\ref{fig:6502-adr-zp}; instrukce Store Accumulator načte do akumulátoru bajt z~první paměťové stránky s offsetem \$42.
@@ -545,7 +545,7 @@ Absence univerzálních registrů je částečně suplována existencí adresní
 		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7,8,15}  \\
 		\bitbox[]{8}{STA} & \bitboxes*{1}[bgcolor=bfcommonlight]{10000101} & \bitboxes*{1}[bgcolor=bfcommonlight]{01000010}
 	\end{bytefield}
-	\caption{~Struktura instrukce adresního režimu nulté stránky s~příkladem instrukce Store Accumulator (STA).}\label{fig:6502-adr-zp}
+	\caption{Struktura instrukce adresního režimu nulté stránky s~příkladem instrukce Store Accumulator (STA).}\label{fig:6502-adr-zp}
 \end{figure}
 
 \emph{Relativní} adresování je používáno výlučně instrukcemi větvení. Obsahuje pouze jeden adresní bajt, který reprezentuje offset v~dvojkovém doplňku. Vyhodnotí-li se podmínka skoku kladně a~skok se tedy provádí, je hodnota offsetu přičítána k~adrese následující instrukce (než se podmínka skoku vyhodnotí, nachází se již programový čítač na další adrese). V~JSA obecně není nutné uvádět offset explicitně, uvádí se konkrétní adresa, nebo návěští; pomocí těchto údajů je assembler schopen výsledný offset dopočítat. Režim je demonstrován na instrukci Branch~On~Carry~Set na obrázku~\ref{fig:6502-adr-rel} s~offsetem \$42.
@@ -559,7 +559,7 @@ Absence univerzálních registrů je částečně suplována existencí adresní
 		\bitbox[]{8}{}    		   & \bitheader[endianness=little]{0,7,8,15}  \\
 		\bitbox[]{8}{BCS} & \bitboxes*{1}[bgcolor=bfcommonlight]{10110000} & \bitboxes*{1}[bgcolor=bfcommonlight]{01000010}
 	\end{bytefield}
-	\caption{~Struktura instrukce relativního adresování s~příkladem instrukce Branch On Carry Set (BCS).}\label{fig:6502-adr-rel}
+	\caption{Struktura instrukce relativního adresování s~příkladem instrukce Branch On Carry Set (BCS).}\label{fig:6502-adr-rel}
 \end{figure}
 
 \subsubsection{Adresní režimy s~indexací}
@@ -595,7 +595,7 @@ První zmíněný režim, \emph{indexovaný-nepřímý}, pracuje s~jednobajtovou
 		
 		\bitbox[]{8}{} & \bitbox{8}[bgcolor=bfcommonlight]{\$12} & \bitbox{8}[bgcolor=bfcommonlight]{\$34}
 	\end{bytefield}
-	\caption{~Struktura instrukce indexovaného-nepřímého režimu s~příkladem instrukce STA.}\label{fig:6502-adr-idx-ind}
+	\caption{Struktura instrukce indexovaného-nepřímého režimu s~příkladem instrukce STA.}\label{fig:6502-adr-idx-ind}
 \end{figure}
 
 Druhý režim, \emph{nepřímý-indexovaný}, funguje podobně, ale přičítání indexu probíhá až v~druhém kroku a~používá se registr Y. Po operačním znaku následuje hodnota ukazatele, která se již nemění. Ukazuje do nulté stránky, kde se nachází dvojbajtový základ konečné adresy. K~základu se přičte hodnota registru Y. Vznikne tak konečná adresa, se kterou může daná instrukce dále pracovat. Příklad opět na instrukci STA je uveden na obrázku~\ref{fig:6502-adr-ind-idx}. Tentokrát bude hodnota akumulátoru uložena na adresu \$3422.
@@ -615,7 +615,7 @@ Druhý režim, \emph{nepřímý-indexovaný}, funguje podobně, ale přičítán
 		
 		\bitbox[]{8}{Výpočet:} & \bitbox{8}[bgcolor=bfcommonlight]{\$3412} & \bitbox{1}[]{+} & \bitbox{8}[bgcolor=bfauxlight]{\$10} \\
 	\end{bytefield}
-	\caption{~Struktura instrukce nepřímého-indexovaného režimu s~příkladem instrukce STA.}\label{fig:6502-adr-ind-idx}
+	\caption{Struktura instrukce nepřímého-indexovaného režimu s~příkladem instrukce STA.}\label{fig:6502-adr-ind-idx}
 \end{figure}
 
 Existuje ještě jeden nepřímý režim, označovaný jako \emph{nepřímý absolutní}. Tento režim je použit pouze instrukcí skoku (JMP). Princip je podobný jako u~zmíněných nepřímých režimů s~tím rozdílem, že nedochází k~přičítání indexu. Instrukce se skládá z~operačního znaku a~dvou adresních bajtů, které fungují jako 16bitový ukazatel na výslednou adresu, na kterou se má skočit. V~příkladu na obrázku~\ref{fig:6502-adr-ind} instrukce JMP skočí na adresu uloženou na adrese \$2010, jejíž hodnota je \$FA55 --- skok bude tedy proveden na adresu \$FA55.
@@ -633,7 +633,7 @@ Existuje ještě jeden nepřímý režim, označovaný jako \emph{nepřímý abs
 		
 		\bitbox[]{8}{} & \bitbox{8}[bgcolor=bfcommonlight]{\$55} & \bitbox{8}[bgcolor=bfcommonlight]{\$FA} \\
 	\end{bytefield}
-	\caption{~Struktura instrukce JMP využívající nepřímý absolutní adresní režim s~příkladem skoku na adresu \$FA55.}\label{fig:6502-adr-ind}
+	\caption{Struktura instrukce JMP využívající nepřímý absolutní adresní režim s~příkladem skoku na adresu \$FA55.}\label{fig:6502-adr-ind}
 \end{figure}
 
 \begin{example}[Využití nepřímého adresování]
@@ -669,7 +669,7 @@ Instrukční cyklus odpovídá standardnímu cyklu procesoru, jako uvádí prof.
 		\draw [arrow] (EX) -| (aux);
 		\draw [arrow] (aux) -- (IC);
 	\end{tikzpicture} 
-	\caption{~Instrukční cyklus procesoru.}\label{fig:6502-instrukcni-cyklus}
+	\caption{Instrukční cyklus procesoru.}\label{fig:6502-instrukcni-cyklus}
 \end{figure}
 
 Přesné dodržení instrukčního cyklu nemusí být u~emulace nutné, dokonce bývá zvykem velkou část cyklu zjednodušit pro dosažení většího výkonu tak, že se pracuje pouze na úrovni instrukcí. Jelikož je ale v~systému komponent více, je nutné se zabývat alespoň délkou trvání jednotlivých instrukcí, aby nedocházelo ke ztrátě synchronizace. 
@@ -818,7 +818,7 @@ Přerušení NMI (non-maskable interrupt) je nemaskovatelné a~vyvolává se ste
 			\end{scope}
 		\end{pgfonlayer}
 	\end{tikztimingtable}
-	\caption{~Detekce přerušení NMI.}\label{fig:6502-detekce-nmi}
+	\caption{Detekce přerušení NMI.}\label{fig:6502-detekce-nmi}
 \end{figure}
 
 \subsubsection*{IRQ}
@@ -971,7 +971,7 @@ Pattern table (volně přeložitelné jako tabulka tvarů) je část paměti typ
 		% Poslední řádek.
 		\forloop{tileIndex}{240}{\value{tileIndex} < 256}{\ifx\tileIndex>0 & \fi \bitbox{16}{D\arabic{tileIndex}}} \\ 	
 	\end{bytefield}
-	\caption{~Struktura pattern table čipu PPU.}\label{fig:ppu-pattern-table}
+	\caption{Struktura pattern table čipu PPU.}\label{fig:ppu-pattern-table}
 \end{figure}
 
 Každá dlaždice je reprezentována dvěma v~paměti po sobě jdoucími částmi. Každá část má 8~bajtů, dohromady má tedy dlaždice 16 bajtů. Každý bajt jedné části představuje řádek obrázku; každý bit poté představuje část hodnoty pixelu. Poněvadž se dlaždice skládá ze dvou částí, je pro každý pixel definována dvoubitová hodnota. Dolní bit této hodnoty reprezentuje bit z~první části; horní bit pak ten z~druhé části. Hodnota pixelu se používá pro výběr barvy z~aktivní palety --- celkem jsou k~dispozici čtyři různé barvy, z~toho první barva je pro všechny palety stejná. Princip skládání hodnot pixelu je znázorněn na obrázku~\ref{fig:ppu-pattern-tile}, kde je ukázán i~potenciální výsledný obrázek, pokud by se používala paleta pozadí 3 z~obrázku~\ref{fig:ppu-palety}.
@@ -1472,7 +1472,7 @@ Sekvencer slouží ke generování průběhu signálu. APU obsahuje vnitřní ta
 			\end{scope}
 		\end{pgfonlayer}
 	\end{tikztimingtable}
-	\caption{~Vzhled průběhů signálu pulzního kanálu APU.}\label{fig:apu-signaly}
+	\caption{Vzhled průběhů signálu pulzního kanálu APU.}\label{fig:apu-signaly}
 \end{figure}
 
 \begin{note}[Průběh signálu se 75\% střídou]
@@ -1527,7 +1527,7 @@ Hlavní časovač funguje podobně jako u~pulzního kanálu, po dosažení nulov
 			\draw[color=lfsr] (ch1-6) -- (c6);
 		\end{scope}
 	\end{tikzpicture}
-	\caption{~Zpětnovazební registr generátoru šumu.}\label{fig:apu-sum-LFSR}
+	\caption{Zpětnovazební registr generátoru šumu.}\label{fig:apu-sum-LFSR}
 \end{figure}
 
 Generátor šumu přivádí hodnotu vytvořenou generátorem obálky do mixu za těchto podmínek:
@@ -2040,7 +2040,7 @@ Třídu \mintinline{cpp}|Sound| spravuje platforma (třída \mintinline{cpp}|Emu
 		\draw [arrow] (zdroj3) -- (dp);
 		\draw [arrow] (dp) -- (out);
 	\end{tikzpicture}
-	\caption{~Schéma toku zvukových dat ze 3~zdrojů.}\label{fig:impl-zvuk-tok-dat}
+	\caption{Schéma toku zvukových dat ze 3~zdrojů.}\label{fig:impl-zvuk-tok-dat}
 \end{figure}
 
 Jak lze pozorovat na implementaci mechanismu zpracování zvuku, je jen na vývojáři emulovaných komponent, potažmo systému, kolik zdrojů zvuku platformě poskytne. Je možné vše smíchat vlastním způsobem a~klidně za celý systém předat jen jeden zdroj, nebo předat několik zdrojů za každou komponentu a~přenechat veškeré míchaní na platformě. Samozřejmě je možné nepředávat žádný zdroj, přehrávání zvuku tak nebude k~dispozici.
