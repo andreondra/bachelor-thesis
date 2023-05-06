@@ -33,11 +33,11 @@ Práce je členěna na několik hlavních částí:
 \end{description}
 
 \begin{note*}[Terminologie]
-	Jelikož je bakalářská práce zaměřena na vzdělávací využití, kombinuje odbornost s~populárně-naučným formátem. Počítá se s~faktem, že čtenář se v~oboru informačních technologií již pohybuje. Ačkoliv se v~obrozeneckém duchu používají české (nebo počeštěné) výrazy, vyskytují se i~anglické termíny tam, kde je to běžné a~v~dané situaci lepší volbou. Nemělo by tedy například čtenáře zaskočit, že se občas jako \emph{programové vybavení} počítače označuje výrazem \emph{software} a~\emph{technické vybavení} počítače jako \emph{hardware}.	
+	Jelikož je bakalářská práce zaměřena na vzdělávací využití, kombinuje odbornost s~populárně-naučným formátem. Počítá se s~faktem, že čtenář se v~oboru informačních technologií již pohybuje. Ačkoliv se v~obrozeneckém duchu používají české (nebo počeštěné) výrazy, vyskytují se i~anglické termíny tam, kde je to běžné a~v~dané situaci lepší volbou. Nemělo by tedy například čtenáře zaskočit, že se občas \emph{programové vybavení} počítače označuje výrazem \emph{software} a~\emph{technické vybavení} počítače jako \emph{hardware}.	
 \end{note*}
 
 \begin{note*}[Značení]
-	V~textu se často používají čísla v šestnáctkové soustavě, poněvadž úsporně reprezentují například paměťové adresy. Šestnáctkové číslice se značí předponou amerického dolaru: \$. Desítková čísla jsou uvedena bez předpony.
+	V~textu se často používají čísla v šestnáctkové soustavě, poněvadž úsporně reprezentují například paměťové adresy. Šestnáctková čísla se značí předponou amerického dolaru: \$. Desítková čísla jsou uvedena bez předpony.
 	
 	Dále se používají různé zkratky; jsou uvedeny v~seznamu zkratek. Neobvyklé zkratky se před jejich použitím v~textu vysvětlují.
 	
@@ -66,7 +66,7 @@ V úvodu byl použit pojem emulátor. Pro začátek je tedy vhodné tento pojem 
 
 Dle jiné definice pod pojem emulátor spadá i~hardwarové řešení emulátoru. Tímto se však práce nezabývá, proto bude dále brána v~potaz jen již uvedená softwarová emulace.
 
-Emulace se od podobného pojmu, \emph{simulace}, liší především tím, že se na emulátoru spouští originální programové vybavení emulovaného systému. Nedochází tedy k~napodobení funkce, ale celého hardwaru tak, aby byl schopný věrně interpretovat původní program. V~případě této práce se jedná o~interpretaci instrukcí původně obsaženého v paměti ROM.
+Emulace se od podobného pojmu, \emph{simulace}, liší především tím, že se na emulátoru spouští originální programové vybavení emulovaného systému. Nedochází tedy k~napodobení funkce, ale celého hardwaru tak, aby byl schopný věrně interpretovat původní program. V~případě této práce se jedná o~interpretaci instrukcí původně obsažených v~paměti ROM kazety.
 
 \begin{example}
 V~kontextu herních konzolí lze uvést rozdíl na následujícím příkladu. Simulace by napodobila vzhled a~chování každé jednotlivé hry. Například simulátor příruční herní konzole s~vestavěnou hrou \emph{Tetris} by byla nová implementace hry bez ohledu na hardware, který byl v~konzoli použit. Emulátor by naopak nebral žádný ohled na jakýkoliv software, ale snažil by se věrně napodobit hardwarové vybavení konzole tak, aby bylo možné kopii softwaru (hru) spustit beze změn. Takto je možné provozovat na emulátoru jakékoliv programové vybavení kompatibilní s~daným hardwarem.~\cite{FulberGarcia2022:simulation-emulation}
@@ -82,7 +82,7 @@ Emulaci je možné dělit dle úrovně, na které emulátor pracuje, což je úz
 Běžné počítačové systémy odpovídají teoretickému modelu programovatelného počítače.
 
 \begin{definition}[Programovatelný počítač]
-	Programovatelný počítač je takový počítač, jehož chování lze změnit výměnou programu sestávajícího z~instrukcí uloženého v~paměti.~\normalfont{\cite{Allison1997:SPC}}
+	Programovatelný počítač je takový počítač, jehož chování lze změnit výměnou programu sestávajícího z~instrukcí uložených v~paměti.~\normalfont{\cite{Allison1997:SPC}}
 \end{definition}
 
 Komponentou počítače, která je zodpovědná za řízení, je většinou \emph{procesor}. Proto má smysl se nejdříve zamýšlet nad úrovní abstrakce procesoru, jelikož je to právě ta komponenta, která bude zpracovávat programy a~řídit komponenty ostatní.
@@ -171,7 +171,7 @@ Pamětí jsou takové komponenty, které umožňují ukládat informace v~různ�
 
 Pro přístup do paměti ke konkrétním položkám se používá jejich adresa, která může být různě široká.  Běžně jde o~nezáporné číslo. Množina možných adres je označována jako adresní prostor~\cite{Pluhacek1995:plp}. Součástí adresního prostoru nemusí být jen paměť, ale díky sběrnici i~další komponenty adresované stejnými vodiči. Takto je možné adresy přiřadit i~periferiím, které se pak označují jako periferie mapované do paměti.
 
-Adresa může být členěna na několik částí, což používá i~manuál k~procesoru~6502. V~architektuře 6502 je adresa 16bitová. Je členěna na dvě části po 8~bitech. Horní část dělí paměti na 256 segmentů o~velikosti 256~bajtů označovaných jako paměťová stránka, v~rámci kterých se adresuje dolní částí adresy.~\cite{mos:hw-manual}
+Adresa může být členěna na několik částí, což používá i~manuál k~procesoru~6502. V~architektuře 6502 je adresa 16bitová. Je členěna na dvě části po 8~bitech. Horní část dělí paměti na 256 segmentů o~velikosti 256~bajtů označovaných jako paměťová stránka, v~rámci kterých se adresuje pomocí dolní částí adresy.~\cite{mos:hw-manual}
 
 V~širším kontextu NES je adresa dělena na části o~různých jiných velikostech. Horní část vždy slouží k~adresaci paměťových segmentů, dolní část k~adresaci v~rámci segmentu. V~takovém obecném případě se segmenty označují jako banky, což je hojně používáno v~souvislosti s~manipulací s~adresním prostorem.
 
@@ -217,7 +217,7 @@ Aby bylo možné výsledky testu používající TRAP interpretovat, je třeba m
 	Listing, neboli výpis, je soubor generovaný assemblerem. Obsahuje původní zdrojový kód, kde je navíc každá instrukce doplněna o~adresu, na které se v~paměti nachází, a~také odpovídající strojový kód, do kterého byla přeložena.~\normalfont{\cite{Plantz2021:computer-organization}}
 \end{definition}
 
-Pomocí listingu lze tedy zjistit, jakému řádku ve zdrojovém kódu odpovídá adresa, kde došlo k~zacyklení (TRAP). Analýza chyb poté spočívá v~procházení nejbližšího kódu, často jsou součástí i~komentáře, které popisují očekávané chování a~důvod, proč byl TRAP vyvolán. V~naprosté většině případů je ale nutné rozumět JSA dané instrukční sady a~zároveň i~správně interpretovat program.
+Pomocí listingu lze tedy zjistit, jakému řádku ve zdrojovém kódu odpovídá adresa, kde došlo k~zacyklení (TRAP). Analýza chyb poté spočívá v~procházení nejbližšího kódu. Často jsou součástí kódu i~komentáře, které popisují očekávané chování a~důvod, proč byl TRAP vyvolán. V~naprosté většině případů je ale nutné rozumět JSA dané instrukční sady a~zároveň i~správně interpretovat program.
 
 \section{Další principy}
 \subsection{Přehrávání zvuku}
@@ -226,7 +226,7 @@ Jelikož se v~práci počítá i~s~použitím zvukového výstupu počítače, j
 
 V~nejobecnější rovině spočívá přehrávání zvuku v~pravidelném zasílání dat v~pevně daném formátu do ovladače audio periferií. Jelikož by nemělo docházet k~přerušením během přehrávání (způsobující nepříjemné \enquote{chrastění}), musí být tok zvukových dat souvislý. O~data si pravidelně žádá ovladač prostřednictvím \enquote{callbacku}, což je obyčejná C funkce~\cite{Reid2023:miniaudio}.
 
-Zvuková data jsou složená z~takzvaných rámců (frames), které se skládají ze vzorků (samples). Počet vzorků v~rámci určuje počet audio kanálů (pro stereo jsou to dva kanály --- levý a~pravý). Počet rámců za sekundu určuje vzorkovací frekvence. Callback je ovladačem volán během jedné sekundy vícekrát. Ovladač si vždy požádá o~nějaké množství rámců, což je předáno argumentem. Úkolem aplikace je tedy dodat požadované množství rámců, pro stereo tedy série vzorků levý, pravý, levý, pravý\dots~\cite{Reid2023:miniaudio}
+Zvuková data jsou složená z~takzvaných rámců (frames), které se skládají ze vzorků (samples). Počet vzorků v~rámci určuje počet audio kanálů (pro stereo jsou to dva kanály --- levý a~pravý). Počet rámců za sekundu určuje vzorkovací frekvence. Callback je ovladačem volán během jedné sekundy vícekrát. Ovladač si vždy požádá o~nějaké množství rámců, což je předáno argumentem. Úkolem aplikace je tedy dodat požadované množství rámců, pro stereo série vzorků levý, pravý, levý, pravý\dots~\cite{Reid2023:miniaudio}
 
 \subsection{Synchronizace vláken}
 Vykonávání více úloh prostřednictvím vláken je v~práci použito pouze v~souvislosti se zpracováním zvuku, kdy volání callbacku (viz sekce~\ref{sec:zpracovani-zvuku}) probíhá v~jiném vlákně než vše ostatní. Aby nedocházelo k~souběžnému přístupu k~jednomu zdroji, je nutné zvuková data předávat zvláštním způsobem.
@@ -257,7 +257,7 @@ Komponentou, která byla využívána i~v~jiných systémech, je (kromě základ
 \end{figure}
 
 \section{Nintendo Entertainment System}
-Konzole Nintendo Entertainment System, často zkracována jako NES, je osmibitový zábavní počítačový systém firmy Nintendo, který byl vydán nejprve v Japonsku jako Family Computer (FC, \enquote{Famicom}). První verze je ukázaná na obrázku~\ref{fig:nes}. V~České republice je tento systém znám především díky mnoha klonům (\enquote{televizní hry na žlutých kazetkách}), které byly levnější a~dostupnější než oficiální systém. Tyto klony používaly kopie původního hardwaru, poté se objevily hardwarové emulátory založené na ASIC, které celou konzoli zmenšily do jednoho čipu (proto přezdívány NES-on-a-chip). Tato kapitola má za úkol popsat především technické specifikace systému --- zájemce o~podrobnou historii NES lze odkázat na Wikipedii~\cite{Wikipedia:NES}, \cite{Wikipedia:famiclone}, kde je mnoho odkazů na čínské klony konzole (často s~groteskními názvy: \enquote{Terminator 2 Super Design} od firmy \enquote{ENDING-MAN}, \enquote{Dr. Boy}, \enquote{Fun Time Home Computer: The New System}) a~článek~\cite{Svara:polystation}. Pro ilustraci jsou fotografie některých klonů součástí přílohy~\ref{apx:klony-nes}.
+Konzole Nintendo Entertainment System, často zkracována jako NES, je osmibitový zábavní počítačový systém firmy Nintendo, který byl vydán nejprve v Japonsku jako Family Computer (FC, \enquote{Famicom}). První verze je ukázaná na obrázku~\ref{fig:nes}. V~České republice je tento systém znám především díky mnoha klonům (\enquote{televizní hry na žlutých kazetkách}), které byly levnější a~dostupnější než oficiální systém. Tyto klony používaly kopie původního hardwaru, poté se objevily hardwarové emulátory založené na ASIC, které celou konzoli zmenšily do jednoho čipu (proto přezdívány NES-on-a-chip). Tato kapitola má za úkol popsat především technické specifikace systému --- zájemce o~podrobnou historii NES lze odkázat na Wikipedii~\cite{Wikipedia:NES}, \cite{Wikipedia:famiclone}, kde je mnoho odkazů na čínské klony konzole (často s~groteskními názvy: \enquote{Terminator 2 Super Design} od firmy \enquote{Ending-Man}, \enquote{Dr. Boy}, \enquote{Fun Time Home Computer: The New System}). Pro ilustraci jsou fotografie některých klonů součástí přílohy~\ref{apx:klony-nes}. Další informace o~klonech jsou v~článku~\cite{Svara:polystation}.
 
 \begin{figure}[ht!]
 	\centering
