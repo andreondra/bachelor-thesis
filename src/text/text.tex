@@ -1382,7 +1382,7 @@ Standardní postup při čtení by se tedy dal shrnout takto:
 	\item Postupné vyčítání osmi bitů ze sériového portu na adrese dle požadovaného ovladače (\$4016 či \$4017).
 \end{enumerate}
 
-\section{Audio Processing Unit}
+\section{Zvukový syntezátor Audio Processing Unit}
 \label{sec:APU}
 Součástí procesoru Ricoh~2A03 je také zvukový syntezátor, přezdívaný jako Audio Processing Unit (APU).
 
@@ -1826,8 +1826,8 @@ Pro účely implementace procesoru 6502 v~tomto projektu bude zvolena možnost 3
 
 NES používá mírně upravenou verzi 6502 --- 2A03. Ta zároveň obsahuje zvukový syntezátor. Pro zajištění modularity bude zvukový syntezátor implementován ve zvláštní třídě a~2A03 bude pouze potomkem 6502 s~upravenými vlastnostmi.
 
-\subsection{Grafický čip 2C02 (PPU)}
-Grafický čip může být implementován na více úrovních abstrakce, což bude mít nejvyšší dopad na vykreslování pozadí.
+\subsection{Grafický čip 2C02}
+Grafický čip, neboli PPU, může být implementován na více úrovních abstrakce, což bude mít nejvyšší dopad na vykreslování pozadí.
 
 Tím, že nametable ve videopaměti přímo reprezentuje část pozadí, může být tato část renderování vyřešena prostým vykreslením obsahu nametable. To však je možné pouze pro jednoduché hry nevyužívající posuv (scrolling). Aby bylo možné hrát více her, bude nutné vykreslování řešit po cyklech přesně tak, jak je popsáno v~analytické části. Pro projekt byla zvolena druhá možnost: sice je náročnější jak na implementaci, tak na výkon procesoru, avšak je věrohodnější a~bližší k~hardwarovému vzoru.
 
@@ -2708,7 +2708,7 @@ Dalším krokem byla implementace zobrazování videopaměti. U~jednoduchých he
 
 Podobným způsobem byla vždy implementována další funkcionalita a~byla testována a~opravována tak dlouho, dokud nebyla funkční. Po implementaci všech základních funkcí čipu je možné zkoušet spouštět různé hry a~zjišťovat, zdali se chovají dle očekávání. Zde však existuje riziko, že samotná hra obsahuje neočekávané chování; některé hry například chybným přístupem do paměti způsobily poškození obrazu, popřípadě zobrazení nesmyslných textů. Například hra \enquote{Ghostbusters} načítá závěrečný text ze špatné pattern table, tudíž dojde k~zobrazení prázdné obrazovky~\cite{Nesdev:game-bugs}. Je jasné, že cílem softwarové emulace je především to, aby správně běželo původní programové vybavení, tudíž testování spouštěním tohoto softwaru je validní. Ovšem důkladnější ladění je možné jen při použití softwaru, jehož chování je přesně definováno. Takovou roli zastávají testy vytvořené komunitou, která vyvinula testovací programy, definovala jejich chování na reálném systému a~zveřejnila je. Velká část používaných testů pochází z~Nesdev~\cite{Nesdev:tests}.
 
-\subsection{APU}
+\subsection{Testování APU}
 Komponentu APU je složité testovat automatizovanými testy, jelikož je zvukový výstup ovlivněn vlastnostmi použitého filtru. Ruční testy lze provádět pomocí nahrávání zvukového výstupu aplikace a~analýzy výsledného průběhu signálu. Nástroj, který lze pro tyto účely použít, je Audacity.
 
 V~průběhu vývoje APU byl zjištěn problém s~výstupem zvuku. Generovaný zvuk obsahoval nepříjemné praskání. První krokem bylo zjistit, který kanál je zdrojem problému, tudíž z~výsledného mixu nejprve odstranit pulzní kanál jeho jednoduchým odstraněním z~mixovacího výpočtu a~ponecháním pouze pulzního kanálu. Bylo nutné vybrat software, který určitě používá kanál pro generování šumu; takovým je například hra \enquote{Super Mario Bros.}. Po spuštění softwaru šlo stále slyšet praskání; problémový kanál tak byl identifikován. Nyní je možné nahrát výstup aplikace a~podrobně prozkoumat průběh výstupního signálu. Průběh vyobrazený aplikací Audacity je znázorněn na obrázku~\ref{fig:test-sum-chybne}.
