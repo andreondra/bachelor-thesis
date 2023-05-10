@@ -1421,13 +1421,13 @@ Podrobnější informace o~fungování čítače lze nalézt v~\cite{Nesdev:apu-
 \subsubsection{Mix}
 Míchání všech výstupů probíhá v~mixu. Každý kanál má vlastní digitálně-analogový převodník, výsledkem je pak nelineární míchací schéma odhadnutelné například následujícím výpočtem převzatým z~\cite{Nesdev:apu-mixer}.
 
-\[\textrm{výstup} = \textrm{suma\_pulz} + \textrm{suma\_tnd}\]
+\[\textrm{\emph{výstup}} = suma\_pulz + suma\_tnd\]
 	
 kde jsou jednotlivé složky vyjádřitelné jako
 	
-\[\textrm{suma\_pulz} = \frac{95,88}{\frac{8128}{\textrm{pulz1} + \textrm{pulz2}} + 100}\]
+\[suma\_pulz = \frac{95,88}{\frac{8128}{pulz1 + pulz2} + 100}\]
 
-\[\textrm{suma\_tnd} = \frac{159,79}{\frac{1}{\frac{\textrm{trojúhelnik}}{8227} + \frac{\textrm{šum}}{12241} + \frac{\textrm{pcm}}{22638}} + 100}\]
+\[suma\_tnd = \frac{159,79}{\frac{1}{\frac{\textrm{\emph{trojúhelník}}}{8227} + \frac{\textrm{\emph{šum}}}{12241} + \frac{pcm}{22638}} + 100}\]
 
 \subsection{Generátor pulzů}
 APU obsahuje celkem dva generátory pulzů. Oba se povolují zápisem hodnoty 1 do příslušných bitů ve společném registru \$4015; pro první kanál se jedná o~nejnižší bit a~pro druhý kanál druhý nejnižší bit. Každý z~generátorů se skládá z~pěti komponent:
