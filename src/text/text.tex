@@ -2520,11 +2520,11 @@ Poslední komponentou k~emulaci byly herní ovladače. Tyto ovladače jsou v~př
 Implementaci je důležité náležitě otestovat, aby se ověřilo, zdali neobsahuje chyby a~zdali naplňuje očekávání. Některé testy lze provádět automaticky, jiné nikoliv. Tato kapitola zběžně provádí průběhem testování a~rozebírá zajímavé situace, ke kterým během testování došlo.
 
 \section{Testování univerzálních součástí}
-Jelikož se za pomocí univerzálních součástí staví celý systém, je nutné potenciální chyby eliminovat již na této úrovni; jinak by nebylo možné ověřit, zdali je chyba způsobena komponentou, nebo komunikacemi mezi komponentami.
+Jelikož se za pomocí univerzálních součástí staví celý systém, je nutné potenciální chyby eliminovat již na této úrovni; jinak by nebylo možné ověřit, zdali je chyba způsobena komponentou, nebo komunikací mezi komponentami.
 
-Testy univerzálních komponent lze i~díky jejich malé složitosti provádět automaticky jednoduchými testy integrovanými s~platformou Google Test a~s~nástrojem CTest, tudíž je lze spouštět například při každém commitu do vzdáleného repozitáře na GitHubu a~jednoduše ověřovat, zdali daný commit nechtěně nepoškodil jinou funkci.
+Testy univerzálních komponent lze i~díky jejich malé složitosti provádět automaticky jednoduchými testy integrovanými s~platformou Google Test a~s~nástrojem CTest, tudíž je lze spouštět například při každém commitu do vzdáleného repozitáře na GitHubu a~jednoduše ověřovat, zdali daný commit nechtěně nezpůsobil chybu v~jiné funkci.
 
-Takto jsou testovány veškeré univerzální komponenty i~pomocné třídy: \texttt{Bus}, \texttt{Memory}, \texttt{Trigger} i~\texttt{Connector}. Ukázka testovacích rutin lze nalézt v~příslušných složkách ve zdrojovém kódu.
+Takto jsou testovány veškeré univerzální komponenty i~pomocné třídy: \texttt{Bus}, \texttt{Memory}, \texttt{Trigger} i~\texttt{Connector}. Ukázku testovacích rutin lze nalézt v~příslušných složkách ve zdrojovém kódu.
 
 \section{Testování komponent konzole}
 \subsection{Testování procesoru 6502}
@@ -2644,7 +2644,7 @@ EXPECT_EQ(prevPC, ADR_SUCCESS)
 
 
 \subsubsection{Příklad testování}
-Jedním z~problému, které se v~průběhu vývoje objevily, byl problém s~časováním přerušení. Byla proto vytvořena verze, která lépe odpovídá skutečnému chování. Kvůli tomu ale přestal fungovat test přerušení: \mintinline{text}|6502_interrupt_test.bin|. Tato část popisuje, jak se dá podobná chyba diagnostikovat a~opravit.
+Jedním z~problémů, které se v~průběhu vývoje objevily, byl problém s~časováním přerušení. Byla proto vytvořena verze, která lépe odpovídá skutečnému chování. Kvůli tomu ale přestal fungovat test přerušení: \mintinline{text}|6502_interrupt_test.bin|. Tato část popisuje, jak se dá podobná chyba diagnostikovat a~opravit.
 
 Test se zastavil na adrese \mintinline{text}|$6b2|. Dle listingu tato adresa odpovídá sekci, kde se testují obě přerušení, NMI a~IRQ. Část způsobující chybu je vyobrazena ve výpisu~\ref{list:6502-test-hledani-chyby}. Nejprve se nastaví vyvolání obou typů přerušení instrukcí \mintinline{text}|sta I_port|, přičemž IRQ bylo maskováno (pro stručnost není proces maskování uveden). Čeká se na provedení obslužné rutiny NMI a~otestuje se, zdali proběhlo. Poté se povolí přerušení IRQ instrukcí \mintinline{text}|cli|. Nyní by měla proběhnout rutina IRQ, k~tomu však nedojde a~test se zastaví.
 
@@ -2680,7 +2680,7 @@ Test se zastavil na adrese \mintinline{text}|$6b2|. Dle listingu tato adresa odp
 
 Již na základě této množiny informací lze chybu nalézt. Test nastaví zpětnovazební registr tak, aby byla vyvolána obě přerušení již při prvním testu, kdy se ověřuje NMI. V~dalším testu (ověření IRQ) již pouze povolí přerušení a~hodnotu ve zpětnovazebním registru nemění.
 
-Skutečný procesor 6502 každé přerušení detekuje jiným způsobem. Přerušení IRQ detekuje úrovňový detektor. Při logické nule se zaznamená požadavek na přerušení a~po dokončení stávající instrukce se ověří, zdali přerušení není maskováno. Pokud je, provede se další instrukce normálním způsobem a~požadavek se zahodí. Tento požadavek je ale znovu zaznamenán, pokud je signál stále aktivní (tedy na logické nule). Emulovaný procesor vyvolal při zápisu do zpětnovazebního registru pouze jeden požadavek, choval se tedy jako hranový detektor, což je v~rozporu se skutečným procesorem, a~proto toto chování test vyhodnotil jako chybné. Hranový detektor je použit pouze u~NMI.
+Skutečný procesor 6502 každé přerušení detekuje jiným způsobem. Přerušení IRQ detekuje úrovňový detektor. Při logické nule se zaznamená požadavek na přerušení a~po dokončení stávající instrukce se ověří, zdali přerušení není maskováno. Pokud je, provede se další instrukce obvyklým způsobem a~požadavek se zahodí. Tento požadavek je ale znovu zaznamenán, pokud je signál stále aktivní (tedy na logické nule). Emulovaný procesor vyvolal při zápisu do zpětnovazebního registru pouze jeden požadavek, choval se tedy jako hranový detektor, což je v~rozporu se skutečným procesorem, a~proto toto chování test vyhodnotil jako chybné. Hranový detektor je použit pouze u~NMI.
 
 Stačí tedy funkci odpovídající pinu IRQ implementovat tak, aby se dal nastavovat jeho stav (aktivní a neaktivní), nikoliv pouze vyvolávat signál, jako je to u~NMI. Klíčovou část kódu ukazuje výpis~\ref{list:6502-preruseni-irq-oprava}.
 
@@ -2711,9 +2711,7 @@ Podobným způsobem byla vždy implementována další funkcionalita a~byla test
 \subsection{APU}
 Komponentu APU je složité testovat automatizovanými testy, jelikož je zvukový výstup ovlivněn vlastnostmi použitého filtru. Ruční testy lze provádět pomocí nahrávání zvukového výstupu aplikace a~analýzy výsledného průběhu signálu. Nástroj, který lze pro tyto účely použít, je Audacity.
 
-V~průběhu vývoje APU byl zjištěn problém s~výstupem zvuku. Generovaný zvuk obsahoval nepříjemné praskání.
-
-První krokem bylo zjistit, který kanál je zdrojem problému, tudíž z~výsledného mixu nejprve odstranit pulzní kanál jeho jednoduchým odstraněním z~mixovacího výpočtu a~ponecháním pouze pulzního kanálu. Bylo nutné vybrat software, který určitě používá kanál pro generování šumu; takovým je například hra \enquote{Super Mario Bros.}. Po spuštění softwaru šlo stále slyšet praskání; problémový kanál tak byl identifikován. Nyní je možné nahrát výstup aplikace a~podrobně prozkoumat průběh výstupního signálu. Průběh vyobrazený aplikací Audacity je znázorněn na obrázku~\ref{fig:test-sum-chybne}.
+V~průběhu vývoje APU byl zjištěn problém s~výstupem zvuku. Generovaný zvuk obsahoval nepříjemné praskání. První krokem bylo zjistit, který kanál je zdrojem problému, tudíž z~výsledného mixu nejprve odstranit pulzní kanál jeho jednoduchým odstraněním z~mixovacího výpočtu a~ponecháním pouze pulzního kanálu. Bylo nutné vybrat software, který určitě používá kanál pro generování šumu; takovým je například hra \enquote{Super Mario Bros.}. Po spuštění softwaru šlo stále slyšet praskání; problémový kanál tak byl identifikován. Nyní je možné nahrát výstup aplikace a~podrobně prozkoumat průběh výstupního signálu. Průběh vyobrazený aplikací Audacity je znázorněn na obrázku~\ref{fig:test-sum-chybne}.
 
 \begin{figure}[ht!]
 	\centering
